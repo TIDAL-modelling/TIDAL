@@ -121,7 +121,7 @@ wide2longServer <- function(id) {
 selectDataUI <- function(id, label = "data") {
   ns <- NS(id)
   tagList(
-    selectInput(ns("select"), "Select a dataset", c("Data formatted on previous page", "Upload long formatted data") )
+    selectInput(ns("select"), "Select a dataset", c("ALSPAC", "Data formatted on previous page") )
   )
 }
 
@@ -133,15 +133,15 @@ selectDataServer <- function(id, dataFormatted) {
 
       data <- reactive({
         req(input$select)
-        if (input$select == "Data formatted on previous page"){
-          data <- dataFormatted()
+        if (input$select == "ALSPAC"){
+          data <- readRDS("/Volumes/ALSPAC/users/amelia/Data/dataSubQCLongClean.RDS")
         }
         else {
-          data <- dataFormatted() # edit this to an upload csv option
+          data <- dataFormatted()
         }
       })
 
-    return(data)
+      return(data)
     }
   )
 }
