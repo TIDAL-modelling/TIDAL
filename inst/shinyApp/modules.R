@@ -18,9 +18,9 @@ wide2longUI <- function(id, label = "wide2long") {
   # `NS(id)` returns a namespace function, which was save as `ns` and will
   # invoke later.
   ns <- NS(id)
-  
+
   useShinyjs()
-  
+
   sidebarLayout(
     sidebarPanel(
       tagList(
@@ -42,7 +42,7 @@ wide2longServer <- function(id) {
   moduleServer(
     id,
     function(input, output, session) {
-      
+
       ns <- NS(id)
 
       info <- eventReactive(input$upload, {
@@ -79,7 +79,7 @@ wide2longServer <- function(id) {
 
         dataLong <- info() %>%
           gather(!!input$occ, !!input$age, all_of(input$ageCols))
-        
+
         dataLong[,input$dep_cat] <- dataDep[,input$dep_cat]
         dataLong[,input$dep] <- dataDep[,input$dep]
 
@@ -94,7 +94,7 @@ wide2longServer <- function(id) {
           select(1:5) %>%
           head()
       })
-      
+
       output$downloadData <- downloadHandler(
         filename = function(){
           paste0(Sys.time(), 'LongFormat.csv')
@@ -103,11 +103,11 @@ wide2longServer <- function(id) {
           write.csv(dataLong(), file)
         }
       )
-      
+
       output$warningMsg <- renderText({
-       ifelse(length(input$ageCols) != length(input$depCols), '<b style="color:red">Select same number of columns for age and depression.</b>', '') 
+       ifelse(length(input$ageCols) != length(input$depCols), '<b style="color:red">Select same number of columns for age and depression.</b>', '')
       })
-      
+
     return(dataLong)
     }
   )
@@ -121,7 +121,7 @@ wide2longServer <- function(id) {
 selectDataUI <- function(id, label = "data") {
   ns <- NS(id)
   tagList(
-    selectInput(ns("select"), "Select a dataset", c("ALSPAC", "Data formatted on previous page") )
+    selectInput(ns("select"), "Select a dataset", c("Data formatted on previous page", "Upload long formatted data") )
   )
 }
 
@@ -130,20 +130,20 @@ selectDataServer <- function(id, dataFormatted) {
     id,
     ## Below is the module function
     function(input, output, session) {
-      
+
       data <- reactive({
         req(input$select)
-        if (input$select == "ALSPAC"){
-          data <- readRDS("/Volumes/ALSPAC/users/amelia/Data/dataSubQCLongClean.RDS")
+        if (input$select == "Data formatted on previous page"){
+          data <- dataFormatted()
         }
         else {
-          data <- dataFormatted()
+          data <- dataFormatted() # edit this to an upload csv option
         }
       })
 
     return(data)
     }
-  )    
+  )
 }
 
 # ----------------------------------
@@ -154,7 +154,7 @@ varsSelectUI <- function(id, label = "Variables Selected") {
   # `NS(id)` returns a namespace function, which was save as `ns` and will
   # invoke later.
   ns <- NS(id)
-  
+
   tagList(
   selectInput(ns("ID"), "Name of the ID variable.", choices = c()),
   selectInput(ns("traj"), "Name of variable to model trajectory on.", choices =  c()),
@@ -169,7 +169,7 @@ varsSelectServer <- function(id, varsSelectData) {
     id,
     function(input, output, session) {
       ns <- NS(id)
-    
+
       colVarUpdate <- function(colVar, i){
         observeEvent(varsSelectData(), {
           updateSelectInput(
@@ -180,11 +180,11 @@ varsSelectServer <- function(id, varsSelectData) {
           )
         })
       }
-      
+
       varNames <- list("ID", "traj", "age")
       varIndex <- list(NULL, NULL, NULL)
       map2(varNames, varIndex, \(varNames, varIndex) colVarUpdate(varNames, varIndex))
-      
+
       # special case for covariates that can have nothing selected (figure out a better way for this)
       observeEvent(varsSelectData(), {
         updateSelectInput(
@@ -194,8 +194,8 @@ varsSelectServer <- function(id, varsSelectData) {
           selected = " "
         )
       })
-      
-      
+
+
       modelForm <- reactive({
         if(input$modelType == "Linear"){
           paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
@@ -207,9 +207,9 @@ varsSelectServer <- function(id, varsSelectData) {
           paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (", input$age, "|" , input$ID, ")")
         }
       })
-      
-      
-    return(modelForm)  
+
+
+    return(modelForm)
     }
   )
 }
@@ -221,7 +221,7 @@ modelRunUI <- function(id, label = "Model") {
   # `NS(id)` returns a namespace function, which was save as `ns` and will
   # invoke later.
   ns <- NS(id)
-  
+
   tagList(
   tableOutput(ns("modelStatsFixed")),
   tableOutput(ns("modelStatsRandom"))
@@ -232,15 +232,15 @@ modelRunServer <- function(id, modelData, formCode) {
   moduleServer(
     id,
     function(input, output, session) {
-    
+
     fit <- reactive({
       lmer(formula = formCode(), REML=F , data = modelData())
     })
-    
+
     output$modelStatsFixed <- renderTable(
       tidy(fit(), "fixed")
     )
-    
+
     output$modelStatsRandom <- renderTable(
       print(VarCorr(fit()), digits = 2, comp=c("Variance")) %>%
         as.data.frame() %>%
@@ -255,7 +255,7 @@ modelRunServer <- function(id, modelData, formCode) {
 #### modelPlot
 modelPlotUI <- function(id, label = "Model Plot") {
   ns <- NS(id)
-  
+
   tagList(
   plotOutput(ns("mainPlot"))
   )
@@ -265,7 +265,7 @@ modelPlotServer <- function(id, modelData, modelFit) {
   moduleServer(
     id,
     function(input, output, session) {
-      
+
       # Get the mean and sd for depression scores at each time point
       #################
       ### THE NAMES IN THE FOLLOWING DATAFRAME MIGHT BE DIFFERENT AND THEN IT WILL THROW AN ERROR!!!
@@ -276,7 +276,7 @@ modelPlotServer <- function(id, modelData, modelFit) {
         sd.dep = aggregate( dep ~ occ, modelData(), sd )
         df.plot = list(m.age, m.dep, sd.dep) %>% reduce(left_join, by = "occ") %>%
           dplyr::rename("Age" = age, "Dep" = dep.x, "sd" = dep.y)
-        
+
         # sample size for each time point
         n <- sapply(1:nrow(df.plot), function(i) {
           dep <-  modelData() %>%
@@ -285,7 +285,7 @@ modelPlotServer <- function(id, modelData, modelFit) {
           length(which(!is.na(dep)))
         })
         df.plot$n <- n
-        
+
         # Calculate confidence intervals for mean trajectories
         df.plot$upper <- NA
         df.plot$lower <- NA
@@ -296,19 +296,19 @@ modelPlotServer <- function(id, modelData, modelFit) {
         }
         return(df.plot)
       })
-      
+
       modelDataEdit <- reactive({
         modelData() %>%
           mutate(pred = predict(modelFit(), ., re.form = NA))
       })
-      
+
       output$mainPlot <- renderPlot(
         ggplot(df.plot(),aes(x=Age, y=Dep)) +
           theme_light()+
           geom_point()+
           geom_line() +
           geom_errorbar(aes(ymin = lower, ymax = upper)) +
-          geom_line(data = modelDataEdit(), aes(x=age,  y = pred), na.rm=T) 
+          geom_line(data = modelDataEdit(), aes(x=age,  y = pred), na.rm=T)
       )
       return(df.plot)
     }
@@ -319,7 +319,7 @@ modelPlotServer <- function(id, modelData, modelFit) {
 #### modelCond
 modelCondUI <- function(id, label = "Model Condition Run") {
   ns <- NS(id)
-  
+
   tagList(
     selectInput(ns("condition"), "Select the condition to split trajectory on.", choices = c("CRP_quartile", "IL6_quartile")),
     plotOutput(ns("modelCondPlot")))
@@ -332,14 +332,14 @@ modelCondServer <- function(id, modelData, formCode, dfPlot) {
       fit <- reactive({
         lmer(formula = paste0(formCode(), "+ ", input$condition), REML=F , data = modelData())
       })
-    
+
     modelDataEdit <- reactive({
       modelDataEdit <- modelData() %>%
         mutate(pred = predict(fit(), ., re.form = NA))
       modelDataEdit$Group_Level <- as.factor(modelDataEdit[,input$condition])
       return(modelDataEdit)
     })
-    
+
     cond <- reactive({
       input$condition
     })
@@ -362,19 +362,19 @@ modelCondServer <- function(id, modelData, formCode, dfPlot) {
 
 # -----------------------------------
 #### Template
-templateUI <- function(id, label = "template") {
-  ns <- NS(id)
-  
-  tagList(
-    
-  )
-}
-
-templateServer <- function(id) {
-  moduleServer(
-    id,
-    function(input, output, session) {
-      
-    }
-  )
-}
+# templateUI <- function(id, label = "template") {
+#   ns <- NS(id)
+#
+#   tagList(
+#
+#   )
+# }
+#
+# templateServer <- function(id) {
+#   moduleServer(
+#     id,
+#     function(input, output, session) {
+#
+#     }
+#   )
+# }
