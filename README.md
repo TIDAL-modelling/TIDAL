@@ -10,7 +10,7 @@
 
 ```{r eval=FALSE}
 # install.packages("remotes")
-remotes::install_github("AmeliaEs/trajMods")
+remotes::install_github("AmeliaES/trajMods")
 ```
 
 ### Usage
