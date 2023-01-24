@@ -134,7 +134,7 @@ selectDataServer <- function(id, dataFormatted) {
       data <- reactive({
         req(input$select)
         if (input$select == "ALSPAC"){
-          data <- readRDS("/Volumes/ALSPAC/users/amelia/Data/dataSubQCLongClean.RDS")
+          data <- dataFormatted()
         }
         else {
           data <- dataFormatted()
