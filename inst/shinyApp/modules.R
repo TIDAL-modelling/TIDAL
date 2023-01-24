@@ -31,7 +31,8 @@ wide2longUI <- function(id, label = "wide2long") {
     ),
     mainPanel(
       tagList(
-        htmlOutput(ns("warningMsg")),
+        htmlOutput(ns("warningMsgEmpty")),
+        htmlOutput(ns("warningMsgLen")),
         tableOutput(ns("preview"))
       )
     )
@@ -67,12 +68,18 @@ wide2longServer <- function(id) {
         # Update select input immediately after uploading file.
         updateSelectInput(session, "ageCols","Select columns for age at each assessment:", choices = vars)
         updateSelectInput(session, "depCols","Select columns for depression scores at each assessment:", choices = vars)
+
+        output$warningMsgEmpty <- renderText({
+          ifelse(is.null(input$ageCols) | is.null(input$depCols), '<b style="color:black">Select columns for age and depression, in chronological order.</b>', '')
+        })
+
         f
+
       })
 
       dataLong <- reactive({
         validate(
-          need(length(input$ageCols) == length(input$depCols), "Please select same number of columns for age and depression on the Data Preparation page.")
+          need(length(input$ageCols) == length(input$depCols), "")
         )
         dataDep <- info() %>%
           gather(!!input$dep_cat, !!input$dep, all_of(input$depCols))
@@ -104,7 +111,7 @@ wide2longServer <- function(id) {
         }
       )
 
-      output$warningMsg <- renderText({
+      output$warningMsgLen <- renderText({
         ifelse(length(input$ageCols) != length(input$depCols), '<b style="color:red">Select same number of columns for age and depression.</b>', '')
       })
 
