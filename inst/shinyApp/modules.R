@@ -24,17 +24,17 @@ wide2longUI <- function(id, label = "wide2long") {
   sidebarLayout(
     sidebarPanel(
       tagList(
+        p("Upload a wide format longitudinal dataset:"),
         fileInput(ns("upload"), NULL),
         uiOutput(ns("moreControls"))
       )
-      ),
-      mainPanel(
+    ),
+    mainPanel(
       tagList(
-        p("Preview of the new columns added to your dataframe to convert it to long format:"),
         htmlOutput(ns("warningMsg")),
         tableOutput(ns("preview"))
       )
-      )
+    )
   )
 }
 
@@ -105,14 +105,13 @@ wide2longServer <- function(id) {
       )
 
       output$warningMsg <- renderText({
-       ifelse(length(input$ageCols) != length(input$depCols), '<b style="color:red">Select same number of columns for age and depression.</b>', '')
+        ifelse(length(input$ageCols) != length(input$depCols), '<b style="color:red">Select same number of columns for age and depression.</b>', '')
       })
 
-    return(dataLong)
+      return(dataLong)
     }
   )
 }
-
 
 # ----------------------------------
 #### selectData ####################
@@ -121,7 +120,8 @@ wide2longServer <- function(id) {
 selectDataUI <- function(id, label = "data") {
   ns <- NS(id)
   tagList(
-    selectInput(ns("select"), "Select a dataset", c("ALSPAC", "Data formatted on previous page") )
+    selectInput(ns("select"), "Select a dataset", c("upload", "Data formatted on previous page") ),
+    uiOutput(ns("uploadFile"))
   )
 }
 
@@ -130,13 +130,21 @@ selectDataServer <- function(id, dataFormatted) {
     id,
     ## Below is the module function
     function(input, output, session) {
+      ns <- NS(id)
 
       data <- reactive({
         req(input$select)
-        if (input$select == "ALSPAC"){
-          data <- dataFormatted()
+        if (input$select == "upload"){
+          output$uploadFile <- renderUI({
+            fileInput(ns("upload"), NULL)
+          })
+          req(input$upload)
+          # data <- data.frame("test" = c(1,2,3))
+          data <- fread(input$upload$datapath)
         }
         else {
+          output$uploadFile <- renderUI({
+          })
           data <- dataFormatted()
         }
       })
@@ -145,6 +153,7 @@ selectDataServer <- function(id, dataFormatted) {
     }
   )
 }
+
 
 # ----------------------------------
 #### varsSelect ####################
