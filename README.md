@@ -26,8 +26,10 @@ Now run the function `runShinyTraj()` to start the R Shiny app.
 ### Developing to do:
 
 - add some documentation and user instructions to page 1 and 2.
+- check my code against what Ellen has done, see if I've missed anything.
 - edit analysis page to split trajectory by a condition, eg. sex
 - add a page that shows individual level trajectories (struggling with the R code to get these trajectories from lme4)
+  - this page includes imputing missing age with the mean for each time point. Check if we need this imputed previously for the data exploration page.
 - add a page to show peak velocity (when code available)
 
 - add a module to run when closing the shiny app using `onStop` to remove the functions in modules.R:
