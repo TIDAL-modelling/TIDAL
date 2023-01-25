@@ -198,7 +198,7 @@ varsSelectServer <- function(id, varsSelectData) {
 
       varNames <- list("ID", "traj", "age")
       varIndex <- list(NULL, NULL, NULL)
-      map2(varNames, varIndex, \(varNames, varIndex) colVarUpdate(varNames, varIndex))
+      purrr::map2(varNames, varIndex, \(varNames, varIndex) colVarUpdate(varNames, varIndex))
 
       # special case for covariates that can have nothing selected (figure out a better way for this)
       # observeEvent(varsSelectData(), {
