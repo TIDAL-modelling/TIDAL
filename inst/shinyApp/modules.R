@@ -175,7 +175,7 @@ varsSelectUI <- function(id, label = "Variables Selected") {
   selectInput(ns("ID"), "Name of the ID variable.", choices = c()),
   selectInput(ns("traj"), "Name of variable to model trajectory on.", choices =  c()),
   selectInput(ns("age"), "Name of variable to use for age.", choices =  c()),
-  selectInput(ns("covars"), "Select any covariates to use in the model", choices =  c(), multiple = TRUE),
+  # selectInput(ns("covars"), "Select any covariates to use in the model", choices =  c(), multiple = TRUE),
   selectInput(ns("modelType"), "Select the type of model you'd like to run.", choices = c("Linear", "Quadratic", "Cubic", "Quartic"))
   )
 }
@@ -202,25 +202,25 @@ varsSelectServer <- function(id, varsSelectData) {
       map2(varNames, varIndex, \(varNames, varIndex) colVarUpdate(varNames, varIndex))
 
       # special case for covariates that can have nothing selected (figure out a better way for this)
-      observeEvent(varsSelectData(), {
-        updateSelectInput(
-          session,
-          "covars",
-          choices = c(" ", names(varsSelectData())),
-          selected = " "
-        )
-      })
+      # observeEvent(varsSelectData(), {
+      #   updateSelectInput(
+      #     session,
+      #     "covars",
+      #     choices = c(" ", names(varsSelectData())),
+      #     selected = " "
+      #   )
+      # })
 
 
       modelForm <- reactive({
         if(input$modelType == "Linear"){
           paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
         } else if(input$modelType == "Quadratic"){
-          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (", input$age, "|" , input$ID, ")")
+          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (", input$age, "|" , input$ID, ") + (I(",input$age, ")^2|" , input$ID, ")" )
         } else if(input$modelType == "Cubic"){
-          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (", input$age, "|" , input$ID, ")")
+          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (", input$age, "|" , input$ID, ") + (I(",input$age, ")^2|" , input$ID, ")")
         } else if(input$modelType == "Quartic"){
-          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (", input$age, "|" , input$ID, ")")
+          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (", input$age, "|" , input$ID, ") + (I(",input$age, ")^2|" , input$ID, ")")
         }
       })
 
@@ -239,6 +239,8 @@ modelRunUI <- function(id, label = "Model") {
   ns <- NS(id)
 
   tagList(
+  textOutput(ns("text")),
+  p(""),
   tableOutput(ns("modelStatsFixed")),
   tableOutput(ns("modelStatsRandom"))
   )
@@ -251,6 +253,15 @@ modelRunServer <- function(id, modelData, formCode) {
 
     fit <- reactive({
       lmer(formula = formCode(), REML=F , data = modelData())
+    })
+
+
+    output$text <- renderText({
+      if(nchar(formCode()) > 20 ){            # not the best/hacky way to make sure the formula doesn't show straight away
+        paste0("Model Formula: ", formCode())
+      }else{
+        paste0("Model Formula: ")
+      }
     })
 
     output$modelStatsFixed <- renderTable(
