@@ -2,7 +2,6 @@
 
 library(broom.mixed)
 library(magrittr)
-library(purrr)
 library(lme4)
 library(dplyr)
 library(ggplot2)
