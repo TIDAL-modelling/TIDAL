@@ -2,6 +2,7 @@
 #'
 #' @import shinyjs
 #' @noRd
+#' @export
 wide2longUI <- function(id, label = "wide2long") {
   # `NS(id)` returns a namespace function, which was save as `ns` and will
   # invoke later.
