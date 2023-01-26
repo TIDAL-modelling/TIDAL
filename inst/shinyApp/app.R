@@ -2,10 +2,6 @@
 
 library(shinythemes)
 
-# Run module functions
-appDir <- system.file("shinyApp", package = "trajMods")
-source(paste0(appDir, "/modules.R"))
-
 # Increase maximum file size that can be uploaded
 options(shiny.maxRequestSize = 30*1024^2)
 
@@ -38,7 +34,7 @@ welcome_page <- tabPanel(
 format_page <- tabPanel(
   title = "Data Preparation",
   fluidPage(
-    wide2longUI("wide2long")
+    trajMods:::wide2longUI("wide2long")
   )
 )
 
@@ -55,11 +51,11 @@ overview_page <-   tabPanel(
       tabPanel("Output",
     sidebarLayout(
       sidebarPanel(
-        selectDataUI("select"),
-        varsSelectUI("varsSelect")),
+        trajMods:::selectDataUI("select"),
+        trajMods:::varsSelectUI("varsSelect")),
       mainPanel(
-        modelRunUI("modelRun"),
-        modelPlotUI("modelPlot")
+        trajMods:::modelRunUI("modelRun"),
+        trajMods:::modelPlotUI("modelPlot")
       ))
         )
     )
@@ -69,7 +65,7 @@ overview_page <-   tabPanel(
 intervention_page <- tabPanel(
   title = "Analysis",
   fluidPage(
-    modelCondUI("modelCond")
+    trajMods:::modelCondUI("modelCond")
   )
 )
 
@@ -89,12 +85,12 @@ ui <- navbarPage(
 
 # Main server
 server <- function(input, output, session) {
-  wide2longServer <- wide2longServer("wide2long")
-  selectedDataServer <- selectDataServer("select", dataFormatted=wide2longServer)
-  varsSelectServer <- varsSelectServer("varsSelect", varsSelectData=selectedDataServer)
-  modelRunServer <- modelRunServer("modelRun", modelData = selectedDataServer, formCode = varsSelectServer)
-  modelPlotServer <- modelPlotServer("modelPlot", modelData = selectedDataServer, modelFit = modelRunServer)
-  modelCondServer <- modelCondServer("modelCond", modelData = selectedDataServer, formCode = varsSelectServer, dfPlot = modelPlotServer)
+  wide2longServer <- trajMods:::wide2longServer("wide2long")
+  selectedDataServer <- trajMods:::selectDataServer("select", dataFormatted=wide2longServer)
+  varsSelectServer <- trajMods:::varsSelectServer("varsSelect", varsSelectData=selectedDataServer)
+  modelRunServer <- trajMods:::modelRunServer("modelRun", modelData = selectedDataServer, formCode = varsSelectServer)
+  modelPlotServer <- trajMods:::modelPlotServer("modelPlot", modelData = selectedDataServer, modelFit = modelRunServer)
+  modelCondServer <- trajMods:::modelCondServer("modelCond", modelData = selectedDataServer, formCode = varsSelectServer, dfPlot = modelPlotServer)
 }
 
 # Run the application
