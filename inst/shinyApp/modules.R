@@ -66,12 +66,12 @@ wide2longServer <- function(id) {
       info <- eventReactive(input$upload, {
         output$moreControls <- renderUI(
           tagList(
-            selectInput(ns("ageCols"), "Select columns for age at each assessment:", choices = NULL, multiple = TRUE),
-            selectInput(ns("depCols"), "Select columns for depression scores at each assessment:", choices = NULL, multiple = TRUE),
+            selectInput(ns("ageCols"), "Select columns for age at each time point:", choices = NULL, multiple = TRUE),
+            selectInput(ns("depCols"), "Select columns for the phenotype (eg. depression) at each time point:", choices = NULL, multiple = TRUE),
             textInput(ns("age"), "Name of new column for age:", value = "age"),
             textInput(ns("occ"), "Name of new column for time point:", value = "occ"),
-            textInput(ns("dep"), "Name of new column for depression scores:", value = "dep"),
-            textInput(ns("dep_cat"), "Name of new column for depression grouping/time point:", value = "dep_cat"),
+            textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
+            textInput(ns("dep_cat"), "Name of new column for depression time point:", value = "dep_cat"),
             downloadButton(ns("downloadData"), "Download .csv")
           )
         )
@@ -83,8 +83,8 @@ wide2longServer <- function(id) {
         f <- fread(inFile$datapath)
         vars <- colnames(f)
         # Update select input immediately after uploading file.
-        updateSelectInput(session, "ageCols","Select columns for age at each assessment:", choices = vars)
-        updateSelectInput(session, "depCols","Select columns for depression scores at each assessment:", choices = vars)
+        updateSelectInput(session, "ageCols","Select columns for age at each time point:", choices = vars)
+        updateSelectInput(session, "depCols","Select columns for the phenotype (eg. depression) at each time point:", choices = vars)
 
         output$warningMsgEmpty <- renderText({
           ifelse(is.null(input$ageCols) | is.null(input$depCols), '<b style="color:black">Select columns for age and depression, in chronological order.</b>', '')
@@ -144,7 +144,7 @@ wide2longServer <- function(id) {
 selectDataUI <- function(id, label = "data") {
   ns <- NS(id)
   tagList(
-    selectInput(ns("select"), "Select a dataset", c("upload", "Data formatted on previous page") ),
+    selectInput(ns("select"), "Select a dataset:", c("Upload a long format dataset", "Data formatted on previous page") ),
     uiOutput(ns("uploadFile"))
   )
 }
@@ -158,13 +158,13 @@ selectDataServer <- function(id, dataFormatted) {
 
       data <- reactive({
         req(input$select)
-        if (input$select == "upload"){
+        if (input$select == "Upload a long format dataset"){
           output$uploadFile <- renderUI({
-            fileInput(ns("upload"), NULL)
+            fileInput(ns("Upload a long format dataset"), NULL)
           })
-          req(input$upload)
+          req(input$`Upload a long format dataset`)
           # data <- data.frame("test" = c(1,2,3))
-          data <- fread(input$upload$datapath)
+          data <- fread(input$`Upload a long format dataset`$datapath)
         }
         else {
           output$uploadFile <- renderUI({
@@ -189,11 +189,11 @@ varsSelectUI <- function(id, label = "Variables Selected") {
   ns <- NS(id)
 
   tagList(
-  selectInput(ns("ID"), "Name of the ID variable.", choices = c()),
-  selectInput(ns("traj"), "Name of variable to model trajectory on.", choices =  c()),
-  selectInput(ns("age"), "Name of variable to use for age.", choices =  c()),
+  selectInput(ns("ID"), "Participant ID variable:", choices = c()),
+  selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores:", choices =  c()),
+  selectInput(ns("age"), "Variable for age:", choices =  c()),
   # selectInput(ns("covars"), "Select any covariates to use in the model", choices =  c(), multiple = TRUE),
-  selectInput(ns("modelType"), "Select the type of model you'd like to run.", choices = c("Linear", "Quadratic", "Cubic", "Quartic"))
+  selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic"))
   )
 }
 
@@ -256,8 +256,8 @@ modelRunUI <- function(id, label = "Model") {
   ns <- NS(id)
 
   tagList(
-  textOutput(ns("text")),
-  p(""),
+  htmlOutput(ns("formulaText")),
+  br(),
   tableOutput(ns("modelStatsFixed")),
   tableOutput(ns("modelStatsRandom"))
   )
@@ -273,11 +273,11 @@ modelRunServer <- function(id, modelData, formCode) {
     })
 
 
-    output$text <- renderText({
+    output$formulaText <- renderText({
       if(nchar(formCode()) > 20 ){            # not the best/hacky way to make sure the formula doesn't show straight away
-        paste0("Model Formula: ", formCode())
+        paste0("<b>Model Formula:</b> ", formCode())
       }else{
-        paste0("Model Formula: ")
+        "<b>Model Formula:</b>"
       }
     })
 

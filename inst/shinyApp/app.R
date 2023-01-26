@@ -46,6 +46,13 @@ format_page <- tabPanel(
 overview_page <-   tabPanel(
   title = "Data Exploration",
   fluidPage(
+    tabsetPanel(
+      tabPanel("Instructions",
+               tagList(
+                 h2("Initial data exploration"),
+                 p("Either upload a long format dataframe (csv or tsv) or use the data frame you formatted on the previous page. Then select the columns you wish to use as variables in your model. Inspect the descriptive statistics of your trajectory variable at each time point. Select the model type (eg. linear or a polynomial model) and view the plot of the mean trajectory against these models.")
+               )),
+      tabPanel("Output",
     sidebarLayout(
       sidebarPanel(
         selectDataUI("select"),
@@ -53,6 +60,7 @@ overview_page <-   tabPanel(
       mainPanel(
         modelRunUI("modelRun"),
         modelPlotUI("modelPlot")
+      ))
         )
     )
   )
