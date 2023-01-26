@@ -6,22 +6,15 @@
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
 <!-- badges: end -->
 
-### Installation
+### Installation and useage
 
 ```{r eval=FALSE}
 # install.packages("remotes")
 remotes::install_github("AmeliaES/trajMods")
-```
-
-### Usage
-
-First, load the package:
-
-```{r eval=FALSE}
 library("trajMods")
+# Launch the R Shiny app
+runShinyTraj()
 ```
-
-Now run the function `runShinyTraj()` to start the R Shiny app.
 
 ### Developing to do:
 
