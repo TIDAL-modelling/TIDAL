@@ -1,5 +1,13 @@
 #' Choosing variables from a drop down menu of the column names loaded in the selectData module
 #'
+#' @import broom.mixed
+#' @import lme4
+#' @import dplyr
+#' @import ggplot2
+#' @import data.table
+#' @import shinyjs
+#' @import tidyr
+#'
 #' @noRd
 #' @keywords internal
 #' @export

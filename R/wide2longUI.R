@@ -1,6 +1,13 @@
 #' Shiny module - wide2longUI
 #'
+#' @import broom.mixed
+#' @import lme4
+#' @import dplyr
+#' @import ggplot2
+#' @import data.table
 #' @import shinyjs
+#' @import tidyr
+#'
 #' @noRd
 #' @export
 wide2longUI <- function(id, label = "wide2long") {
