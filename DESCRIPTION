@@ -9,4 +9,4 @@ Description: More about what it does (maybe more than one line)
 License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.3
-Imports: shiny, broom.mixed, data.table, dplyr, ggplot2, lme4, magrittr, shinyjs, shinythemes, tidyr
+Imports: shiny, shinythemes

@@ -258,6 +258,7 @@ modelRunUI <- function(id, label = "Model") {
   tagList(
   htmlOutput(ns("formulaText")),
   br(),
+  tableOutput(ns("desc")),
   tableOutput(ns("modelStatsFixed")),
   tableOutput(ns("modelStatsRandom"))
   )
@@ -280,6 +281,10 @@ modelRunServer <- function(id, modelData, formCode) {
         "<b>Model Formula:</b>"
       }
     })
+
+    # output$desc <- renderTable(
+    #
+    # )
 
     output$modelStatsFixed <- renderTable(
       tidy(fit(), "fixed")
