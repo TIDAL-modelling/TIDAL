@@ -56,7 +56,15 @@ varsSelectServer <- function(id, varsSelectData) {
       })
 
 
-      return(modelForm)
+      return(
+        list(
+        modelForm = modelForm,
+        ID = reactive({ input$ID }),
+        traj = reactive({ input$traj }),
+        age = reactive({ input$age }),
+        modelType = reactive({ input$modelType })
+        )
+      )
     }
   )
 }

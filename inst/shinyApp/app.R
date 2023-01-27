@@ -88,7 +88,9 @@ server <- function(input, output, session) {
   wide2longServer <- trajMods:::wide2longServer("wide2long")
   selectedDataServer <- trajMods:::selectDataServer("select", dataFormatted=wide2longServer)
   varsSelectServer <- trajMods:::varsSelectServer("varsSelect", varsSelectData=selectedDataServer)
-  modelRunServer <- trajMods:::modelRunServer("modelRun", modelData = selectedDataServer, formCode = varsSelectServer)
+  modelRunServer <- trajMods:::modelRunServer("modelRun",
+                                              modelData = selectedDataServer,
+                                              formCode = varsSelectServer$modelForm)
   modelPlotServer <- trajMods:::modelPlotServer("modelPlot", modelData = selectedDataServer, modelFit = modelRunServer)
   modelCondServer <- trajMods:::modelCondServer("modelCond", modelData = selectedDataServer, formCode = varsSelectServer, dfPlot = modelPlotServer)
 }
