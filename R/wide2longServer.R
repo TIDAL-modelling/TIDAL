@@ -26,7 +26,7 @@ wide2longServer <- function(id) {
             textInput(ns("age"), "Name of new column for age:", value = "age"),
             textInput(ns("occ"), "Name of new column for time point:", value = "occ"),
             textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
-            textInput(ns("dep_cat"), "Name of new column for depression time point:", value = "dep_cat"),
+            textInput(ns("dep_cat"), "Name of new column for phenotype time point:", value = "dep_cat"),
             downloadButton(ns("downloadData"), "Download .csv")
           )
         )
