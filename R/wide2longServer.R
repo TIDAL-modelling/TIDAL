@@ -28,7 +28,6 @@ wide2longServer <- function(id) {
             textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
             textInput(ns("dep_cat"), "Name of new column for phenotype category:", value = "dep_cat"),
             checkboxInput(ns("ageImpute"), "Do you want to impute missing age?", value = TRUE ),
-            verbatimTextOutput(ns("value")),
             downloadButton(ns("downloadData"), "Download .csv")
           )
         )
@@ -53,21 +52,18 @@ wide2longServer <- function(id) {
 
       })
 
-      output$value <- renderText({ input$ageImpute })
-
-
       dataLong <- reactive({
         validate(
           need(length(input$ageCols) == length(input$depCols), "")
         )
 
-        # if(input$ageImpute){
-        # # Impute mean age where age is missing
-        # dataWide <- info() #%>%
-        #   # mutate_at(vars( !!input$occ ), ~replace(., is.na(.), mean(., na.rm = T)))
-        # }else{
+        if(isTRUE(input$ageImpute)){
+        # Impute mean age where age is missing
+        dataWide <- info() %>%
+          mutate_at(vars( !!input$ageCols ), ~replace(., is.na(.), mean(., na.rm = T)))
+        }else{
           dataWide <- info()
-        # }
+        }
 
         dataDep <- dataWide %>%
           gather(!!input$dep_cat, !!input$dep, all_of(input$depCols))
