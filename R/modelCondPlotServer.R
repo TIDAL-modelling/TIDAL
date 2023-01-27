@@ -20,14 +20,18 @@ modelCondPlotServer <- function(id,
                             timePoint,
                             conditionVar,
                             covariates,
-                            covarLogical){
+                            covarsLogical){
 
   moduleServer(
     id,
     function(input, output, session) {
 
     modelDataEdit <- reactive({
+      if(!covarsLogical()){
       fit <- lmer(formula = paste0(formCode(), "+ ", conditionVar()), REML=F , data = modelData())
+      }else{
+        fit <- lmer(formula = paste0(formCode(), "+ ", conditionVar(), " + ", paste0(covariates(), collapse = " + ") ), REML=F , data = modelData())
+      }
 
       i <- which(colnames(modelData()) %in% conditionVar())
 
@@ -38,17 +42,14 @@ modelCondPlotServer <- function(id,
       return(modelDataEdit)
     })
 
-    output$test <- renderText({
-      paste(formCode(), "+ ", conditionVar() )
-    })
-
-    output$table <- renderTable({
-    head(modelDataEdit())
-    })
-
-    output$tableCount <- renderTable({
-      modelDataEdit() %>%
-        count(Group_Level)
+    output$form<- renderText({
+      if(nchar(formCode()) > 20 & !as.logical(covarsLogical()) ){            # not the best/hacky way to make sure the formula doesn't show straight away
+        paste0("<b>Model Formula:</b> ", formCode(), "+ ", conditionVar() )
+      }else if(nchar(formCode()) > 20 & as.logical(covarsLogical())){
+        paste0("<b>Model Formula:</b> ", formCode(), "+ ", conditionVar(), " + ", paste(covariates(), collapse = " + ") )
+      }else{
+        "<b>Model Formula:</b>"
+      }
     })
 
     output$modelCondPlot <- renderPlot({

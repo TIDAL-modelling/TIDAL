@@ -70,7 +70,19 @@ intervention_page <- tabPanel(
         trajMods:::modelCondUI("modelCond")
       ),
       mainPanel(
-        trajMods:::modelCondPlotUI("modelCondPlot")
+        tabsetPanel(
+          tabPanel(
+            "Instructions",
+            tagList(
+              h4("Split by variable analysis"),
+              p("Using the model made on the previous page explore some factors which may influence the trajectory. Select from a list of variables (ie. column names) of the dataset to split the trajectory by. There is also the option to include covariates in the model.")
+            )
+          ),
+          tabPanel(
+          "Output",
+          trajMods:::modelCondPlotUI("modelCondPlot")
+          )
+      )
     )
     )
   )
@@ -118,7 +130,7 @@ server <- function(input, output, session) {
                                                 timePoint = varsSelectServer$timePoint,
                                                 conditionVar = modelCondServer$condition,
                                                 covariates = modelCondServer$covariates,
-                                                covarLogical = modelCondServer$covarsLogical)
+                                                covarsLogical = modelCondServer$covarsLogical)
 }
 
 # Run the application

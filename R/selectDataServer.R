@@ -14,10 +14,12 @@ selectDataServer <- function(id, dataFormatted) {
         req(input$select)
         if (input$select == "Upload a long format dataset"){
           output$uploadFile <- renderUI({
-            fileInput(ns("Upload a long format dataset"), NULL)
+            tagList(
+            fileInput(ns("Upload a long format dataset"), NULL),
+            p("Please wait for file to upload.")
+            )
           })
           req(input$`Upload a long format dataset`)
-          # data <- data.frame("test" = c(1,2,3))
           data <- fread(input$`Upload a long format dataset`$datapath)
         }
         else {

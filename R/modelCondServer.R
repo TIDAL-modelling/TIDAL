@@ -41,7 +41,7 @@ modelCondServer <- function(id,
       return(list(
         condition = reactive({input$condition}),
         covariates = reactive({input$covariates}),
-        covarLogical = reactive({input$covarsLogical})
+        covarsLogical = reactive({input$covarsLogical})
       )
       )
     }
