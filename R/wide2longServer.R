@@ -26,7 +26,9 @@ wide2longServer <- function(id) {
             textInput(ns("age"), "Name of new column for age:", value = "age"),
             textInput(ns("occ"), "Name of new column for time point:", value = "occ"),
             textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
-            textInput(ns("dep_cat"), "Name of new column for phenotype time point:", value = "dep_cat"),
+            textInput(ns("dep_cat"), "Name of new column for phenotype category:", value = "dep_cat"),
+            checkboxInput(ns("ageImpute"), "Do you want to impute missing age?", value = TRUE ),
+            verbatimTextOutput(ns("value")),
             downloadButton(ns("downloadData"), "Download .csv")
           )
         )
@@ -37,6 +39,8 @@ wide2longServer <- function(id) {
 
         f <- fread(inFile$datapath)
         vars <- colnames(f)
+
+
         # Update select input immediately after uploading file.
         updateSelectInput(session, "ageCols","Select columns for age at each time point:", choices = vars)
         updateSelectInput(session, "depCols","Select columns for the phenotype (eg. depression) at each time point:", choices = vars)
@@ -49,14 +53,26 @@ wide2longServer <- function(id) {
 
       })
 
+      output$value <- renderText({ input$ageImpute })
+
+
       dataLong <- reactive({
         validate(
           need(length(input$ageCols) == length(input$depCols), "")
         )
-        dataDep <- info() %>%
+
+        # if(input$ageImpute){
+        # # Impute mean age where age is missing
+        # dataWide <- info() #%>%
+        #   # mutate_at(vars( !!input$occ ), ~replace(., is.na(.), mean(., na.rm = T)))
+        # }else{
+          dataWide <- info()
+        # }
+
+        dataDep <- dataWide %>%
           gather(!!input$dep_cat, !!input$dep, all_of(input$depCols))
 
-        dataLong <- info() %>%
+        dataLong <- dataWide %>%
           gather(!!input$occ, !!input$age, all_of(input$ageCols))
 
         dataLong[,input$dep_cat] <- dataDep[,input$dep_cat]
