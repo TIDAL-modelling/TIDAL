@@ -25,9 +25,6 @@ modelPlotServer <- function(id,
     function(input, output, session) {
 
       # Get the mean and sd for depression scores at each time point
-      #################
-      ### THE NAMES IN THE FOLLOWING DATAFRAME MIGHT BE DIFFERENT AND THEN IT WILL THROW AN ERROR!!!
-      #################
       df.plot <- reactive({
         modelData() %>%
           group_by(across( !!timePoint() )) %>%
