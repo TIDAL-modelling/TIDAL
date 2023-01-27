@@ -17,6 +17,7 @@ modelCondPlotUI <- function(id, label = "Model Condition Run") {
   tagList(
     textOutput(ns("test")),
     tableOutput(ns("table")),
+    tableOutput(ns("tableCount")),
     plotOutput(ns("modelCondPlot"))
     )
 }

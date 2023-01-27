@@ -18,7 +18,7 @@ modelCondPlotServer <- function(id,
                             traj,
                             age,
                             timePoint,
-                            condition,
+                            conditionVar,
                             covariates,
                             covarLogical){
 
@@ -27,22 +27,28 @@ modelCondPlotServer <- function(id,
     function(input, output, session) {
 
     modelDataEdit <- reactive({
-      fit <- lmer(formula = paste0(formCode(), "+ ", condition()), REML=F , data = modelData())
+      fit <- lmer(formula = paste0(formCode(), "+ ", conditionVar()), REML=F , data = modelData())
+
+      i <- which(colnames(modelData()) %in% conditionVar())
 
       modelDataEdit <- modelData() %>%
-        mutate(pred = predict(fit, ., re.form = NA))
-
-      modelDataEdit$Group_Level <- as.factor( modelDataEdit[,condition()] )
+        mutate(pred = predict(fit, ., re.form = NA)) %>%
+        mutate(Group_Level = .[[i]] )
 
       return(modelDataEdit)
     })
 
     output$test <- renderText({
-      paste(formCode(), "+ ", condition() )
+      paste(formCode(), "+ ", conditionVar() )
     })
 
     output$table <- renderTable({
-      head(modelDataEdit())
+    head(modelDataEdit())
+    })
+
+    output$tableCount <- renderTable({
+      modelDataEdit() %>%
+        count(sex)
     })
 
     output$modelCondPlot <- renderPlot({
