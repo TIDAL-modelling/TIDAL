@@ -30,8 +30,9 @@ modelCondPlotServer <- function(id,
       fit <- lmer(formula = paste0(formCode(), "+ ", condition()), REML=F , data = modelData())
 
       modelDataEdit <- modelData() %>%
-        mutate(pred = predict(fit, ., re.form = NA)) %>%
-        mutate(Group_Level = as.factor( sex ) )
+        mutate(pred = predict(fit, ., re.form = NA))
+
+      modelDataEdit$Group_Level <- as.factor( modelDataEdit[,condition()] )
 
       return(modelDataEdit)
     })
