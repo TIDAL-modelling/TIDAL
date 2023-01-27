@@ -73,10 +73,10 @@ intervention_page <- tabPanel(
 ui <- navbarPage(
   title = "Multi-Level Modelling",
   theme = shinytheme('united'),
-  tags$style(type="text/css",
-             ".shiny-output-error { visibility: hidden; }",
-             ".shiny-output-error:before { visibility: hidden; }"
-  ),
+  # tags$style(type="text/css",
+  #            ".shiny-output-error { visibility: hidden; }",
+  #            ".shiny-output-error:before { visibility: hidden; }"
+  # ),
   welcome_page,
   format_page,
   overview_page,
@@ -100,7 +100,13 @@ server <- function(input, output, session) {
                                                 traj = varsSelectServer$traj,
                                                 age = varsSelectServer$age,
                                                 timePoint = varsSelectServer$timePoint)
-  modelCondServer <- trajMods:::modelCondServer("modelCond", modelData = selectedDataServer, formCode = varsSelectServer, dfPlot = modelPlotServer)
+  modelCondServer <- trajMods:::modelCondServer("modelCond",
+                                                modelData = selectedDataServer,
+                                                formCode = varsSelectServer$modelForm,
+                                                dfPlot = modelPlotServer,
+                                                traj = varsSelectServer$traj,
+                                                age = varsSelectServer$age,
+                                                timePoint = varsSelectServer$timePoint)
 }
 
 # Run the application
