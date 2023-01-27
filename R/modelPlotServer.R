@@ -12,7 +12,14 @@
 #' @noRd
 #' @keywords internal
 #' @export
-modelPlotServer <- function(id, modelData, modelFit) {
+modelPlotServer <- function(id,
+                            modelData,
+                            modelFit,
+                            SubjectID,
+                            traj,
+                            timePoint,
+                            age
+                            ) {
   moduleServer(
     id,
     function(input, output, session) {

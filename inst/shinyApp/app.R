@@ -90,8 +90,17 @@ server <- function(input, output, session) {
   varsSelectServer <- trajMods:::varsSelectServer("varsSelect", varsSelectData=selectedDataServer)
   modelRunServer <- trajMods:::modelRunServer("modelRun",
                                               modelData = selectedDataServer,
-                                              formCode = varsSelectServer$modelForm)
-  modelPlotServer <- trajMods:::modelPlotServer("modelPlot", modelData = selectedDataServer, modelFit = modelRunServer)
+                                              formCode = varsSelectServer$modelForm,
+                                              SubjectID = varsSelectServer$ID,
+                                              traj = varsSelectServer$traj,
+                                              timePoint = varsSelectServer$timePoint)
+  modelPlotServer <- trajMods:::modelPlotServer("modelPlot",
+                                                modelData = selectedDataServer,
+                                                modelFit = modelRunServer,
+                                                SubjectID = varsSelectServer$ID,
+                                                traj = varsSelectServer$traj,
+                                                age = varsSelectServer$age,
+                                                timePoint = varsSelectServer$timePoint)
   modelCondServer <- trajMods:::modelCondServer("modelCond", modelData = selectedDataServer, formCode = varsSelectServer, dfPlot = modelPlotServer)
 }
 

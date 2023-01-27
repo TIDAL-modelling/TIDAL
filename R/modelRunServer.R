@@ -12,7 +12,15 @@
 #' @noRd
 #' @keywords internal
 #' @export
-modelRunServer <- function(id, modelData, formCode) {
+modelRunServer <- function(id,
+                           modelData,
+                           formCode,
+                           SubjectID,
+                           traj,
+                           age,
+                           timePoint
+                           ) {
+
   moduleServer(
     id,
     function(input, output, session) {
@@ -30,9 +38,16 @@ modelRunServer <- function(id, modelData, formCode) {
         }
       })
 
-      # output$desc <- renderTable(
-      #
-      # )
+      output$desc <- renderTable(
+        modelData() %>%
+          group_by(timePoint()) %>%
+          summarise(N = sum(!is.na(traj())),
+                    mean = mean(traj(), na.rm = T),
+                    SD = sd(traj(), na.rm = T),
+                    median = median(traj(), na.rm = T),
+                    IQR = IQR(traj(), na.rm = T)
+          )
+      )
 
       output$modelStatsFixed <- renderTable(
         tidy(fit(), "fixed")

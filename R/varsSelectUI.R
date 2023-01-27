@@ -18,8 +18,9 @@ varsSelectUI <- function(id, label = "Variables Selected") {
 
   tagList(
     selectInput(ns("ID"), "Participant ID variable:", choices = c()),
-    selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores:", choices =  c()),
-    selectInput(ns("age"), "Variable for time point:", choices =  c()),
+    selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices =  c()),
+    selectInput(ns("age"), "Variable for age at time point (continous):", choices =  c()),
+    selectInput(ns("timePoint"), "Variable for time point (categorical):", choices =  c()),
     # selectInput(ns("covars"), "Select any covariates to use in the model", choices =  c(), multiple = TRUE),
     selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic"))
   )

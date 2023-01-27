@@ -28,8 +28,8 @@ varsSelectServer <- function(id, varsSelectData) {
         })
       }
 
-      varNames <- list("ID", "traj", "age")
-      varIndex <- list(NULL, NULL, NULL)
+      varNames <- list("ID", "traj", "age", "timePoint")
+      varIndex <- list(NULL, NULL, NULL, NULL)
       purrr::map2(varNames, varIndex, \(varNames, varIndex) colVarUpdate(varNames, varIndex))
 
       # special case for covariates that can have nothing selected (figure out a better way for this)
@@ -62,6 +62,7 @@ varsSelectServer <- function(id, varsSelectData) {
         ID = reactive({ input$ID }),
         traj = reactive({ input$traj }),
         age = reactive({ input$age }),
+        timePoint = reactive({ input$timePoint }),
         modelType = reactive({ input$modelType })
         )
       )
