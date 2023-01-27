@@ -15,9 +15,7 @@
 modelRunServer <- function(id,
                            modelData,
                            formCode,
-                           SubjectID,
                            traj,
-                           age,
                            timePoint
                            ) {
 
@@ -40,12 +38,12 @@ modelRunServer <- function(id,
 
       output$desc <- renderTable(
         modelData() %>%
-          group_by(timePoint()) %>%
-          summarise(N = sum(!is.na(traj())),
-                    mean = mean(traj(), na.rm = T),
-                    SD = sd(traj(), na.rm = T),
-                    median = median(traj(), na.rm = T),
-                    IQR = IQR(traj(), na.rm = T)
+          group_by(across( !!timePoint() )) %>%
+          summarise(N = sum(!is.na( !!sym(traj()) )),
+                    mean = mean(!!sym(traj()), na.rm = T),
+                    SD = sd(!!sym(traj()), na.rm = T),
+                    median = median(!!sym(traj()), na.rm = T),
+                    IQR = IQR(!!sym(traj()), na.rm = T)
           )
       )
 

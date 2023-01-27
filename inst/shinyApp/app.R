@@ -73,10 +73,10 @@ intervention_page <- tabPanel(
 ui <- navbarPage(
   title = "Multi-Level Modelling",
   theme = shinytheme('united'),
-  # tags$style(type="text/css",
-  #            ".shiny-output-error { visibility: hidden; }",
-  #            ".shiny-output-error:before { visibility: hidden; }"
-  # ),
+  tags$style(type="text/css",
+             ".shiny-output-error { visibility: hidden; }",
+             ".shiny-output-error:before { visibility: hidden; }"
+  ),
   welcome_page,
   format_page,
   overview_page,
@@ -91,7 +91,6 @@ server <- function(input, output, session) {
   modelRunServer <- trajMods:::modelRunServer("modelRun",
                                               modelData = selectedDataServer,
                                               formCode = varsSelectServer$modelForm,
-                                              SubjectID = varsSelectServer$ID,
                                               traj = varsSelectServer$traj,
                                               timePoint = varsSelectServer$timePoint)
   modelPlotServer <- trajMods:::modelPlotServer("modelPlot",

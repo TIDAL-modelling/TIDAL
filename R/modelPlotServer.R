@@ -29,9 +29,9 @@ modelPlotServer <- function(id,
       ### THE NAMES IN THE FOLLOWING DATAFRAME MIGHT BE DIFFERENT AND THEN IT WILL THROW AN ERROR!!!
       #################
       df.plot <- reactive({
-        m.age = aggregate( age ~ occ, modelData(), mean )
-        m.dep = aggregate( dep ~ occ, modelData(), mean )
-        sd.dep = aggregate( dep ~ occ, modelData(), sd )
+        m.age = aggregate( age() ~ timePoint(), modelData(), mean )
+        m.dep = aggregate( traj() ~ timePoint(), modelData(), mean )
+        sd.dep = aggregate( traj() ~ timePoint(), modelData(), sd )
         df.plot = list(m.age, m.dep, sd.dep) %>% purrr::reduce(left_join, by = "occ") %>%
           dplyr::rename("Age" = age, "Dep" = dep.x, "sd" = dep.y)
 
