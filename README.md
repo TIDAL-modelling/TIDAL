@@ -18,11 +18,22 @@ runShinyTraj()
 
 ### Developing to do:
 
-- add some documentation and user instructions to page 1 and 2.
-- check my code against what Ellen has done, see if I've missed anything.
+- edit data exploration page
+  - make pretty table of random and fixed effects
+  - tab the output into descriptive stats, model summary and plot
 - edit analysis page to split trajectory by a condition, eg. sex
+  - add UI input for covariates
+  - UI for categorical value to split on
+  - output of final model that is run
+  - output of table of model rand and fix effects
+  - output of plot
+  - add documention/instructions
 - add a page that shows individual level trajectories (struggling with the R code to get these trajectories from lme4)
-  - this page includes imputing missing age with the mean for each time point. Check if we need this imputed previously for the data exploration page.
+  - add documention/instructions
 - add a page to show peak velocity (when code available)
-- change module script into a series of internal functions https://blog.r-hub.io/2019/12/12/internal-functions/
+  - add documention/instructions
+- add a synthetic dataset to package and Shiny, so people can use this dataset to explore the tool if they don't have their own
+- make gifs/videos to demostrate the main features of the app
+- add a feature that returns an R script at the end of analysis with the code for the analysis that has been conducted.
+
 
