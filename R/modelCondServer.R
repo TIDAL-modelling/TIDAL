@@ -21,10 +21,12 @@ modelCondServer <- function(id,
       ns <- NS(id)
 
       observeEvent(modelData(),{
+
+
         updateSelectInput(
           session,
           "condition",
-          choices = names(modelData())
+          choices = colnames(modelData())[apply(modelData(), 2, function(x) length(unique(x))) < 40]
         )
       })
 

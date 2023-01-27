@@ -48,7 +48,7 @@ modelCondPlotServer <- function(id,
 
     output$tableCount <- renderTable({
       modelDataEdit() %>%
-        count(sex)
+        count(Group_Level)
     })
 
     output$modelCondPlot <- renderPlot({
@@ -57,7 +57,7 @@ modelCondPlotServer <- function(id,
         geom_point()+
         geom_line() +
         geom_errorbar(aes(ymin = lower, ymax = upper)) +
-        geom_line(data = modelDataEdit(), aes(x= !!sym(age()) ,  y = pred, color = Group_Level ) , na.rm=T)+
+        geom_line(data = modelDataEdit(), aes(x= !!sym(age()) ,  y = pred, color = factor(Group_Level) ) , na.rm=T)+
         scale_colour_discrete(na.translate = F)
     })
   }
