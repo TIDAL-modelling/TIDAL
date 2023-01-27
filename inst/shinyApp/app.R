@@ -65,7 +65,14 @@ overview_page <-   tabPanel(
 intervention_page <- tabPanel(
   title = "Analysis",
   fluidPage(
-    trajMods:::modelCondUI("modelCond")
+    sidebarLayout(
+      sidebarPanel(
+        trajMods:::modelCondUI("modelCond")
+      ),
+      mainPanel(
+        trajMods:::modelCondPlotUI("modelCondPlot")
+    )
+    )
   )
 )
 
@@ -101,12 +108,17 @@ server <- function(input, output, session) {
                                                 age = varsSelectServer$age,
                                                 timePoint = varsSelectServer$timePoint)
   modelCondServer <- trajMods:::modelCondServer("modelCond",
+                                                modelData = selectedDataServer)
+  modelCondPlotServer <- trajMods:::modelCondPlotServer("modelCondPlot",
                                                 modelData = selectedDataServer,
                                                 formCode = varsSelectServer$modelForm,
                                                 dfPlot = modelPlotServer,
                                                 traj = varsSelectServer$traj,
                                                 age = varsSelectServer$age,
-                                                timePoint = varsSelectServer$timePoint)
+                                                timePoint = varsSelectServer$timePoint,
+                                                condition = modelCondServer$condition,
+                                                covariates = modelCondServer$covariates,
+                                                covarLogical = modelCondServer$covarsLogical)
 }
 
 # Run the application
