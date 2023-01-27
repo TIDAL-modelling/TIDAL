@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import magrittr
 #'
 #' @noRd
 #' @keywords internal
@@ -40,7 +41,7 @@ modelRunServer <- function(id, modelData, formCode) {
       output$modelStatsRandom <- renderTable(
         print(VarCorr(fit()), digits = 2, comp=c("Variance")) %>%
           as.data.frame() %>%
-          set_rownames(NULL)
+          magrittr::set_rownames(NULL)
       )
       return(fit)
     }

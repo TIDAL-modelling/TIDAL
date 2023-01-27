@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import purrr
 #'
 #' @noRd
 #' @keywords internal
@@ -24,7 +25,7 @@ modelPlotServer <- function(id, modelData, modelFit) {
         m.age = aggregate( age ~ occ, modelData(), mean )
         m.dep = aggregate( dep ~ occ, modelData(), mean )
         sd.dep = aggregate( dep ~ occ, modelData(), sd )
-        df.plot = list(m.age, m.dep, sd.dep) %>% reduce(left_join, by = "occ") %>%
+        df.plot = list(m.age, m.dep, sd.dep) %>% purrr::reduce(left_join, by = "occ") %>%
           dplyr::rename("Age" = age, "Dep" = dep.x, "sd" = dep.y)
 
         # sample size for each time point
