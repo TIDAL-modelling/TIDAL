@@ -52,15 +52,6 @@ modelRunServer <- function(id,
           )
       )
 
-      # ------------------------------------------
-      # model results
-      output$modelStatsFixed <- renderTable(
-        tidy(fit(), "fixed")
-      )
-
-      output$modelStatsRandom <- renderTable(
-        VarCorr(fit())
-      )
       return(fit)
     }
   )
