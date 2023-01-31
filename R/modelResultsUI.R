@@ -1,4 +1,4 @@
-#' Run model
+#' Show fixed and random effects
 #'
 #' @import broom.mixed
 #' @import lme4
@@ -11,14 +11,18 @@
 #' @noRd
 #' @keywords internal
 #' @export
-modelRunUI <- function(id, label = "Model") {
+modelResultsUI <- function(id, label = "Model") {
   # `NS(id)` returns a namespace function, which was save as `ns` and will
   # invoke later.
   ns <- NS(id)
 
   tagList(
-    h4("Descriptive Statistics"),
-    tableOutput(ns("desc"))
+    htmlOutput(ns("formulaText")),
+    br(),
+    h4("Fixed Effects"),
+    tableOutput(ns("modelStatsFixed")),
+    h4("Random Effects"),
+    tableOutput(ns("modelStatsRandom"))
     )
 }
 
