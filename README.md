@@ -18,9 +18,9 @@ runShinyTraj()
 
 ### Developing to do:
 
+- document module functions with ROxygen 
 - edit data exploration page
-  - make pretty table of random and fixed effects
-  - tab the output into descriptive stats, model summary and plot
+  - Tab for fixed/random effect results (model formula on this page)
 - edit analysis page to split trajectory by a condition, eg. sex
   - output of final model that is run
   - output of table of model rand and fix effects
