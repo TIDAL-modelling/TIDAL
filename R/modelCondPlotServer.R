@@ -26,6 +26,8 @@ modelCondPlotServer <- function(id,
     id,
     function(input, output, session) {
 
+    # ---------------------------------------
+    # paste the formula depending on whether covariates are wanted or not
     modelDataEdit <- reactive({
       if(!covarsLogical()){
       fit <- lmer(formula = paste0(formCode(), "+ ", conditionVar()), REML=F , data = modelData())
@@ -33,8 +35,11 @@ modelCondPlotServer <- function(id,
         fit <- lmer(formula = paste0(formCode(), "+ ", conditionVar(), " + ", paste0(covariates(), collapse = " + ") ), REML=F , data = modelData())
       }
 
+      # select the index for the column that the user wants to split the analysis on
       i <- which(colnames(modelData()) %in% conditionVar())
 
+      # add the "predicted" column to this dataset (it's not really a prediction because its the same dataset, it just shows the model)
+      # add a column for coloring the plot by the split by variable
       modelDataEdit <- modelData() %>%
         mutate(pred = predict(fit, ., re.form = NA)) %>%
         mutate(Group_Level = .[[i]] )
@@ -42,6 +47,8 @@ modelCondPlotServer <- function(id,
       return(modelDataEdit)
     })
 
+    # ---------------------------------------
+    # Paste the model formula for the user to see (don't want it to appear straight away - could improve this)
     output$form<- renderText({
       if(nchar(formCode()) > 20 & !as.logical(covarsLogical()) ){            # not the best/hacky way to make sure the formula doesn't show straight away
         paste0("<b>Model Formula:</b> ", formCode(), "+ ", conditionVar() )
@@ -52,6 +59,8 @@ modelCondPlotServer <- function(id,
       }
     })
 
+    # ---------------------------------------
+    # Plot the split by variable plot
     output$modelCondPlot <- renderPlot({
       ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
         theme_light()+

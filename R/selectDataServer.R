@@ -6,10 +6,11 @@
 selectDataServer <- function(id, dataFormatted) {
   moduleServer(
     id,
-    ## Below is the module function
+    # Below is the module function
     function(input, output, session) {
       ns <- NS(id)
 
+      # if the user wants to upload a file, add a UI for this
       data <- reactive({
         req(input$select)
         if (input$select == "Upload a long format dataset"){
@@ -22,7 +23,7 @@ selectDataServer <- function(id, dataFormatted) {
           req(input$`Upload a long format dataset`)
           data <- fread(input$`Upload a long format dataset`$datapath)
         }
-        else {
+        else { # otherwise the user can use the data from the previous wide2long module using the dataFormatted argument
           output$uploadFile <- renderUI({
           })
           data <- dataFormatted()

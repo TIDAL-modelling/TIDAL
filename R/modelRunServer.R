@@ -23,11 +23,14 @@ modelRunServer <- function(id,
     id,
     function(input, output, session) {
 
+      # ------------------------------------------
+      # run the model
       fit <- reactive({
         lmer(formula = formCode(), REML=F , data = modelData())
       })
 
-
+      # ------------------------------------------
+      # paste the formula text
       output$formulaText <- renderText({
         if(nchar(formCode()) > 20 ){            # not the best/hacky way to make sure the formula doesn't show straight away
           paste0("<b>Model Formula:</b> ", formCode())
@@ -36,6 +39,8 @@ modelRunServer <- function(id,
         }
       })
 
+      # ------------------------------------------
+      # show descriptive statistics
       output$desc <- renderTable(
         modelData() %>%
           group_by(across( !!timePoint() )) %>%
@@ -47,15 +52,6 @@ modelRunServer <- function(id,
           )
       )
 
-      output$modelStatsFixed <- renderTable(
-        tidy(fit(), "fixed")
-      )
-
-      output$modelStatsRandom <- renderTable(
-        print(VarCorr(fit()), digits = 2, comp=c("Variance")) %>%
-          as.data.frame() %>%
-          magrittr::set_rownames(NULL)
-      )
       return(fit)
     }
   )

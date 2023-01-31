@@ -17,6 +17,7 @@ varsSelectServer <- function(id, varsSelectData) {
     function(input, output, session) {
       ns <- NS(id)
 
+      # Update UI of ID, traj, age and timePoint with drop down choices of all the column names in varsSelectData (output from selectDataServer.R)
       colVarUpdate <- function(colVar, i){
         observeEvent(varsSelectData(), {
           updateSelectInput(
@@ -42,7 +43,7 @@ varsSelectServer <- function(id, varsSelectData) {
       #   )
       # })
 
-
+      # add what type of model to run and input the different formula here:
       modelForm <- reactive({
         if(input$modelType == "Linear"){
           paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")

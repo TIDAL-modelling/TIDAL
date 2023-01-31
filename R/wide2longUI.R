@@ -1,4 +1,4 @@
-#' Shiny module - wide2longUI
+#' This function takes a wide format dataset and converts it to a long format dataset.
 #'
 #' @import broom.mixed
 #' @import lme4

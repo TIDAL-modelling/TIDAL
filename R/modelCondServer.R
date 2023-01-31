@@ -22,7 +22,11 @@ modelCondServer <- function(id,
 
       observeEvent(modelData(),{
 
-
+        # allow the user to select a variable from the column names of the dataset
+        # critically this should be categorical variables (for the plot to split by a factor)
+        # hacky way to choose a categorical variable is below
+        # user can only select columns with unique values of length < 40. 40 being an arbitary number
+        # but any more than this may not be very useful or visible on a plot, 40 is already a lot.
         updateSelectInput(
           session,
           "condition",
@@ -30,7 +34,7 @@ modelCondServer <- function(id,
         )
       })
 
-
+      # Select the covariates based on col names, user can choose anything - not like above.
       output$covarsOpt <- renderUI({
         if(isTRUE(input$covarsLogical)){
             selectInput(ns("covariates"), "Select covariates:", choices = colnames(modelData()), multiple = TRUE )

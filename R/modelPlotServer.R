@@ -24,6 +24,7 @@ modelPlotServer <- function(id,
     id,
     function(input, output, session) {
 
+      # ------------------------------------------
       # Get the mean and sd for depression scores at each time point
       df.plot <- reactive({
         modelData() %>%
@@ -38,11 +39,15 @@ modelPlotServer <- function(id,
 
       })
 
+      # ------------------------------------------
+      # add the "prediction"/model col to dataframe
       modelDataEdit <- reactive({
         modelData() %>%
           mutate(pred = predict(modelFit(), ., re.form = NA))
       })
 
+      # ------------------------------------------
+      # plot the mean trajectory against the model
       output$mainPlot <- renderPlot(
         ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
           theme_light()+
