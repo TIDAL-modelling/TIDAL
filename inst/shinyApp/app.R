@@ -135,9 +135,10 @@ server <- function(input, output, session) {
                                                 traj = varsSelectServer$traj,
                                                 age = varsSelectServer$age,
                                                 timePoint = varsSelectServer$timePoint,
-                                                conditionVar = modelCondServer$condition,
-                                                covariates = modelCondServer$covariates,
-                                                covarsLogical = modelCondServer$covarsLogical)
+                                                conditionVar = modelCondServer$condition#,
+                                                # covariates = modelCondServer$covariates,
+                                                # covarsLogical = modelCondServer$covarsLogical
+                                                )
 }
 
 # Run the application
