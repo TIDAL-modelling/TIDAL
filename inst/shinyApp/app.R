@@ -54,8 +54,11 @@ overview_page <-   tabPanel(
         trajMods:::selectDataUI("select"),
         trajMods:::varsSelectUI("varsSelect")),
       mainPanel(
-        trajMods:::modelRunUI("modelRun"),
-        trajMods:::modelPlotUI("modelPlot")
+        tabsetPanel(
+          tabPanel("Descriptive Statistics",
+        trajMods:::modelRunUI("modelRun")),
+        tabPanel("Plot",
+        trajMods:::modelPlotUI("modelPlot")))
       ))
         )
     )
