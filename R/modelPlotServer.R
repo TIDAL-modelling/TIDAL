@@ -25,21 +25,6 @@ modelPlotServer <- function(id,
     function(input, output, session) {
 
       # ------------------------------------------
-      # Get the mean and sd for depression scores at each time point
-      df.plot <- reactive({
-        modelData() %>%
-          group_by(across( !!timePoint() )) %>%
-          summarise(Age = mean(!!sym(age()), na.rm = T),
-                    Phenotype = mean(!!sym(traj()), na.rm = T),
-                    SD = sd(!!sym(traj()), na.rm = T),
-                    n = sum(!is.na( !!sym(traj()) ))
-          ) %>%
-          mutate(upper = Phenotype + ( qnorm(0.975)*SD/sqrt(n) ),
-                 lower = Phenotype - ( qnorm(0.975)*SD/sqrt(n) ))
-
-      })
-
-      # ------------------------------------------
       # add the "prediction"/model col to dataframe
       modelDataEdit <- reactive({
         modelData() %>%

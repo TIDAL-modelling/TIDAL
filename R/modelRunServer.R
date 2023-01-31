@@ -15,6 +15,7 @@
 modelRunServer <- function(id,
                            modelData,
                            formCode,
+                           age,
                            traj,
                            timePoint
                            ) {
@@ -30,16 +31,6 @@ modelRunServer <- function(id,
       })
 
       # ------------------------------------------
-      # paste the formula text
-      output$formulaText <- renderText({
-        if(nchar(formCode()) > 20 ){            # not the best/hacky way to make sure the formula doesn't show straight away
-          paste0("<b>Model Formula:</b> ", formCode())
-        }else{
-          "<b>Model Formula:</b>"
-        }
-      })
-
-      # ------------------------------------------
       # show descriptive statistics
       output$desc <- renderTable(
         modelData() %>%
@@ -50,6 +41,31 @@ modelRunServer <- function(id,
                     median = median(!!sym(traj()), na.rm = T),
                     IQR = IQR(!!sym(traj()), na.rm = T)
           )
+      )
+
+      # ------------------------------------------
+      # Plot the distributions
+      # Get the mean and sd for depression scores at each time point
+      df.plot <- reactive({
+        modelData() %>%
+          group_by(across( !!timePoint() )) %>%
+          summarise(Age = mean(!!sym(age()), na.rm = T),
+                    Phenotype = mean(!!sym(traj()), na.rm = T),
+                    SD = sd(!!sym(traj()), na.rm = T),
+                    n = sum(!is.na( !!sym(traj()) ))
+          ) %>%
+          mutate(upper = Phenotype + ( qnorm(0.975)*SD/sqrt(n) ),
+                 lower = Phenotype - ( qnorm(0.975)*SD/sqrt(n) ))
+
+      })
+
+      output$plot <- renderPlot(
+        ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
+          theme_light()+
+          theme_light()+
+          geom_point()+
+          geom_line() +
+          geom_errorbar(aes(ymin = lower, ymax = upper))
       )
 
       return(fit)

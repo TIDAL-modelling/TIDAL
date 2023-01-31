@@ -18,6 +18,7 @@ modelCondPlotServer <- function(id,
                             traj,
                             age,
                             timePoint,
+                            modelType,
                             conditionVar#,
                             # covariates,
                             # covarsLogical
@@ -31,10 +32,20 @@ modelCondPlotServer <- function(id,
     # paste the formula depending on whether covariates are wanted or not
     modelDataEdit <- reactive({
       # if(!covarsLogical()){
-      fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "`"), REML=F , data = modelData())
+      # fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "`"), REML=F , data = modelData())
       # }else{
       #   fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "`", " + ", paste0(covariates(), collapse = " + ") ), REML=F , data = modelData())
       # }
+
+      if(modelType() == "Linear"){
+        fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "` + ", age(), "*", conditionVar() ), REML=F , data = modelData())
+      } else if(modelType() == "Quadratic"){
+        fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "` + ", age(), "*", conditionVar(), " + I(", age(), "^2)*", conditionVar() ), REML=F , data = modelData())
+      } else if(modelType() == "Cubic"){
+        fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "` + ", age(), "*", conditionVar(), " + I(", age(), "^2)*", conditionVar()), REML=F , data = modelData())
+      } else if(modelType() == "Quartic"){
+        fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "` + ", age(), "*", conditionVar(), " + I(", age(), "^2)*", conditionVar()), REML=F , data = modelData())
+      }
 
       # select the index for the column that the user wants to split the analysis on
       i <- which(colnames(modelData()) %in% conditionVar())
@@ -55,19 +66,13 @@ modelCondPlotServer <- function(id,
         VarCorr(fit)
       )
 
-      return(modelDataEdit)
-    })
+      # ---------------------------------------
+      # Paste the model formula for the user to see (don't want it to appear straight away - could improve this)
+      output$form<- renderText({
+        paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(fit)$call)[2])
+      })
 
-    # ---------------------------------------
-    # Paste the model formula for the user to see (don't want it to appear straight away - could improve this)
-    output$form<- renderText({
-      if(nchar(formCode()) > 20 & !as.logical(covarsLogical()) ){            # not the best/hacky way to make sure the formula doesn't show straight away
-        paste0("<b>Model Formula:</b> ", formCode(), "+ ", conditionVar() )
-      }else if(nchar(formCode()) > 20 & as.logical(covarsLogical())){
-        paste0("<b>Model Formula:</b> ", formCode(), "+ ", conditionVar(), " + ", paste(covariates(), collapse = " + ") )
-      }else{
-        "<b>Model Formula:</b>"
-      }
+      return(modelDataEdit)
     })
 
     # ---------------------------------------

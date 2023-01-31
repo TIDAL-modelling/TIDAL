@@ -18,7 +18,10 @@ modelRunUI <- function(id, label = "Model") {
 
   tagList(
     p("Descriptive statistics of your variable of interest, eg. depression, for each time point."),
-    tableOutput(ns("desc"))
+    tableOutput(ns("desc")),
+    p("Plot the mean scores of your variable of interest by the time/age variable.
+       Have a look to see what type of model you think best fits your data."),
+    plotOutput(ns("plot"))
     )
 }
 

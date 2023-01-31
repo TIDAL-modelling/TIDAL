@@ -116,6 +116,7 @@ server <- function(input, output, session) {
                                               modelData = selectedDataServer,
                                               formCode = varsSelectServer$modelForm,
                                               traj = varsSelectServer$traj,
+                                              age = varsSelectServer$age,
                                               timePoint = varsSelectServer$timePoint)
   modelResultsServer <- trajMods:::modelResultsServer("modelResults",
                                                       modelFit = modelRunServer)
@@ -135,7 +136,8 @@ server <- function(input, output, session) {
                                                 traj = varsSelectServer$traj,
                                                 age = varsSelectServer$age,
                                                 timePoint = varsSelectServer$timePoint,
-                                                conditionVar = modelCondServer$condition#,
+                                                conditionVar = modelCondServer$condition,
+                                                modelType = varsSelectServer$modelType
                                                 # covariates = modelCondServer$covariates,
                                                 # covarsLogical = modelCondServer$covarsLogical
                                                 )
