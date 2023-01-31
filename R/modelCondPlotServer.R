@@ -59,11 +59,16 @@ modelCondPlotServer <- function(id,
       # ---------------
       # model results
       output$modelStatsFixed <- renderTable(
-        tidy(fit, "fixed")
+        cbind(
+          tidy(fit, "fixed"),
+          confint(fit, "beta_", method = "Wald")) %>%
+          mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
+          mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
       )
 
       output$modelStatsRandom <- renderTable(
-        VarCorr(fit)
+        as.data.frame(VarCorr(fit),
+                      order = "lower.tri")
       )
 
       # ---------------------------------------

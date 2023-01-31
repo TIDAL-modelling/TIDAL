@@ -30,11 +30,23 @@ modelResultsServer <- function(id,
       # ------------------------------------------
       # model results
       output$modelStatsFixed <- renderTable(
-        tidy(modelFit(), "fixed")
+        cbind(
+          tidy(modelFit(), "fixed"),
+          confint(modelFit(), "beta_", method = "Wald")) %>%
+          mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
+          mutate(p.z = ifelse(p.z <= 0, "p < 0.001", p.z))
       )
 
+
+      # Extract variance & correlation components for the random effects. In the
+      # resulting data frame, vcov indicates the variances and covariances, and sdcor
+      # indicates the SDs and correlations. "lower.tri" returns the estimates in the
+      # order of the lower triangle of the variance-covariance matrix (can
+      # alternatively request "cov.last" to return correlations / covariances last).
+
       output$modelStatsRandom <- renderTable(
-        VarCorr(modelFit())
+        as.data.frame(VarCorr(modelFit()),
+                      order = "lower.tri")
       )
     }
   )
