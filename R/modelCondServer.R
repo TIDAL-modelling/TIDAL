@@ -35,17 +35,18 @@ modelCondServer <- function(id,
       })
 
       # Select the covariates based on col names, user can choose anything - not like above.
-      output$covarsOpt <- renderUI({
-        if(isTRUE(input$covarsLogical)){
-            selectInput(ns("covariates"), "Select covariates:", choices = colnames(modelData()), multiple = TRUE )
-        } else {
-          p()
-          }
-        })
+      # output$covarsOpt <- renderUI({
+      #   if(isTRUE(input$covarsLogical)){
+      #       selectInput(ns("covariates"), "Select covariates:", choices = colnames(modelData()), multiple = TRUE )
+      #   } else {
+      #     p()
+      #     }
+      #   })
+
       return(list(
-        condition = reactive({input$condition}),
-        covariates = reactive({input$covariates}),
-        covarsLogical = reactive({input$covarsLogical})
+        condition = reactive({input$condition})#,
+        # covariates = reactive({input$covariates}),
+        # covarsLogical = reactive({input$covarsLogical})
       )
       )
     }

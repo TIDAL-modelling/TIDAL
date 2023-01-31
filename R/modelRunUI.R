@@ -17,7 +17,7 @@ modelRunUI <- function(id, label = "Model") {
   ns <- NS(id)
 
   tagList(
-    h4("Descriptive Statistics"),
+    p("Descriptive statistics of your variable of interest, eg. depression, for each time point."),
     tableOutput(ns("desc"))
     )
 }

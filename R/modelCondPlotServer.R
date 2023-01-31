@@ -18,9 +18,10 @@ modelCondPlotServer <- function(id,
                             traj,
                             age,
                             timePoint,
-                            conditionVar,
-                            covariates,
-                            covarsLogical){
+                            conditionVar#,
+                            # covariates,
+                            # covarsLogical
+                            ){
 
   moduleServer(
     id,
@@ -29,11 +30,11 @@ modelCondPlotServer <- function(id,
     # ---------------------------------------
     # paste the formula depending on whether covariates are wanted or not
     modelDataEdit <- reactive({
-      if(!covarsLogical()){
+      # if(!covarsLogical()){
       fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "`"), REML=F , data = modelData())
-      }else{
-        fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "`", " + ", paste0(covariates(), collapse = " + ") ), REML=F , data = modelData())
-      }
+      # }else{
+      #   fit <- lmer(formula = paste0(formCode(), "+ `", conditionVar(), "`", " + ", paste0(covariates(), collapse = " + ") ), REML=F , data = modelData())
+      # }
 
       # select the index for the column that the user wants to split the analysis on
       i <- which(colnames(modelData()) %in% conditionVar())
