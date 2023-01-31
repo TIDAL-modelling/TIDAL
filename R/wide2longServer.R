@@ -1,4 +1,8 @@
-#' Shiny module
+#' This function takes a wide format dataset and converts it to a long format dataset.
+#'
+#' @param id The id of the module server
+#'
+#' @return Returns a long format dataset
 #'
 #' @import broom.mixed
 #' @import lme4
@@ -11,6 +15,10 @@
 #' @noRd
 #' @keywords internal
 #' @export
+#'
+#' @examples
+#' wide2longServer("server1")
+wide2longServer <- function(id) {...}
 wide2longServer <- function(id) {
   moduleServer(
     id,
