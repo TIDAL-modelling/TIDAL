@@ -94,17 +94,36 @@ intervention_page <- tabPanel(
 )
 
 
+singeTraj_page <-  tabPanel(
+  title = "Individiual Trajectories",
+  fluidPage(
+    tabsetPanel(
+      tabPanel("Instructions",
+              tagList(
+                h4("Explore individual trajectories using model estimates"),
+                p("Using the model specified in the Data Exploration page, we can have a look at individuals trajectories.")
+              )
+      ),
+      tabPanel("Analysis",
+               trajMods:::singleTrajUI("singeTraj")
+      )
+    )
+  )
+)
+
+
 ui <- navbarPage(
   title = "Multi-Level Modelling",
   theme = shinytheme('united'),
-  tags$style(type="text/css",
-             ".shiny-output-error { visibility: hidden; }",
-             ".shiny-output-error:before { visibility: hidden; }"
-  ),
+  # tags$style(type="text/css",
+  #            ".shiny-output-error { visibility: hidden; }",
+  #            ".shiny-output-error:before { visibility: hidden; }"
+  # ),
   welcome_page,
   format_page,
   overview_page,
-  intervention_page
+  intervention_page,
+  singeTraj_page
 )
 
 # Main server
@@ -141,6 +160,10 @@ server <- function(input, output, session) {
                                                 # covariates = modelCondServer$covariates,
                                                 # covarsLogical = modelCondServer$covarsLogical
                                                 )
+  singleTrajServer <- trajMods:::singleTrajServer("singeTraj",
+                                                  ID = varsSelectServer$ID,
+                                                  modelData = selectedDataServer,
+                                                  modelFit = modelRunServer)
 }
 
 # Run the application
