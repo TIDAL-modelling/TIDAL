@@ -76,15 +76,23 @@ singleTrajServer <- function(id,
         )
       })
 
-        # ------------------------------------------
-        # add the "prediction"/model col to dataframe
-        modelDataEdit <- reactive({
-          modelData() %>%
-            mutate(pred = predict(modelFit(), ., re.form = NA))
-        })
-       #
+      # -----------------------------------------------
+      # add the "prediction"/model col to dataframe
+      modelDataEdit <- reactive({
+        # Get individual combined random and fixed effects:
+        rand <- coef(modelFit())[[1]]
+
+        # Not all participants were included in the prediction,
+        # I assume because they didn't have enough data?
+        modelDataEdit <- modelData() %>%
+          mutate(pred = predict(modelFit(), ., re.form = NA)) %>%
+          filter(!!sym(ID()) %in% row.names(rand))
+
+        return(modelDataEdit)
+      })
+
        # -----------------------------------------------
-       # Select the IDs from input:
+       # Select the IDs from input (for individuals that we can get model estimates for):
         IDs <- reactive({
           if(input$choice == "Random Sample"){
           IDs <- modelDataEdit() %>%
@@ -114,8 +122,60 @@ singleTrajServer <- function(id,
         })
 
 
-       # # -----------------------------------------------
+       # -----------------------------------------------
+       #################################################
        # Estimate the individual trajectories:
+       #################################################
+
+
+
+#
+#         # loop over all participants to calculate their predictions including the random effects
+#         subjects <- unique(randPred$Subject)
+#
+#         pred_random <- lapply(subjects, function(x){
+#           # get prediction at each time point
+#           pred <- randPred %>%
+#             filter(Subject == x) %>%
+#             pull(pred)
+#
+#           # get age at each time point
+#           age <- randPred %>%
+#             filter(Subject == x) %>%
+#             pull(age)
+#
+#           # number of unique time points
+#           n <-  nrow(randPred) / length(unique(randPred$Subject))
+#
+#           # get the random effects for each participant
+#           u0 <- rep(filter(rand, row.names(rand) %in% x)[,1], n)
+#           u1 <- rep(filter(rand, row.names(rand) %in% x)[,2], n)
+#           u2 <- rep(filter(rand, row.names(rand) %in% x)[,3], n)
+#           # u3 <- rep(filter(rand, row.names(rand) %in% x)[,4], n)
+#
+#           # combine these into a dataframe
+#           data.frame("Subject" = x, age,  u0, u1, u2, pred)
+#
+#         }) %>%
+#           do.call(rbind,.) # combine the lists into one dataframe
+#
+#         pred_random <- pred_random %>%
+#           mutate(pred_individual = ( u0 + (u1*age) + (u2*(age^2)) ) ) %>%
+#           rename(ID = "Subject")
+#
+#
+#         set.seed(1234)
+#
+#         ggplot() +
+#           geom_line(data =dataSubQCLong, aes(x=age,  y = pred), na.rm=T) +
+#           geom_line(data = pred_random %>%
+#                       filter(ID %in% sample(subjects, 6)),
+#                     aes(x=age,  y = pred_individual, color = ID), na.rm=T, linetype="dashed") +
+#           ggtitle(formCode) +
+#           scale_color_manual(values = c("#8B8000", "grey", "purple", "green", "blue", "red")) +
+#           ylim(c(0,15))
+
+
 
 
        # -----------------------------------------------
