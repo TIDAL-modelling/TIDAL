@@ -161,7 +161,8 @@ server <- function(input, output, session) {
                                                 # covarsLogical = modelCondServer$covarsLogical
                                                 )
   singleTrajServer <- trajMods:::singleTrajServer("singeTraj",
-                                                  ID = varsSelectServer$ID,
+                                                  subject = varsSelectServer$ID,
+                                                  age = varsSelectServer$age,
                                                   modelData = selectedDataServer,
                                                   modelFit = modelRunServer)
 }

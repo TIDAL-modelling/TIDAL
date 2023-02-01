@@ -1,5 +1,6 @@
 singleTrajServer <- function(id,
-                             ID,
+                             subject,
+                             age,
                              modelData,
                              modelFit) {
   # create a module server
@@ -77,16 +78,18 @@ singleTrajServer <- function(id,
       })
 
       # -----------------------------------------------
+      # Get individual combined random and fixed effects:
+      rand <- reactive({
+        coef(modelFit())[[1]]
+      })
+
       # add the "prediction"/model col to dataframe
       modelDataEdit <- reactive({
-        # Get individual combined random and fixed effects:
-        rand <- coef(modelFit())[[1]]
-
         # Not all participants were included in the prediction,
         # I assume because they didn't have enough data?
         modelDataEdit <- modelData() %>%
           mutate(pred = predict(modelFit(), ., re.form = NA)) %>%
-          filter(!!sym(ID()) %in% row.names(rand))
+          filter(!!sym(subject()) %in% row.names(rand()))
 
         return(modelDataEdit)
       })
@@ -97,7 +100,7 @@ singleTrajServer <- function(id,
           if(input$choice == "Random Sample"){
           IDs <- modelDataEdit() %>%
             sample_n(input$NRand) %>%
-            pull(!!sym(ID()))
+            pull(!!sym(subject()))
           }else if(input$choice == "Select specific individuals"){
             IDs <- strsplit(input$SelectIDs, ",")[[1]] %>% # split string by commas
                       str_remove_all(., "\n") %>%  # remove any new lines (if present)
@@ -106,7 +109,7 @@ singleTrajServer <- function(id,
             IDs <- modelDataEdit() %>%
               filter(!!sym(input$catVars) == input$catLevels) %>%
               sample_n(input$NRandVar) %>%
-              pull(!!sym(ID()))
+              pull(!!sym(subject()))
           }
           return(sort(IDs))
         })
@@ -118,7 +121,7 @@ singleTrajServer <- function(id,
 
         output$table <- renderDataTable({
           modelDataEdit() %>%
-            filter(!!sym(ID()) %in% IDs())
+            filter(!!sym(subject()) %in% IDs())
         })
 
 
@@ -127,60 +130,47 @@ singleTrajServer <- function(id,
        # Estimate the individual trajectories:
        #################################################
 
+        output$trajPlot <-  renderPlot({
+          # loop over all participants to calculate their predictions including the random effects
+         pred_random <- lapply(IDs(), function(x){
 
+           # get age at each time point
+           ages <- modelDataEdit() %>%
+             filter(!!sym(subject()) == x) %>%
+             pull(!!sym(age()))
 
-#
-#         # loop over all participants to calculate their predictions including the random effects
-#         subjects <- unique(randPred$Subject)
-#
-#         pred_random <- lapply(subjects, function(x){
-#           # get prediction at each time point
-#           pred <- randPred %>%
-#             filter(Subject == x) %>%
-#             pull(pred)
-#
-#           # get age at each time point
-#           age <- randPred %>%
-#             filter(Subject == x) %>%
-#             pull(age)
-#
-#           # number of unique time points
-#           n <-  nrow(randPred) / length(unique(randPred$Subject))
-#
-#           # get the random effects for each participant
-#           u0 <- rep(filter(rand, row.names(rand) %in% x)[,1], n)
-#           u1 <- rep(filter(rand, row.names(rand) %in% x)[,2], n)
-#           u2 <- rep(filter(rand, row.names(rand) %in% x)[,3], n)
-#           # u3 <- rep(filter(rand, row.names(rand) %in% x)[,4], n)
-#
-#           # combine these into a dataframe
-#           data.frame("Subject" = x, age,  u0, u1, u2, pred)
-#
-#         }) %>%
-#           do.call(rbind,.) # combine the lists into one dataframe
-#
-#         pred_random <- pred_random %>%
-#           mutate(pred_individual = ( u0 + (u1*age) + (u2*(age^2)) ) ) %>%
-#           rename(ID = "Subject")
-#
-#
-#         set.seed(1234)
-#
-#         ggplot() +
-#           geom_line(data =dataSubQCLong, aes(x=age,  y = pred), na.rm=T) +
-#           geom_line(data = pred_random %>%
-#                       filter(ID %in% sample(subjects, 6)),
-#                     aes(x=age,  y = pred_individual, color = ID), na.rm=T, linetype="dashed") +
-#           ggtitle(formCode) +
-#           scale_color_manual(values = c("#8B8000", "grey", "purple", "green", "blue", "red")) +
-#           ylim(c(0,15))
+           # number of unique time points
+           n <- modelDataEdit() %>%
+                  filter(!!sym(subject()) == x) %>%
+                  nrow()
 
+           # get the random effects for each participant
+           effects <- sapply(1:ncol(rand()), function(i){
+             filter(rand(), row.names(rand()) %in% x)[,i]
+           })
 
+           agesPoly <- sapply(1:(ncol(rand())-1), function(i){
+             ages^i
+           })
 
+           pred_individual <- sapply(1:nrow(agesPoly), function(y){
+             sapply(1:ncol(agesPoly), function(i){
+               effects[i + 1]*agesPoly[y,i]
+             }) %>% sum() + effects[1]
+           }) %>% data.frame("pred_individual" = .)
 
-       # -----------------------------------------------
-       # Plot the individual trajectories:
-       # output$trajPlot
+           cbind(data.frame(ID = x, age = ages),
+                 pred_individual)
+
+         }) %>% do.call(rbind,.)
+
+         # -----------------------------------------------
+         # Plot the individual trajectories:
+         ggplot() +
+           geom_line(data = modelDataEdit(), aes(x= !!sym(age()),  y = pred), na.rm=T) +
+           geom_line(data = pred_random ,
+                     aes(x=age,  y = pred_individual, color = ID), na.rm=T, linetype="dashed")
+       })
 
     }
   )
