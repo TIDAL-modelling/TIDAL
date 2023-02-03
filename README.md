@@ -1,10 +1,15 @@
 # Tool to Implement Developmental Analyses of Longitudinal Data (`TIDAL`)
 
+<p align="center">
+<img width="600" alt="Screenshot 2023-02-03 at 13 00 15" src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png">
+</p>
+
 ## R package and Shiny application
 
 <!-- badges: start -->
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
 <!-- badges: end -->
+
 
 ### Installation and useage
 
