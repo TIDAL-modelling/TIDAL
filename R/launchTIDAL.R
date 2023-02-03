@@ -9,9 +9,9 @@
 #'
 #' @export
 launchTIDAL <- function() {
-  appDir <- system.file("shinyApp", package = "trajMods")
+  appDir <- system.file("shinyApp", package = "TIDAL")
   if (appDir == "") {
-    stop("Could not find directory. Try re-installing `trajMods`.", call. = FALSE)
+    stop("Could not find directory. Try re-installing `TIDAL`.", call. = FALSE)
   }
 
   shiny::runApp(paste0(appDir, "/app.R") , display.mode = "normal")
