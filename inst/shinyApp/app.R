@@ -34,7 +34,7 @@ welcome_page <- tabPanel(
 format_page <- tabPanel(
   title = "Data Preparation",
   fluidPage(
-    trajMods:::wide2longUI("wide2long")
+    TIDAL:::wide2longUI("wide2long")
   )
 )
 
@@ -51,16 +51,16 @@ overview_page <-   tabPanel(
       tabPanel("Output",
     sidebarLayout(
       sidebarPanel(
-        trajMods:::selectDataUI("select"),
-        trajMods:::varsSelectUI("varsSelect")),
+        TIDAL:::selectDataUI("select"),
+        TIDAL:::varsSelectUI("varsSelect")),
       mainPanel(
         tabsetPanel(
           tabPanel("Descriptive Statistics",
-        trajMods:::modelRunUI("modelRun")),
+        TIDAL:::modelRunUI("modelRun")),
         tabPanel("Model Results",
-                 trajMods:::modelResultsUI("modelResults")),
+                 TIDAL:::modelResultsUI("modelResults")),
         tabPanel("Plot",
-        trajMods:::modelPlotUI("modelPlot")))
+        TIDAL:::modelPlotUI("modelPlot")))
       ))
         )
     )
@@ -72,7 +72,7 @@ intervention_page <- tabPanel(
   fluidPage(
     sidebarLayout(
       sidebarPanel(
-        trajMods:::modelCondUI("modelCond")
+        TIDAL:::modelCondUI("modelCond")
       ),
       mainPanel(
         tabsetPanel(
@@ -85,7 +85,7 @@ intervention_page <- tabPanel(
           ),
           tabPanel(
           "Output",
-          trajMods:::modelCondPlotUI("modelCondPlot")
+          TIDAL:::modelCondPlotUI("modelCondPlot")
           )
       )
     )
@@ -105,7 +105,7 @@ singeTraj_page <-  tabPanel(
               )
       ),
       tabPanel("Analysis",
-               trajMods:::singleTrajUI("singeTraj")
+               TIDAL:::singleTrajUI("singeTraj")
       )
     )
   )
@@ -128,27 +128,27 @@ ui <- navbarPage(
 
 # Main server
 server <- function(input, output, session) {
-  wide2longServer <- trajMods:::wide2longServer("wide2long")
-  selectedDataServer <- trajMods:::selectDataServer("select", dataFormatted=wide2longServer)
-  varsSelectServer <- trajMods:::varsSelectServer("varsSelect", varsSelectData=selectedDataServer)
-  modelRunServer <- trajMods:::modelRunServer("modelRun",
+  wide2longServer <- TIDAL:::wide2longServer("wide2long")
+  selectedDataServer <- TIDAL:::selectDataServer("select", dataFormatted=wide2longServer)
+  varsSelectServer <- TIDAL:::varsSelectServer("varsSelect", varsSelectData=selectedDataServer)
+  modelRunServer <- TIDAL:::modelRunServer("modelRun",
                                               modelData = selectedDataServer,
                                               formCode = varsSelectServer$modelForm,
                                               traj = varsSelectServer$traj,
                                               age = varsSelectServer$age,
                                               timePoint = varsSelectServer$timePoint)
-  modelResultsServer <- trajMods:::modelResultsServer("modelResults",
+  modelResultsServer <- TIDAL:::modelResultsServer("modelResults",
                                                       modelFit = modelRunServer)
-  modelPlotServer <- trajMods:::modelPlotServer("modelPlot",
+  modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
                                                 modelData = selectedDataServer,
                                                 modelFit = modelRunServer,
                                                 SubjectID = varsSelectServer$ID,
                                                 traj = varsSelectServer$traj,
                                                 age = varsSelectServer$age,
                                                 timePoint = varsSelectServer$timePoint)
-  modelCondServer <- trajMods:::modelCondServer("modelCond",
+  modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                                 modelData = selectedDataServer)
-  modelCondPlotServer <- trajMods:::modelCondPlotServer("modelCondPlot",
+  modelCondPlotServer <- TIDAL:::modelCondPlotServer("modelCondPlot",
                                                 modelData = selectedDataServer,
                                                 formCode = varsSelectServer$modelForm,
                                                 dfPlot = modelPlotServer,
@@ -160,7 +160,7 @@ server <- function(input, output, session) {
                                                 # covariates = modelCondServer$covariates,
                                                 # covarsLogical = modelCondServer$covarsLogical
                                                 )
-  singleTrajServer <- trajMods:::singleTrajServer("singeTraj",
+  singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
                                                   subject = varsSelectServer$ID,
                                                   age = varsSelectServer$age,
                                                   modelData = selectedDataServer,

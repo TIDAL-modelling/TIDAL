@@ -8,7 +8,7 @@
 #' @import shinythemes
 #'
 #' @export
-runShinyTraj <- function() {
+launchTIDAL <- function() {
   appDir <- system.file("shinyApp", package = "trajMods")
   if (appDir == "") {
     stop("Could not find directory. Try re-installing `trajMods`.", call. = FALSE)
