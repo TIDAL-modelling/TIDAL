@@ -1,6 +1,6 @@
-## `TIDAL` package
+# Tool to Implement Developmental Analyses of Longitudinal Data (`TIDAL`)
 
-### R package and Shiny app for modelling longitudinal trajectory models
+## R package and Shiny application
 
 <!-- badges: start -->
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
@@ -15,5 +15,52 @@ library("TIDAL")
 # Launch the R Shiny app
 launchTIDAL()
 ```
+### Main Features
+
+#### Overview
+
+The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people.
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/24313187/216603041-f4bf851c-72d6-4cb3-b9f7-415047e8abca.png" width="700">
+</p>
+
+#### Data Preparation
+This allows the user to upload a wide format of their longitudinal dataset. Select which columns measure time and the phenotype they want to model trajectories on. Converts the dataframe to long format. Allows the user to download the long format dataset.
+
+<p align="center">
+  <video src="https://user-images.githubusercontent.com/24313187/216603909-9868a4e4-35ed-4b09-86ef-38a126a3d6b1.mov" controls="controls" muted="muted" class="d-block rounded-bottom-2 width-fit" style="max-height:640px;">
+</video>
+</p>
+
+#### Data Exploration
+This is the first stage of the trajectory modelling. Here the user either uploads a long format dataset or uses the dataset formatted on the previous page (Data Preparation). They specify the columns relatated to the variables to include in the model. There is a choice of model type and the user can see which model type looks like it best fits their data to explore further on the following pages.
+
+<p align="center">
+  <video src="https://user-images.githubusercontent.com/24313187/216604313-bc7f3643-35c3-408a-b85a-d302ec0b3e1e.mov" controls="controls" muted="muted" class="d-block rounded-bottom-2 width-fit" style="max-height:640px;">
+</video>
+</p>
+
+#### Group Interactions
+Split the trajectories by categorical varaibles to examine the differences in trajectories.
+
+<p align="center">
+  <video src="https://user-images.githubusercontent.com/24313187/216604194-9a4f520d-1f62-4822-b463-5e2c04efef65.mov" controls="controls" muted="muted" class="d-block rounded-bottom-2 width-fit" style="max-height:640px;">
+</video>
+</p>
+
+#### Individual Trajectories
+View trajectories for specific individuals. Choose from a random sample, specific individuals of interest, individuals within a specific variable, eg. a random sample of females only.
+
+<p align="center">
+  <video src="https://user-images.githubusercontent.com/24313187/216604268-332cd5ff-e0fa-4a05-a3b5-f4a993ea13d0.mov" controls="controls" muted="muted" class="d-block rounded-bottom-2 width-fit" style="max-height:640px;">
+</video>
+</p>
 
 
+### Other pages in development
+* **Points of acceleration**
+  * Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory.
+* **Stability**
+  * Captures within-individual variability in depressive symptoms over time and compare how this varies by different forms of interventions or combinations of interventions. 
+  
