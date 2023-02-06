@@ -30,7 +30,8 @@ modelRunServer <- function(id,
       newModelData <- reactive({
         req(age())
         modelData() %>%
-         mutate(!!sym(age()) := scale(!!sym(age()) - mean( !!sym(age()), na.rm = T )))
+          # mutate(!!sym(age()) := scale(!!sym(age()) - mean( !!sym(age()), na.rm = T )))
+          mutate(!!sym(age()) := !!sym(age()) - mean( !!sym(age()), na.rm = T ))
       })
 
       # Run the model
@@ -58,6 +59,7 @@ modelRunServer <- function(id,
       warning <- reactive({
         if( any(str_detect(as.character(summary(fit())$call), "optimizer")) ){
           "Model did not converge. A different optimizer was used. Please interpret results with caution."
+          # paste0(summary(fit())$optinfo$conv$lme4$messages %>% paste0(collapse = ", "))
         }else{
           ""
         }
