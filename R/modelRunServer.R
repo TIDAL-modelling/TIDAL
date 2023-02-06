@@ -8,6 +8,7 @@
 #' @import shinyjs
 #' @import tidyr
 #' @import magrittr
+#' @import stringr
 #'
 #' @noRd
 #' @keywords internal
@@ -25,15 +26,48 @@ modelRunServer <- function(id,
     function(input, output, session) {
 
       # ------------------------------------------
-      # run the model
-      fit <- reactive({
-        lmer(formula = formCode(), REML=F , data = modelData())
+      #### Run the model
+      newModelData <- reactive({
+        req(age())
+        modelData() %>%
+         mutate(!!sym(age()) := scale(!!sym(age()) - mean( !!sym(age()), na.rm = T )))
       })
+
+      # Run the model
+      fit <- reactive({
+        fit <- lmer(formula = formCode(), REML=F , data = newModelData())
+
+        # Inspect warnings from the model
+        message <- summary(fit)$optinfo$conv$lme4$messages %>% paste0(collapse = ", ")
+
+        # If the model returns a warning about not converging, need to rescale variables or is.singular then
+        # rerun the model with a different optimiser
+
+        if( str_detect(message, "converge|Rescale|singular") ) {
+          fit <- lmer(formula = formCode(), REML=F , data = newModelData(),
+                      control=lmerControl(optimizer="bobyqa",
+                                          optCtrl=list(maxfun=2e5)))
+        }else{
+          fit <- fit
+        }
+
+        return(fit)
+      })
+
+      # Output message
+      warning <- reactive({
+        if( any(str_detect(as.character(summary(fit())$call), "optimizer")) ){
+          "Model did not converge. A different optimizer was used. Please interpret results with caution."
+        }else{
+          ""
+        }
+      })
+
 
       # ------------------------------------------
       # show descriptive statistics
       output$desc <- renderTable(
-        modelData() %>%
+        newModelData() %>%
           group_by(across( !!timePoint() )) %>%
           summarise(N = sum(!is.na( !!sym(traj()) )),
                     mean = mean(!!sym(traj()), na.rm = T),
@@ -47,7 +81,7 @@ modelRunServer <- function(id,
       # Plot the distributions
       # Get the mean and sd for depression scores at each time point
       df.plot <- reactive({
-        modelData() %>%
+        newModelData() %>%
           group_by(across( !!timePoint() )) %>%
           summarise(Age = mean(!!sym(age()), na.rm = T),
                     Phenotype = mean(!!sym(traj()), na.rm = T),
@@ -68,7 +102,12 @@ modelRunServer <- function(id,
           geom_errorbar(aes(ymin = lower, ymax = upper))
       )
 
-      return(fit)
+      return(
+        list(
+          fit = fit,
+          data = newModelData,
+          warning = warning
+          ))
     }
   )
 }

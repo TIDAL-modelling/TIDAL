@@ -19,6 +19,8 @@ modelResultsUI <- function(id, label = "Model") {
   tagList(
     htmlOutput(ns("formulaText")),
     br(),
+    textOutput(ns("warning")),
+    br(),
     h4("Fixed Effects"),
     tableOutput(ns("modelStatsFixed")),
     h4("Random Effects"),

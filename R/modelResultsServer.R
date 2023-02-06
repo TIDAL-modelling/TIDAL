@@ -14,7 +14,8 @@
 #' @keywords internal
 #' @export
 modelResultsServer <- function(id,
-                           modelFit
+                           modelFit,
+                           warningMsg
 ) {
 
   moduleServer(
@@ -25,6 +26,12 @@ modelResultsServer <- function(id,
       # paste the formula text
       output$formulaText <- renderText({
         paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(modelFit())$call)[2])
+      })
+
+      # ------------------------------------------
+      # Warning text
+      output$warning <- renderText({
+        warningMsg()
       })
 
       # ------------------------------------------

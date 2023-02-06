@@ -48,11 +48,11 @@ varsSelectServer <- function(id, varsSelectData) {
         if(input$modelType == "Linear"){
           paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
         } else if(input$modelType == "Quadratic"){
-          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (", input$age, "|" , input$ID, ") + (I(",input$age, "^2)|" , input$ID, ")" )
+          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")" )
         } else if(input$modelType == "Cubic"){
-          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (", input$age, "|" , input$ID, ") + (I(",input$age, "^2)|" , input$ID, ")")
+          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
         } else if(input$modelType == "Quartic"){
-          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (", input$age, "|" , input$ID, ") + (I(",input$age, "^2)|" , input$ID, ")")
+          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
         }
       })
 

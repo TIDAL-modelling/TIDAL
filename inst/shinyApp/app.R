@@ -9,9 +9,9 @@ options(shiny.maxRequestSize = 30*1024^2)
 welcome_page <- tabPanel(
   title = "Overview",
   fluidPage(
-  h1("Multilevel Modelling of Longitudinal Data"),
+  h1("Tool to Implement Developmental Analyses of Longitudinal Data"),
   p("The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people."),
-  p("These features include:"),
+  p("These features will include:"),
   tags$ul(
     tags$li("How mental health is changing over specific periods of time."),
     tags$li("When mental health is improving or worsening at the fastest rate (points of acceleration)."),
@@ -24,6 +24,8 @@ welcome_page <- tabPanel(
   p("This is the first stage of the trajectory modelling. Here the user either uploads a long format dataset or uses the dataset formatted on the previous page (Data Preparation). They specify the columns relatated to the variables to include in the model. There is a choice of model type and the user can see which model type looks like it best fits their data to explore further on the following pages."),
   h4("Group Interactions"),
   p("Split the trajectories by varaibles to examine the differences in trajectories."),
+  h4("Individual Trajectories"),
+  p("View trajectories for specific individuals. Choose from a random sample, specific individuals of interest, individuals within a specific variable, eg. a random sample of females only."),
   h4("Points of acceleration"),
   p("Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory."),
   h4("Stability"),
@@ -68,7 +70,7 @@ overview_page <-   tabPanel(
 )
 
 intervention_page <- tabPanel(
-  title = "Analysis",
+  title = "Group Interactions",
   fluidPage(
     sidebarLayout(
       sidebarPanel(
@@ -113,12 +115,12 @@ singeTraj_page <-  tabPanel(
 
 
 ui <- navbarPage(
-  title = "Multi-Level Modelling",
+  title = "TIDAL",
   theme = shinytheme('united'),
-  # tags$style(type="text/css",
-  #            ".shiny-output-error { visibility: hidden; }",
-  #            ".shiny-output-error:before { visibility: hidden; }"
-  # ),
+  tags$style(type="text/css",
+             ".shiny-output-error { visibility: hidden; }",
+             ".shiny-output-error:before { visibility: hidden; }"
+  ),
   welcome_page,
   format_page,
   overview_page,
@@ -138,18 +140,19 @@ server <- function(input, output, session) {
                                               age = varsSelectServer$age,
                                               timePoint = varsSelectServer$timePoint)
   modelResultsServer <- TIDAL:::modelResultsServer("modelResults",
-                                                      modelFit = modelRunServer)
+                                                   modelFit = modelRunServer$fit,
+                                                   warningMsg = modelRunServer$warning)
   modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
-                                                modelData = selectedDataServer,
-                                                modelFit = modelRunServer,
+                                                modelData = modelRunServer$data,
+                                                modelFit = modelRunServer$fit,
                                                 SubjectID = varsSelectServer$ID,
                                                 traj = varsSelectServer$traj,
                                                 age = varsSelectServer$age,
                                                 timePoint = varsSelectServer$timePoint)
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
-                                                modelData = selectedDataServer)
+                                                modelData = modelRunServer$data)
   modelCondPlotServer <- TIDAL:::modelCondPlotServer("modelCondPlot",
-                                                modelData = selectedDataServer,
+                                                modelData = modelRunServer$data,
                                                 formCode = varsSelectServer$modelForm,
                                                 dfPlot = modelPlotServer,
                                                 traj = varsSelectServer$traj,
@@ -163,8 +166,8 @@ server <- function(input, output, session) {
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
                                                   subject = varsSelectServer$ID,
                                                   age = varsSelectServer$age,
-                                                  modelData = selectedDataServer,
-                                                  modelFit = modelRunServer)
+                                                  modelData = modelRunServer$data,
+                                                  modelFit = modelRunServer$fit)
 }
 
 # Run the application

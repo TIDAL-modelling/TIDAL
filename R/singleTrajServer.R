@@ -134,6 +134,8 @@ singleTrajServer <- function(id,
           # loop over all participants to calculate their predictions including the random effects
          pred_random <- lapply(IDs(), function(x){
 
+           x <- as.character(x)
+
            # get age at each time point
            ages <- modelDataEdit() %>%
              filter(!!sym(subject()) == x) %>%
@@ -169,7 +171,7 @@ singleTrajServer <- function(id,
          ggplot() +
            geom_line(data = modelDataEdit(), aes(x= !!sym(age()),  y = pred), na.rm=T) +
            geom_line(data = pred_random ,
-                     aes(x=age,  y = pred_individual, color = ID), na.rm=T, linetype="dashed")
+                     aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")
        })
 
     }
