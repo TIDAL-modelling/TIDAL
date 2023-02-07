@@ -27,10 +27,12 @@ modelRunServer <- function(id,
 
       # ------------------------------------------
       #### Run the model
+
+      # Mean center age to 0
       newModelData <- reactive({
         req(age())
         modelData() %>%
-          # mutate(!!sym(age()) := scale(!!sym(age()) - mean( !!sym(age()), na.rm = T )))
+          mutate(age_original = !!sym(age()) ) %>%
           mutate(!!sym(age()) := !!sym(age()) - mean( !!sym(age()), na.rm = T ))
       })
 
@@ -85,7 +87,7 @@ modelRunServer <- function(id,
       df.plot <- reactive({
         newModelData() %>%
           group_by(across( !!timePoint() )) %>%
-          summarise(Age = mean(!!sym(age()), na.rm = T),
+          summarise(Age = mean(age_original, na.rm = T),
                     Phenotype = mean(!!sym(traj()), na.rm = T),
                     SD = sd(!!sym(traj()), na.rm = T),
                     n = sum(!is.na( !!sym(traj()) ))

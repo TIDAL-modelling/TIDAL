@@ -36,7 +36,7 @@ modelPlotServer <- function(id,
       df.plot <- reactive({
         modelData() %>%
           group_by(across( !!timePoint() )) %>%
-          summarise(Age = mean(!!sym(age()), na.rm = T),
+          summarise(Age = mean(age_original, na.rm = T),
                     Phenotype = mean(!!sym(traj()), na.rm = T),
                     SD = sd(!!sym(traj()), na.rm = T),
                     n = sum(!is.na( !!sym(traj()) ))
@@ -54,7 +54,7 @@ modelPlotServer <- function(id,
           geom_point()+
           geom_line() +
           geom_errorbar(aes(ymin = lower, ymax = upper)) +
-          geom_line(data = modelDataEdit(), aes(x= !!sym(age()) ,  y = pred), na.rm=T)
+          geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T)
       )
       return(df.plot)
     }

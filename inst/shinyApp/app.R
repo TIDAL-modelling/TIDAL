@@ -143,16 +143,16 @@ server <- function(input, output, session) {
                                                    modelFit = modelRunServer$fit,
                                                    warningMsg = modelRunServer$warning)
   modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
-                                                modelData = selectedDataServer,
+                                                modelData = modelRunServer$data,
                                                 modelFit = modelRunServer$fit,
                                                 SubjectID = varsSelectServer$ID,
                                                 traj = varsSelectServer$traj,
                                                 age = varsSelectServer$age,
                                                 timePoint = varsSelectServer$timePoint)
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
-                                                modelData = selectedDataServer)
+                                                modelData = modelRunServer$data)
   modelCondPlotServer <- TIDAL:::modelCondPlotServer("modelCondPlot",
-                                                modelData = selectedDataServer,
+                                                modelData = modelRunServer$data,
                                                 formCode = varsSelectServer$modelForm,
                                                 dfPlot = modelPlotServer,
                                                 traj = varsSelectServer$traj,
@@ -166,7 +166,7 @@ server <- function(input, output, session) {
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
                                                   subject = varsSelectServer$ID,
                                                   age = varsSelectServer$age,
-                                                  modelData = selectedDataServer,
+                                                  modelData = modelRunServer$data,
                                                   modelFit = modelRunServer$fit)
 }
 
