@@ -30,7 +30,9 @@ wide2longUI <- function(id, label = "wide2long") {
         tabPanel("Instructions",
                  tagList(
                    h2("Convert longitudinal data from wide format to long format"),
-                   strong("Please only upload synthetic datasets available on the TIDAL GitHub repository if using the application online."),
+                   tags$div(
+                     HTML('<strong style="color:red">Please only upload synthetic datasets available on the TIDAL GitHub repository if using the application online.</strong>')
+                   ),
                    p('In order to model trajectories R requires the data frame to be in "long" format. It\'s likely that the data is initially inputted as a "wide" format. This page allows you to upload wide formatted data and converts it to long. Similar to the image displayed below.'),
                    img(src = "wide2long.png", height = 350, width = 550),
                    h4("Steps:"),
