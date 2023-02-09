@@ -9,7 +9,7 @@
 #'
 #' @export
 launchTIDAL <- function() {
-  appDir <- system.file("shinyApp", package = "TIDAL")
+  appDir <- system.file("TIDALapp", package = "TIDAL")
   if (appDir == "") {
     stop("Could not find directory. Try re-installing `TIDAL`.", call. = FALSE)
   }

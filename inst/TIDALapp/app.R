@@ -17,6 +17,7 @@ welcome_page <- tabPanel(
     tags$li("When mental health is improving or worsening at the fastest rate (points of acceleration)."),
     tags$li("How variable mental health responses are over time within individuals (stability).")
   ),
+  strong("Please only upload synthetic datasets available on the TIDAL GitHub repository if using the application online."),
   p('To use this tool please read the "Instructions" tab on each page to guide you through the process. In brief the main aims of each page:'),
   h4("Data Preparation"),
   p("This allows the user to upload a wide format of their longitudinal dataset. Select which columns measure time and the phenotype they want to model trajectories on. Converts the dataframe to long format. Allows the user to download the long format dataset."),
@@ -48,6 +49,7 @@ overview_page <-   tabPanel(
       tabPanel("Instructions",
                tagList(
                  h2("Initial data exploration"),
+                 strong("Please only upload synthetic datasets available on the TIDAL GitHub repository if using the application online."),
                  p("Either upload a long format dataframe (csv or tsv) or use the data frame you formatted on the previous page. Then select the columns you wish to use as variables in your model. Inspect the descriptive statistics of your trajectory variable at each time point. Select the model type (eg. linear or a polynomial model) and view the plot of the mean trajectory against these models.")
                )),
       tabPanel("Output",
