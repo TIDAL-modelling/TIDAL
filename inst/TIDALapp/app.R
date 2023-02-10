@@ -19,7 +19,7 @@ welcome_page <- tabPanel(
   ),
   tags$div(
     HTML('<strong style="color:red">Please only upload synthetic datasets available on the
-                        <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue">
+                        <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue" target="_blank">
                         TIDAL GitHub repository</a>
                         if using the application online.</strong>')
   ),
@@ -56,7 +56,7 @@ overview_page <-   tabPanel(
                  h2("Initial data exploration"),
                  tags$div(
                    HTML('<strong style="color:red">Please only upload synthetic datasets available on the
-                        <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue">
+                        <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue" target="_blank">
                         TIDAL GitHub repository</a>
                         if using the application online.</strong>')
                  ),

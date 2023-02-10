@@ -32,7 +32,7 @@ wide2longUI <- function(id, label = "wide2long") {
                    h2("Convert longitudinal data from wide format to long format"),
                    tags$div(
                      HTML('<strong style="color:red">Please only upload synthetic datasets available on the
-                        <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue">
+                        <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue" target="_blank">
                         TIDAL GitHub repository</a>
                         if using the application online.</strong>')
                    ),
