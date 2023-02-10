@@ -4,14 +4,19 @@
 <img width="600" alt="Screenshot 2023-02-03 at 13 00 15" src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png">
 </p>
 
-## R package and Shiny application
-
 <!-- badges: start -->
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
 <!-- badges: end -->
 
+## Installation and useage
 
-### Installation and useage
+### Online: https://tidal.shinyapps.io/tidalapp/ 
+
+To use this tool online please do not upload any sensitive data. Only use the [synthetic datasets](data/), described below.
+
+### Locally
+
+Please install the R package and launch the Shiny app locally if you want to upload sensitive data:
 
 ```{r eval=FALSE}
 # install.packages("remotes")
@@ -20,9 +25,22 @@ library("TIDAL")
 # Launch the R Shiny app
 launchTIDAL()
 ```
-### Main Features
 
-#### Overview
+## Synthetic datasets 
+To save the dataset click on the link below (right click to open in new tab) and then click `File` -> `Save Page As...`.
+
+* [ad_use_dep_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/ad_use_dep_simulated.csv)
+  * Anti-depressant use at 7 time points.
+* [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/emot_reg_emot_simulated.csv)
+  * Emotional regulation scores at 5 time points.
+* [fp_use_dep_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/fp_use_dep_simulated.csv)
+  * Financial problems and GAD-7 scores at 6 time points.
+* [sleep_use_dep_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/sleep_use_dep_simulated.csv)
+  * Sleep scores and emotional/MFQ scores at 4 time points.
+
+## Main Features
+
+### Overview
 
 The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people.
 
@@ -30,7 +48,7 @@ The aim is for this digital tool to facilitate trajectories work and remove barr
   <img src="https://user-images.githubusercontent.com/24313187/216603041-f4bf851c-72d6-4cb3-b9f7-415047e8abca.png" width="700">
 </p>
 
-#### Data Preparation
+### Data Preparation
 This allows the user to upload a wide format of their longitudinal dataset. Select which columns measure time and the phenotype they want to model trajectories on. Converts the dataframe to long format. Allows the user to download the long format dataset.
 
 <p align="center">
@@ -38,7 +56,7 @@ This allows the user to upload a wide format of their longitudinal dataset. Sele
 </video>
 </p>
 
-#### Data Exploration
+### Data Exploration
 This is the first stage of the trajectory modelling. Here the user either uploads a long format dataset or uses the dataset formatted on the previous page (Data Preparation). They specify the columns relatated to the variables to include in the model. There is a choice of model type and the user can see which model type looks like it best fits their data to explore further on the following pages.
 
 <p align="center">
@@ -46,7 +64,7 @@ This is the first stage of the trajectory modelling. Here the user either upload
 </video>
 </p>
 
-#### Group Interactions
+### Group Interactions
 Split the trajectories by categorical varaibles to examine the differences in trajectories.
 
 <p align="center">
@@ -54,7 +72,7 @@ Split the trajectories by categorical varaibles to examine the differences in tr
 </video>
 </p>
 
-#### Individual Trajectories
+### Individual Trajectories
 View trajectories for specific individuals. Choose from a random sample, specific individuals of interest, individuals within a specific variable, eg. a random sample of females only.
 
 <p align="center">
@@ -63,7 +81,7 @@ View trajectories for specific individuals. Choose from a random sample, specifi
 </p>
 
 
-### Other features in development
+## Other features in development
 * **Points of acceleration**
   * Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory.
 * **Stability**
