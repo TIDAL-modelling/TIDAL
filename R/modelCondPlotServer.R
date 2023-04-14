@@ -35,7 +35,7 @@ modelCondPlotServer <- function(id,
       if(modelType() == "Linear"){
         fit <- lmer(formula = paste0(formCode(),
                                      "+ factor(", conditionVar(), ")",
-                                     " + ", age(), "*factor(", conditionVar(), ")",
+                                     " + ", age(), "*factor(", conditionVar(), ")"
                                      ),
                     REML=F , data = modelData())
       } else if(modelType() == "Quadratic"){
