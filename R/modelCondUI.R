@@ -14,11 +14,45 @@
 modelCondUI <- function(id, label = "Model Condition Run") {
   ns <- NS(id)
 
-  tagList(
-    selectInput(ns("condition"), "Select the condition to split trajectory on.", choices = c()  ),
-    p("Be aware that it may take a while for the model to re-run when you change input for this page.")
-    # checkboxInput(ns("covarsLogical"), "Do you want to include covariates?", value = FALSE),
-    # uiOutput(ns("covarsOpt"))
+  sidebarLayout(
+    sidebarPanel(
+      tagList(
+        selectInput(ns("condition"), "Select the condition to split trajectory on.", choices = c()  ),
+        p("Be aware that it may take a while for the model to re-run when you change input for this page.")
+        # checkboxInput(ns("covarsLogical"), "Do you want to include covariates?", value = FALSE),
+        # uiOutput(ns("covarsOpt"))
+      )
+    ),
+    mainPanel(
+      tabsetPanel(
+        tabPanel(
+          "Instructions",
+          tagList(
+            h4("Split by variable analysis"),
+            p("Using the model made on the previous page explore some factors which may influence the trajectory. Select from a list of variables (ie. column names) of the dataset to split the trajectory by. There is also the option to include covariates in the model.")
+          )
+        ),
+        tabPanel(
+          "Output",
+          tabsetPanel(
+            tabPanel("Model Results",
+                     tagList(
+                       htmlOutput(ns("form")),
+                       h4("Fixed Effects"),
+                       tableOutput(ns("modelStatsFixed")),
+                       h4("Random Effects"),
+                       tableOutput(ns("modelStatsRandom"))
+                     )
+            ),
+            tabPanel("Plot",
+                     plotOutput(ns("modelCondPlot"))
+            )
+          )
+        )
+      )
     )
+  )
+
+
   }
 

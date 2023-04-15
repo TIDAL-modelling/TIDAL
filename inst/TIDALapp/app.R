@@ -84,26 +84,7 @@ overview_page <-   tabPanel(
 intervention_page <- tabPanel(
   title = "Group Interactions",
   fluidPage(
-    sidebarLayout(
-      sidebarPanel(
-        TIDAL:::modelCondUI("modelCond")
-      ),
-      mainPanel(
-        tabsetPanel(
-          tabPanel(
-            "Instructions",
-            tagList(
-              h4("Split by variable analysis"),
-              p("Using the model made on the previous page explore some factors which may influence the trajectory. Select from a list of variables (ie. column names) of the dataset to split the trajectory by. There is also the option to include covariates in the model.")
-            )
-          ),
-          tabPanel(
-          "Output",
-          TIDAL:::modelCondPlotUI("modelCondPlot")
-          )
-      )
-    )
-    )
+    TIDAL:::modelCondUI("modelCond")
   )
 )
 
@@ -162,19 +143,13 @@ server <- function(input, output, session) {
                                                 age = varsSelectServer$age,
                                                 timePoint = varsSelectServer$timePoint)
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
-                                                modelData = modelRunServer$data)
-  modelCondPlotServer <- TIDAL:::modelCondPlotServer("modelCondPlot",
-                                                modelData = modelRunServer$data,
-                                                formCode = varsSelectServer$modelForm,
-                                                dfPlot = modelPlotServer,
-                                                traj = varsSelectServer$traj,
-                                                age = varsSelectServer$age,
-                                                timePoint = varsSelectServer$timePoint,
-                                                conditionVar = modelCondServer$condition,
-                                                modelType = varsSelectServer$modelType
-                                                # covariates = modelCondServer$covariates,
-                                                # covarsLogical = modelCondServer$covarsLogical
-                                                )
+                                              modelData = modelRunServer$data,
+                                               formCode = varsSelectServer$modelForm,
+                                               dfPlot = modelPlotServer,
+                                               traj = varsSelectServer$traj,
+                                               age = varsSelectServer$age,
+                                               timePoint = varsSelectServer$timePoint,
+                                               modelType = varsSelectServer$modelType)
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
                                                   subject = varsSelectServer$ID,
                                                   age = varsSelectServer$age,
