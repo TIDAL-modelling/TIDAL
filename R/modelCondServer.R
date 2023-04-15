@@ -42,7 +42,7 @@ modelCondServer <- function(id,
 
       # ---------------------------------------
       # paste the formula depending on whether covariates are wanted or not
-      fit <- reactive({
+      fit <- eventReactive(input$button,{
 
         if(modelType() == "Linear"){
           fit <- lmer(formula = paste0(formCode(),
@@ -78,7 +78,7 @@ modelCondServer <- function(id,
         return(fit)
       })
 
-      modelDataEdit <- reactive({
+      modelDataEdit <- eventReactive(input$button,{
 
         # select the index for the column that the user wants to split the analysis on
         i <- which(colnames(modelData()) %in% input$condition)
@@ -124,7 +124,6 @@ modelCondServer <- function(id,
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = factor(Group_Level) ) , na.rm=T)+
           scale_colour_discrete(na.translate = F)
       })
-
     }
   )
 }
