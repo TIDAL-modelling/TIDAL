@@ -72,10 +72,10 @@ wide2longServer <- function(id) {
       })
 
       # -------------------------------
-      # We want the user to not type in names that match exisiting column names
+      # We want the user to not type in names that match existing column names
       output$warningMsgColName <- renderText({
         ifelse(c(input$dep_cat, input$dep,input$time_point,input$age) %in%  colnames(info())  ,
-               '<b style="color:red">Please type in colum names that are unique and do not already exist in your dataset.</b>', '')
+               '<b style="color:red">Please type in column names that are unique and do not already exist in your dataset.</b>', '')
       })
       # -------------------------------
       # Convert the wide dataframe to long format
