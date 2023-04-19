@@ -36,7 +36,7 @@ wide2longServer <- function(id) {
             selectInput(ns("ageCols"), "Select columns for age at each time point:", choices = NULL, multiple = TRUE),
             selectInput(ns("depCols"), "Select columns for the phenotype (eg. depression) at each time point:", choices = NULL, multiple = TRUE),
             textInput(ns("age"), "Name of new column for age:", value = "age"),
-            textInput(ns("occ"), "Name of new column for time point:", value = "occ"),
+            textInput(ns("time_point"), "Name of new column for time point:", value = "time_point"),
             textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
             textInput(ns("dep_cat"), "Name of new column for phenotype category:", value = "dep_cat"),
             checkboxInput(ns("ageImpute"), "Do you want to impute missing age?", value = TRUE ),
@@ -74,7 +74,7 @@ wide2longServer <- function(id) {
       # -------------------------------
       # We want the user to not type in names that match exisiting column names
       output$warningMsgColName <- renderText({
-        ifelse(c(input$dep_cat, input$dep,input$occ,input$age) %in%  colnames(info())  ,
+        ifelse(c(input$dep_cat, input$dep,input$time_point,input$age) %in%  colnames(info())  ,
                '<b style="color:red">Please type in colum names that are unique and do not already exist in your dataset.</b>', '')
       })
       # -------------------------------
@@ -96,16 +96,20 @@ wide2longServer <- function(id) {
 
         # now convert wide to long
         dataDep <- dataWide %>%
+          mutate(!!input$dep := as.numeric(!!input$dep)) %>%
+          mutate(!!input$dep_cat := as.factor(!!input$dep_cat)) %>%
           gather(!!input$dep_cat, !!input$dep, all_of(input$depCols))
 
         dataLong <- dataWide %>%
-          gather(!!input$occ, !!input$age, all_of(input$ageCols))
+          mutate(!!input$age := as.numeric(!!input$age)) %>%
+          mutate(!!input$time_point := as.factor(!!input$time_point)) %>%
+          gather(!!input$time_point, !!input$age, all_of(input$ageCols))
 
         dataLong[,input$dep_cat] <- dataDep[,input$dep_cat]
         dataLong[,input$dep] <- dataDep[,input$dep]
 
         dataLong <- dataLong %>%
-          relocate(c(!!input$occ, !!input$age, !!input$dep_cat, !!input$dep), .after = 1)
+          relocate(c(!!input$time_point, !!input$age, !!input$dep_cat, !!input$dep), .after = 1)
 
         dataLong
       })
