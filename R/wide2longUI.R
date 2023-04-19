@@ -53,6 +53,7 @@ wide2longUI <- function(id, label = "wide2long") {
                  tagList(
                    htmlOutput(ns("warningMsgEmpty")),
                    htmlOutput(ns("warningMsgLen")),
+                   htmlOutput(ns("warningMsgColName")),
                    tableOutput(ns("preview"))
                  )
         )

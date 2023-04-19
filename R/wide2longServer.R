@@ -68,9 +68,15 @@ wide2longServer <- function(id) {
       # We want the user to select the same number of age and depression columns,
       # so include a message telling them to do this when they are not equal
       output$warningMsgLen <- renderText({
-        ifelse(length(input$ageCols) != length(input$depCols), '<b style="color:red">Select same number of columns for age and depression.</b>', '')
+        ifelse(length(input$ageCols) != length(input$depCols), '<b style="color:red">Select the same number of columns for age and phenotype.</b>', '')
       })
 
+      # -------------------------------
+      # We want the user to not type in names that match exisiting column names
+      output$warningMsgColName <- renderText({
+        ifelse(c(input$dep_cat, input$dep,input$occ,input$age) %in%  colnames(info())  ,
+               '<b style="color:red">Please type in colum names that are unique and do not already exist in your dataset.</b>', '')
+      })
       # -------------------------------
       # Convert the wide dataframe to long format
       dataLong <- reactive({
