@@ -17,31 +17,37 @@ varsSelectServer <- function(id, varsSelectData) {
     function(input, output, session) {
       ns <- NS(id)
 
-      # Update UI of ID, traj, age and timePoint with drop down choices of all the column names in varsSelectData (output from selectDataServer.R)
+      # Update UI of ID and timePoint with drop down choices of all the column names in varsSelectData (output from selectDataServer.R)
       colVarUpdate <- function(colVar, i){
         observeEvent(varsSelectData(), {
           updateSelectInput(
             session,
             colVar,
             choices = names(varsSelectData()),
-            selected = names(varsSelectData()[i])
+            selected = names(varsSelectData() [i])
           )
         })
       }
 
-      varNames <- list("ID", "traj", "age", "timePoint")
-      varIndex <- list(NULL, NULL, NULL, NULL)
+      varNames <- list("ID", "timePoint")
+      varIndex <- list(NULL,  NULL)
       purrr::map2(varNames, varIndex, \(varNames, varIndex) colVarUpdate(varNames, varIndex))
 
-      # special case for covariates that can have nothing selected (figure out a better way for this)
-      # observeEvent(varsSelectData(), {
-      #   updateSelectInput(
-      #     session,
-      #     "covars",
-      #     choices = c(" ", names(varsSelectData())),
-      #     selected = " "
-      #   )
-      # })
+      # Update UI of ID, traj, age and timePoint with drop down choices of all the column names in varsSelectData (output from selectDataServer.R)
+      colVarUpdateNumeric <- function(colVar, i){
+        observeEvent(varsSelectData(), {
+          updateSelectInput(
+            session,
+            colVar,
+            choices = names(select(varsSelectData(), where(is.numeric)) ),
+            selected = names(select(varsSelectData(), where(is.numeric)) [i])
+          )
+        })
+      }
+
+      varNames <- list("traj", "age")
+      varIndex <- list(NULL, NULL)
+      purrr::map2(varNames, varIndex, \(varNames, varIndex) colVarUpdateNumeric(varNames, varIndex))
 
       # add what type of model to run and input the different formula here:
       modelForm <- reactive({
