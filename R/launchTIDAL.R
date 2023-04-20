@@ -1,14 +1,20 @@
 #' Run Shiny app from local R environment
 #'
-#' Opens an interactive Shiny GUI
+#' Opens an interactive Shiny GUI.
 #'
-#' "display" can be either "default" which opens as a pop out window in R studio or "browser" which opens in the browser.
-#'
+#' @param display Character vector. Can be either "default" or "browser". Default is "default".
+#'   "default" opens the Shiny app in a pop-out window in RStudio, while "browser" opens it in a web browser.
 #'
 #' @import shiny
 #' @import shinythemes
 #'
 #' @export
+#' @examples
+#' # Launch Shiny app with default display
+#' launchTIDAL()
+#'
+#' # Launch Shiny app with browser display
+#' launchTIDAL(display = "browser")
 launchTIDAL <- function(display = "default") {
   appDir <- system.file("TIDALapp", package = "TIDAL")
 
