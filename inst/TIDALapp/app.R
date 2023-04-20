@@ -66,8 +66,7 @@ overview_page <-   tabPanel(
       tabPanel("Output",
     sidebarLayout(
       sidebarPanel(
-        TIDAL:::selectDataUI("select"),
-        TIDAL:::varsSelectUI("varsSelect")),
+        TIDAL:::selectDataUI("select")),
       mainPanel(
         tabsetPanel(
           tabPanel("Descriptive Statistics",
@@ -126,34 +125,33 @@ ui <- navbarPage(
 server <- function(input, output, session) {
   wide2longServer <- TIDAL:::wide2longServer("wide2long")
   selectedDataServer <- TIDAL:::selectDataServer("select", dataFormatted=wide2longServer)
-  varsSelectServer <- TIDAL:::varsSelectServer("varsSelect", varsSelectData=selectedDataServer)
   modelRunServer <- TIDAL:::modelRunServer("modelRun",
-                                              modelData = selectedDataServer,
-                                              formCode = varsSelectServer$modelForm,
-                                              traj = varsSelectServer$traj,
-                                              age = varsSelectServer$age,
-                                              timePoint = varsSelectServer$timePoint)
+                                              modelData = selectedDataServer$data,
+                                              formCode = selectedDataServer$modelForm,
+                                              traj = selectedDataServer$traj,
+                                              age = selectedDataServer$age,
+                                              timePoint = selectedDataServer$timePoint)
   modelResultsServer <- TIDAL:::modelResultsServer("modelResults",
                                                    modelFit = modelRunServer$fit,
                                                    warningMsg = modelRunServer$warning)
   modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
                                                 modelData = modelRunServer$data,
                                                 modelFit = modelRunServer$fit,
-                                                SubjectID = varsSelectServer$ID,
-                                                traj = varsSelectServer$traj,
-                                                age = varsSelectServer$age,
-                                                timePoint = varsSelectServer$timePoint)
+                                                SubjectID = selectedDataServer$ID,
+                                                traj = selectedDataServer$traj,
+                                                age = selectedDataServer$age,
+                                                timePoint = selectedDataServer$timePoint)
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                               modelData = modelRunServer$data,
-                                               formCode = varsSelectServer$modelForm,
+                                               formCode = selectedDataServer$modelForm,
                                                dfPlot = modelPlotServer,
-                                               traj = varsSelectServer$traj,
-                                               age = varsSelectServer$age,
-                                               timePoint = varsSelectServer$timePoint,
-                                               modelType = varsSelectServer$modelType)
+                                               traj = selectedDataServer$traj,
+                                               age = selectedDataServer$age,
+                                               timePoint = selectedDataServer$timePoint,
+                                               modelType = selectedDataServer$modelType)
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
-                                                  subject = varsSelectServer$ID,
-                                                  age = varsSelectServer$age,
+                                                  subject = selectedDataServer$ID,
+                                                  age = selectedDataServer$age,
                                                   modelData = modelRunServer$data,
                                                   modelFit = modelRunServer$fit)
 }
