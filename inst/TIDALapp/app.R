@@ -33,9 +33,9 @@ welcome_page <- tabPanel(
   p("Split the trajectories by varaibles to examine the differences in trajectories."),
   h4("Individual Trajectories"),
   p("View trajectories for specific individuals. Choose from a random sample, specific individuals of interest, individuals within a specific variable, eg. a random sample of females only."),
-  h4("Points of acceleration"),
+  h4("Points of acceleration (In Development)"),
   p("Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory."),
-  h4("Stability"),
+  h4("Stability (In Development)"),
   p("Captures within-individual variability in depressive symptoms over time and compare how this varies by different forms of interventions or combinations of interventions.")
 )
 )
@@ -61,7 +61,7 @@ overview_page <-   tabPanel(
                         TIDAL GitHub repository</a>
                         if using the application online.</strong>')
                  ),
-                 p("Either upload a long format dataframe (csv or tsv) or use the data frame you formatted on the previous page. Then select the columns you wish to use as variables in your model. Inspect the descriptive statistics of your trajectory variable at each time point. Select the model type (eg. linear or a polynomial model) and view the plot of the mean trajectory against these models.")
+                 p("Either upload a long format dataframe (.csv or .tsv) or use the data frame you formatted on the previous page. If you are uploading a long format dataframe then columns must have unique names. Then select the columns you wish to use as variables in your model. Inspect the descriptive statistics of your trajectory variable at each time point. Select the model type (eg. linear or a polynomial model) and view the plot of the mean trajectory against these models.")
                )),
       tabPanel("Output",
     sidebarLayout(
