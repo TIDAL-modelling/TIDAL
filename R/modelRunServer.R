@@ -60,8 +60,7 @@ modelRunServer <- function(id,
       # Output message
       warning <- reactive({
         if( any(str_detect(as.character(summary(fit())$call), "optimizer")) ){
-          "Model did not converge. A different optimizer was used. Please interpret results with caution."
-          # paste0(summary(fit())$optinfo$conv$lme4$messages %>% paste0(collapse = ", "))
+          'The lme4 &quot;bobyqa&quot; optimiser was used. Please see more info <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.'
         }else{
           ""
         }
