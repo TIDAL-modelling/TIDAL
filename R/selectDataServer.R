@@ -33,6 +33,34 @@ selectDataServer <- function(id, dataFormatted) {
         return(data)
       })
 
+      # ------------------------------
+      # Ensure column names go back to blank when input$select changes
+
+      # Create a reactiveValues object to store the previous value of input$select
+      prev_select <- reactiveValues(value = NULL)
+
+      observeEvent(input$select, {
+        # Check if input$select has changed from the previous value
+        if (!is.null(prev_select$value) && prev_select$value != input$select) {
+          # Check if input$select changed to or from the desired options
+          if ((prev_select$value == "Upload a long format dataset" && input$select == "Data formatted on previous page") ||
+              (prev_select$value == "Data formatted on previous page" && input$select == "Upload a long format dataset")) {
+            # Code to run when input$select changes between the desired options
+            updateSelectInput(session, ns("ID"), "Participant ID variable:", choices =  c())
+            updateSelectInput(session, ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices =  c())
+            updateSelectInput(session, ns("age"), "Variable for age at time point (continous):", choices =  c())
+            updateSelectInput(session, ns("timePoint"), "Variable for time point (categorical):", choices =  c())
+          }
+        }
+
+        # Update the previous value of input$select
+        prev_select$value <- input$select
+      })
+
+
+
+      # ------------------------------
+
       # Update UI of ID and timePoint with drop down choices of all the column names in data (output from selectDataServer.R)
       colVarUpdate <- function(colVar, i){
         observeEvent(data(), {
