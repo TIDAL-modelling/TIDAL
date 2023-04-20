@@ -9,6 +9,7 @@ options(shiny.maxRequestSize = 30*1024^2)
 welcome_page <- tabPanel(
   title = "Overview",
   fluidPage(
+  HTML('<center><img src="TIDAL.png" width="550"></center>'),
   h1("Tool to Implement Developmental Analyses of Longitudinal Data"),
   p("The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people."),
   p("These features will include:"),
@@ -109,7 +110,7 @@ singeTraj_page <-  tabPanel(
 
 ui <- navbarPage(
   title = "TIDAL",
-  theme = shinytheme('united'),
+  theme = shinytheme('cerulean'),
   tags$style(type="text/css",
              ".shiny-output-error { visibility: hidden; }",
              ".shiny-output-error:before { visibility: hidden; }"
