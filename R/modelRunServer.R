@@ -14,6 +14,7 @@
 #' @keywords internal
 #' @export
 modelRunServer <- function(id,
+                           button,
                            modelData,
                            formCode,
                            age,
@@ -29,15 +30,17 @@ modelRunServer <- function(id,
       #### Run the model
 
       # Mean center age to 0
-      newModelData <- reactive({
+      newModelData <- eventReactive(button(), {
         req(age())
+        req(modelData())
         modelData() %>%
           mutate(age_original = !!sym(age()) ) %>%
           mutate(!!sym(age()) := !!sym(age()) - mean( !!sym(age()), na.rm = T ))
       })
 
       # Run the model
-      fit <- reactive({
+      fit <- eventReactive(button(), {
+        req(formCode())
         fit <- lmer(formula = formCode(), REML=F , data = newModelData())
 
         # Inspect warnings from the model
@@ -69,7 +72,8 @@ modelRunServer <- function(id,
 
       # ------------------------------------------
       # show descriptive statistics
-      output$desc <- renderTable(
+      output$desc <- renderTable({
+        req(newModelData())
         newModelData() %>%
           group_by(across( !!timePoint() )) %>%
           summarise(N = sum(!is.na( !!sym(traj()) )),
@@ -78,12 +82,13 @@ modelRunServer <- function(id,
                     median = median(!!sym(traj()), na.rm = T),
                     IQR = IQR(!!sym(traj()), na.rm = T)
           )
-      )
+      })
 
       # ------------------------------------------
       # Plot the distributions
       # Get the mean and sd for depression scores at each time point
       df.plot <- reactive({
+        req(newModelData())
         newModelData() %>%
           group_by(across( !!timePoint() )) %>%
           summarise(Age = mean(age_original, na.rm = T),
@@ -96,14 +101,15 @@ modelRunServer <- function(id,
 
       })
 
-      output$plot <- renderPlot(
+      output$plot <- renderPlot({
+        req(df.plot())
         ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
           theme_light()+
           theme_light()+
           geom_point()+
           geom_line() +
           geom_errorbar(aes(ymin = lower, ymax = upper))
-      )
+      })
 
       return(
         list(

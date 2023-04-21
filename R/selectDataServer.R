@@ -20,7 +20,7 @@ selectDataServer <- function(id, dataFormatted) {
       }
       })
 
-      data <- eventReactive(input$select, {
+      data <- reactive ({
         if (input$select == "Upload a long format dataset"){
           req(input$uploadFile)
           data <- fread(input$uploadFile$datapath)
@@ -33,8 +33,7 @@ selectDataServer <- function(id, dataFormatted) {
 
       # ------------------------------
       output$additional <- renderUI({
-        req(data()) # Make sure data() is available
-
+          req(data())
         # Render UI elements
         tagList(
           selectInput(ns("ID"), "Participant ID variable:", choices = names(data())),
@@ -45,10 +44,9 @@ selectDataServer <- function(id, dataFormatted) {
         )
       })
       # ------------------------------
-
-
       # add what type of model to run and input the different formula here:
-      modelForm <- reactive({
+      modelForm <- eventReactive(input$button, {
+        req(data())
         if(input$modelType == "Linear"){
           paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
         } else if(input$modelType == "Quadratic"){
@@ -63,6 +61,7 @@ selectDataServer <- function(id, dataFormatted) {
 
       return(
         list(
+          button = reactive({ input$button }),
           data = data,
           modelForm = modelForm,
           ID = reactive({ input$ID }),
