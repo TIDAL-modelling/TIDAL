@@ -128,7 +128,7 @@ wide2longServer <- function(id) {
           paste0(Sys.time(), 'LongFormat.csv')
         },
         content = function(file){
-          write.csv(dataLong(), file)
+          write.csv(dataLong(), file, row.names = F, quote = F)
         }
       )
 

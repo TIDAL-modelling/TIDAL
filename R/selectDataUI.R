@@ -20,6 +20,7 @@ selectDataUI <- function(id, label = "data") {
     selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices =  c()),
     selectInput(ns("age"), "Variable for age at time point (continous):", choices =  c()),
     selectInput(ns("timePoint"), "Variable for time point (categorical):", choices =  c()),
-    selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic"))
+    selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic"))#,
+    # actionButton(ns("button"), "Run Model")
   )
 }
