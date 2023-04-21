@@ -19,7 +19,6 @@ selectDataUI <- function(id, label = "data") {
                 c("Upload a long format dataset", "Data formatted on previous page")),
     uiOutput(ns("uploadFile")),
     tableOutput(ns("test")),
-    uiOutput(ns("additional")),
-    actionButton(ns("button"), "Run Model")
+    uiOutput(ns("additional"))
   )
 }

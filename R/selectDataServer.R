@@ -37,16 +37,16 @@ selectDataServer <- function(id, dataFormatted) {
         # Render UI elements
         tagList(
           selectInput(ns("ID"), "Participant ID variable:", choices = names(data())),
-          selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(data())),
-          selectInput(ns("age"), "Variable for age at time point (continous):", choices = names(data())),
-          selectInput(ns("timePoint"), "Variable for time point (categorical):", choices = names(data())),
-          selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic"))
+          selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(select(data(), where(is.numeric)) ) ),
+          selectInput(ns("age"), "Variable for age at time point (continous):", choices = names(select(data(), where(is.numeric)) ) ),
+          selectInput(ns("timePoint"), "Variable for time point (categorical):", choices = names(data()) ),
+          selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic")),
+          actionButton(ns("button"), "Run Model")
         )
       })
       # ------------------------------
       # add what type of model to run and input the different formula here:
       modelForm <- eventReactive(input$button, {
-        req(data())
         if(input$modelType == "Linear"){
           paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
         } else if(input$modelType == "Quadratic"){
