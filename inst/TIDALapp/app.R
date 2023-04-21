@@ -110,10 +110,10 @@ singeTraj_page <-  tabPanel(
 ui <- navbarPage(
   title = "TIDAL",
   theme = shinytheme('cerulean'),
-  tags$style(type="text/css",
-             ".shiny-output-error { visibility: hidden; }",
-             ".shiny-output-error:before { visibility: hidden; }"
-  ),
+  # tags$style(type="text/css",
+  #            ".shiny-output-error { visibility: hidden; }",
+  #            ".shiny-output-error:before { visibility: hidden; }"
+  # ),
   welcome_page,
   format_page,
   overview_page,
