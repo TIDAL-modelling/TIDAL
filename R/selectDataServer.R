@@ -14,8 +14,7 @@ selectDataServer <- function(id, dataFormatted) {
         output$uploadFile <- renderUI({
           if (input$select == "Upload a long format dataset"){
           tagList(
-            fileInput(ns("uploadFile"), NULL),
-            p("Please wait for file to upload.")
+            fileInput(ns("uploadFile"), NULL)
           )
       }
       })
