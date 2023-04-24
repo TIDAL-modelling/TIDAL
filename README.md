@@ -23,6 +23,8 @@ remotes::install_github("AmeliaES/TIDAL")
 library("TIDAL")
 # Launch the R Shiny app
 launchTIDAL()
+# To get documentation for launchTIDAL()
+?launchTIDAL
 ```
 
 ### Online
