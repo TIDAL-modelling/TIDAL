@@ -1,4 +1,4 @@
-# Tool to Implement Developmental Analyses of Longitudinal Data (`TIDAL`)
+# Tool to Implement Developmental Analyses of Longitudinal Data 
 
 <p align="center">
 <img width="600" alt="Screenshot 2023-02-03 at 13 00 15" src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png">
@@ -8,15 +8,14 @@
 ![my badge](https://badgen.net/badge/Status/In%20Development/orange)
 <!-- badges: end -->
 
+
+
+
 ## Installation and useage
-
-### Online: https://tidal.shinyapps.io/tidalapp/
-
-To use this tool online please do not upload any sensitive data. Only use the [synthetic datasets](data/), described below.
 
 ### Locally
 
-Please install the R package and launch the Shiny app locally if you want to upload sensitive data:
+Please install the R package and launch the Shiny app locally if you want to upload sensitive data. If using R Studio it's recommended to restart your R session before installing.
 
 ```{r eval=FALSE}
 # install.packages("remotes")
@@ -26,14 +25,20 @@ library("TIDAL")
 launchTIDAL()
 ```
 
+### Online
+
+https://tidal.shinyapps.io/tidalapp/
+
+To use this tool online please do not upload any sensitive data. Only use the [synthetic datasets](data/), described below.
+
 ## Synthetic datasets
-To save the dataset click on the link below (right click to open in new tab) and then click `File` -> `Save Page As...`.
+To save the dataset click on the link below (right click to open in new tab) and then click `File` -> `Save Page As...` and save as a .csv file.
 
 * [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/emot_reg_emot_simulated.csv)
   * Emotional regulation in childhood and emotional sympotms scores across 5 time points between childhood and adolescence.
-  * This dataset contains ~13000 subjects, who have been simulated from original MCS participants.
+  * This dataset contains ~13000 subjects, who have been simulated from original [Millennium Cohort Study (MCS)](https://cls.ucl.ac.uk/cls-studies/millennium-cohort-study/) participants.
   * There are two emotion regulation variables one could use:
-  * er_t1_bin is a binary variable of better (coded as 0) and worse (coded as 1) emotion regulation in childhood.
+      * `er_t1_bin` is a binary variable of better (coded as 0) and worse (coded as 1) emotion regulation in childhood.
 
 ## Main Features
 
