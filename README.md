@@ -90,4 +90,21 @@ View trajectories for specific individuals. Choose from a random sample, specifi
 * Allow users to input an x-axis value (eg. age) and recieve y-axis value (eg. depression score), for mean values from a user specified model.
 * Allow users to download tables and plots (also to edit colours in the plots)
 * Return an R script at the end of analysis with the code ran to generate tables and plots downloaded.
+
+
+## Authors, contributors and funders
+* Amelia J. Edmondson-Stait1, Ellen J. Thompson2, Eileen Y. Xu1, Richard M. A. Parker 3, Ahmed Elhakeem3,  Liana Romaniuk1, Iona Beange1, Rebecca M. Pearson3,4, Andrew M. McIntosh1, Thalia C. Eley2, Kate Tilling3, Heather C. Whalley1,5, Alex S. F. Kwong1
+1.  Division of Psychiatry, University of Edinburgh
+2. Social Genetic and Developmental Psychiatry Centre, King’s College London
+3. Medical Research Council Integrative Epidemiology Unit, University of Bristol
+4. Department of Psychology, Manchester Metropolitan University
+5. Generation Scotland: Scottish Family Health Study (GS:SFHS), University of Edinburgh
+* We would also like to acknowledge cohort participants and those who have given feedback to our tool, including clinicians, teachers, researchers and our young people advisory group.
+* This project is funded by The Wellcome Trust and Social Finance.
+
+
+
+
+
+
   
