@@ -32,13 +32,10 @@ https://tidal.shinyapps.io/tidalapp/
 To use this tool online please do not upload any sensitive data. Only use the [synthetic datasets](data/), described below.
 
 ## Synthetic datasets
-To save the dataset click on the link below (right click to open in new tab) and then click `File` -> `Save Page As...` and save as a .csv file.
+  * [Documentation and description of data](https://github.com/AmeliaES/TIDAL/blob/documentation/data/README.md)
+  * To save the dataset click on the link below (right click to open in new tab) and then click `File` -> `Save Page As...` and save as a .csv file.
+       * [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/emot_reg_emot_simulated.csv)
 
-* [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/emot_reg_emot_simulated.csv)
-  * Emotional regulation in childhood and emotional sympotms scores across 5 time points between childhood and adolescence.
-  * This dataset contains ~13000 subjects, who have been simulated from original [Millennium Cohort Study (MCS)](https://cls.ucl.ac.uk/cls-studies/millennium-cohort-study/) participants.
-  * There are two emotion regulation variables one could use:
-      * `er_t1_bin` is a binary variable of better (coded as 0) and worse (coded as 1) emotion regulation in childhood.
 
 ## Main Features
 
