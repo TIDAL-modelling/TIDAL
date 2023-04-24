@@ -18,7 +18,7 @@ selectDataServer <- function(id, dataFormatted) {
           )
       }
       })
-
+      # if the user wants to use data formatted on previous page, from wide to long format then save this as "data()"
       data <- reactive ({
         if (input$select == "Upload a long format dataset"){
           req(input$uploadFile)
@@ -30,7 +30,7 @@ selectDataServer <- function(id, dataFormatted) {
         return(data)
       })
 
-      # ------------------------------
+      # Allow the user to assign the variables below from the column names in their dataframe
       output$additional <- renderUI({
           req(data())
         # Render UI elements
@@ -43,8 +43,9 @@ selectDataServer <- function(id, dataFormatted) {
           actionButton(ns("button"), "Run Model")
         )
       })
-      # ------------------------------
-      # add what type of model to run and input the different formula here:
+     
+      # add what type of model to run and input the different formula here
+      # This only runs when the user clicks on the button
       modelForm <- eventReactive(input$button, {
         if(input$modelType == "Linear"){
           paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
