@@ -93,12 +93,15 @@ View trajectories for specific individuals. Choose from a random sample, specifi
 
 
 ## Authors, contributors and funders
-* Amelia J. Edmondson-Stait1, Ellen J. Thompson2, Eileen Y. Xu1, Richard M. A. Parker 3, Ahmed Elhakeem3,  Liana Romaniuk1, Iona Beange1, Rebecca M. Pearson3,4, Andrew M. McIntosh1, Thalia C. Eley2, Kate Tilling3, Heather C. Whalley1,5, Alex S. F. Kwong1
-1.  Division of Psychiatry, University of Edinburgh
-2. Social Genetic and Developmental Psychiatry Centre, King’s College London
-3. Medical Research Council Integrative Epidemiology Unit, University of Bristol
-4. Department of Psychology, Manchester Metropolitan University
-5. Generation Scotland: Scottish Family Health Study (GS:SFHS), University of Edinburgh
+* Amelia J. Edmondson-Stait<sup>1</sup>, Ellen J. Thompson<sup>2</sup>, Eileen Y. Xu<sup>1</sup>, Richard M. A. Parker <sup>3</sup>, Ahmed Elhakeem<sup>3</sup>,  Liana Romaniuk<sup>1</sup>, Iona Beange<sup>1</sup>, Rebecca M. Pearson<sup>3,4</sup>, Andrew M. McIntosh<sup>1</sup>, Thalia C. Eley<sup>2</sup>, Kate Tilling<sup>3</sup>, Heather C. Whalley<sup>1,5</sup>, Alex S. F. Kwong<sup>1</sup>
+* Affiliations:
+     <ol type="1">
+        <li>Division of Psychiatry, University of Edinburgh</li>
+        <li>Social Genetic and Developmental Psychiatry Centre, King’s College London</li>
+        <li>Medical Research Council Integrative Epidemiology Unit, University of Bristol</li>
+        <li>Department of Psychology, Manchester Metropolitan University</li>
+        <li>Generation Scotland: Scottish Family Health Study (GS:SFHS), University of Edinburgh</li>
+     </ol>
 * We would also like to acknowledge cohort participants and those who have given feedback to our tool, including clinicians, teachers, researchers and our young people advisory group.
 * This project is funded by The Wellcome Trust and Social Finance.
 
