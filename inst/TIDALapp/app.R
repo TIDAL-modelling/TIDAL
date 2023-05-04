@@ -19,10 +19,10 @@ welcome_page <- tabPanel(
     tags$li("How variable mental health responses are over time within individuals (stability).")
   ),
   tags$div(
-    HTML('<strong style="color:red">Please only upload synthetic datasets available on the
+    HTML('<strong style="color:red">Please only use synthetic data if using the application online. Details of this data is available on the
                         <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue" target="_blank">
                         TIDAL GitHub repository</a>
-                        if using the application online.</strong>')
+                        .</strong>')
   ),
   p('To use this tool please read the "Instructions" tab on each page to guide you through the process. In brief the main aims of each page:'),
   h4("Data Preparation"),
@@ -110,10 +110,10 @@ singeTraj_page <-  tabPanel(
 ui <- navbarPage(
   title = "TIDAL",
   theme = shinytheme('cerulean'),
-  # tags$style(type="text/css",
-  #            ".shiny-output-error { visibility: hidden; }",
-  #            ".shiny-output-error:before { visibility: hidden; }"
-  # ),
+  tags$style(type="text/css",
+             ".shiny-output-error { visibility: hidden; }",
+             ".shiny-output-error:before { visibility: hidden; }"
+  ),
   welcome_page,
   format_page,
   overview_page,
