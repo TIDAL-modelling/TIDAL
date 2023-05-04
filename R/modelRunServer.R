@@ -28,8 +28,9 @@ modelRunServer <- function(id,
 
       # ------------------------------------------
       #### Run the model
-
-      # Mean center age to 0
+      
+      # Mean center age to 0, 
+      # only do this when the action button in the side pannel is clicked
       newModelData <- eventReactive(button(), {
         req(age())
         req(modelData())
@@ -39,6 +40,7 @@ modelRunServer <- function(id,
       })
 
       # Run the model
+      # only do this when the action button in the side pannel is clicked
       fit <- eventReactive(button(), {
         req(formCode())
         fit <- lmer(formula = formCode(), REML=F , data = newModelData())
