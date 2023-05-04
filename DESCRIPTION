@@ -11,3 +11,5 @@ Encoding: UTF-8
 RoxygenNote: 7.2.3
 Imports: shiny, shinythemes, shinyjs, stringr, purrr, tidyr, dplyr, broom.mixed, lme4, data.table, ggplot2, magrittr
 LazyData: true
+Depends: 
+    R (>= 2.10)
