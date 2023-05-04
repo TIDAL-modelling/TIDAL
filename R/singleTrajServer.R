@@ -119,11 +119,6 @@ singleTrajServer <- function(id,
           paste0("The following IDs are plotted: ", paste0(IDs(), collapse = ", "))
         })
 
-        output$table <- renderDataTable({
-          modelDataEdit() %>%
-            filter(!!sym(subject()) %in% IDs())
-        })
-
 
        # -----------------------------------------------
        #################################################

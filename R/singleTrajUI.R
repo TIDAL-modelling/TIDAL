@@ -17,8 +17,7 @@ singleTrajUI <- function(id, label = "Model") {
     mainPanel(
       tagList(
       textOutput(ns("textIDs")),
-      plotOutput(ns("trajPlot")),
-      dataTableOutput(ns("table"))
+      plotOutput(ns("trajPlot"))
       )
     )
   )
