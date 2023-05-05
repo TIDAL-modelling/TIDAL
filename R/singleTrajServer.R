@@ -134,7 +134,7 @@ singleTrajServer <- function(id,
            # get age at each time point
            ages <- modelDataEdit() %>%
              filter(!!sym(subject()) == x) %>%
-             pull(!!sym(age()))
+             pull(age_original)
 
            # number of unique time points
            n <- modelDataEdit() %>%
@@ -164,7 +164,7 @@ singleTrajServer <- function(id,
          # -----------------------------------------------
          # Plot the individual trajectories:
          ggplot() +
-           geom_line(data = modelDataEdit(), aes(x= !!sym(age()),  y = pred), na.rm=T) +
+           geom_line(data = modelDataEdit(), aes(x= age_original,  y = pred), na.rm=T) +
            geom_line(data = pred_random ,
                      aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")
        })
