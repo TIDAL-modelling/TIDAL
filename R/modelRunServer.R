@@ -45,26 +45,31 @@ modelRunServer <- function(id,
         req(formCode())
 
         # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
-
-
         # Run the mixed model
-        fit <- lmer(formula = formCode(), REML=F , data = newModelData())
-
-        # Inspect warnings from the model
-        message <- summary(fit)$optinfo$conv$lme4$messages %>% paste0(collapse = ", ")
-
-        # If the model returns a warning about not converging, need to rescale variables or is.singular then
-        # rerun the model with a different optimiser
-
-        if( str_detect(message, "converge|Rescale|singular") ) {
-          fit <- lmer(formula = formCode(), REML=F , data = newModelData(),
-                      control=lmerControl(optimizer="bobyqa",
-                                          optCtrl=list(maxfun=2e5)))
+        fit <- try(lmer(formula = formCode(), REML=F , data = newModelData()))
+        if(class(fit) == "try-error"){
+          output$errorObs <- renderText({
+            "The model doesn't run. This could be because there is too much missing data or too few time points."
+          })
         }else{
-          fit <- fit
+          # Inspect warnings from the model
+          message <- summary(fit)$optinfo$conv$lme4$messages %>% paste0(collapse = ", ")
+
+          # If the model returns a warning about not converging, need to rescale variables or is.singular then
+          # rerun the model with a different optimiser
+
+          if( str_detect(message, "converge|Rescale|singular") ) {
+            fit <- lmer(formula = formCode(), REML=F , data = newModelData(),
+                        control=lmerControl(optimizer="bobyqa",
+                                            optCtrl=list(maxfun=2e5)))
+          }else{
+            fit <- fit
+          }
+
         }
 
         return(fit)
+
       })
 
       # Output message

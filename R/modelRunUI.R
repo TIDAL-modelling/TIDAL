@@ -17,6 +17,7 @@ modelRunUI <- function(id, label = "Model") {
   ns <- NS(id)
 
   tagList(
+    textOutput(ns("errorObs")),
     p("Descriptive statistics of your variable of interest, eg. depression, for each time point."),
     tableOutput(ns("desc")),
     p('Plot the mean scores of your variable of interest by the time/age variable.
