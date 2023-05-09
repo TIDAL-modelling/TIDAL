@@ -154,7 +154,7 @@ wide2longServer <- function(id) {
       # add an option to download the long format dataframe
       output$downloadData <- downloadHandler(
         filename = function(){
-          paste0(Sys.time(), 'LongFormat.csv')
+          paste0(Sys.Date(), 'LongFormat.csv')
         },
         content = function(file){
           write.csv(dataLong(), file, row.names = F, quote = F)
