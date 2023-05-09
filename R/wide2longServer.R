@@ -12,6 +12,7 @@
 #' @import shinyjs
 #' @import tidyr
 #' @import stringr
+#' @import shinyBS
 #'
 #' @noRd
 #' @keywords internal
@@ -75,7 +76,12 @@ wide2longServer <- function(id) {
           textInput(ns("time_point"), "Name of new column for time point:", value = "time_point"),
           textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
           textInput(ns("dep_cat"), "Name of new column for phenotype category:", value = "dep_cat"),
-          checkboxInput(ns("ageImpute"), "Do you want to impute missing age?", value = TRUE )
+          tags$div(title = "Check the box to impute missing\nage with the mean age calculated\nat each time point.",
+          checkboxInput(ns("ageImpute"),
+                        tags$span("Impute missing age",
+                                  tipify(bsButton("pB2", "?", style = "info", size = "extra-small"),
+                                         "")),
+                        value = TRUE ))
         )
       })
 
