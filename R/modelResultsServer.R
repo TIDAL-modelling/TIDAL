@@ -55,6 +55,16 @@ modelResultsServer <- function(id,
         as.data.frame(VarCorr(modelFit()),
                       order = "lower.tri")
       )
+
+      # number of observations (measurements) and the number of groups (people)
+      output$Ndims <- renderText(
+        paste0("The number of observations (measurements) is ",
+               format(summary(modelFit())$devcomp$dims[[1]], big.mark=",", scientific=FALSE),
+               " and the number of groups (people) is ",
+                format(summary(modelFit())$ngrps[[1]], big.mark=",", scientific=FALSE) ,
+               ".")
+      )
+
     }
   )
 }
