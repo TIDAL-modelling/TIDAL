@@ -75,8 +75,7 @@ wide2longServer <- function(id) {
           textInput(ns("time_point"), "Name of new column for time point:", value = "time_point"),
           textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
           textInput(ns("dep_cat"), "Name of new column for phenotype category:", value = "dep_cat"),
-          checkboxInput(ns("ageImpute"), "Do you want to impute missing age?", value = TRUE ),
-          downloadButton(ns("downloadData"), "Download .csv")
+          checkboxInput(ns("ageImpute"), "Do you want to impute missing age?", value = TRUE )
         )
       })
 
@@ -149,6 +148,13 @@ wide2longServer <- function(id) {
         dataLong() %>%
           select(1:5) %>%
           head()
+      })
+
+      # -------------------------------
+      # Download button appears only when dataframe has been converted to long format and dataLong() exists
+      output$downloadDataButton <- renderUI({
+      req(dataLong())
+      downloadButton(ns("downloadData"), "Download .csv")
       })
 
       # -------------------------------

@@ -24,7 +24,8 @@ wide2longUI <- function(id, label = "wide2long") {
                     choices = c("Upload data", "Use demo synthetic data"),
                     selected = "Upload data"),
         uiOutput(ns("uploadControls")),
-        uiOutput(ns("moreControls"))
+        uiOutput(ns("moreControls")),
+        uiOutput(ns("downloadDataButton"))
         )
     ),
     mainPanel(
