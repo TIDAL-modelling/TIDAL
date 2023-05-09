@@ -11,6 +11,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import stringr
 #'
 #' @noRd
 #' @keywords internal
@@ -154,7 +155,11 @@ wide2longServer <- function(id) {
       # add an option to download the long format dataframe
       output$downloadData <- downloadHandler(
         filename = function(){
-          paste0(Sys.Date(), 'LongFormat.csv')
+          if(input$dataSource == "Upload data"){
+            paste0(word(input$upload$name, 1, sep = "\\."), "_LongFormat_", Sys.Date(), ".csv")
+          }else{
+            "emot_reg_emot_simulated_LongFormat.csv"
+          }
         },
         content = function(file){
           write.csv(dataLong(), file, row.names = F, quote = F)
