@@ -18,6 +18,7 @@ modelResultsUI <- function(id, label = "Model") {
 
   tagList(
     htmlOutput(ns("formulaText")),
+    p("The time variable (eg. age) has been mean centred, to aid model convergence."),
     br(),
     htmlOutput(ns("warning")),
     br(),
