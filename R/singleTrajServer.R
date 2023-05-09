@@ -120,6 +120,7 @@ singleTrajServer <- function(id,
           IDs <- strsplit(input$SelectIDs, ",")[[1]] %>% # split string by commas
             str_remove_all(., "\n") %>%  # remove any new lines (if present)
             str_trim()                   # remove any white space (if present)
+          IDs <- IDs[nchar(IDs) != 0] # Remove any empty values due to spurious commas
         }else if(input$choice  == "A specific variable"){
           IDs <- modelDataEdit() %>%
             filter(!!sym(input$catVars) == input$catLevels) %>%
