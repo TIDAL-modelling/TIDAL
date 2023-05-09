@@ -28,8 +28,8 @@ modelRunServer <- function(id,
 
       # ------------------------------------------
       #### Run the model
-      
-      # Mean center age to 0, 
+
+      # Mean center age to 0,
       # only do this when the action button in the side pannel is clicked
       newModelData <- eventReactive(button(), {
         req(age())
@@ -40,9 +40,14 @@ modelRunServer <- function(id,
       })
 
       # Run the model
-      # only do this when the action button in the side pannel is clicked
+      # only do this when the action button in the side panel is clicked
       fit <- eventReactive(button(), {
         req(formCode())
+
+        # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
+
+
+        # Run the mixed model
         fit <- lmer(formula = formCode(), REML=F , data = newModelData())
 
         # Inspect warnings from the model
