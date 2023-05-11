@@ -1,4 +1,4 @@
-#' Model plot - data exploration page
+#' Server to download results from explore data page
 #'
 #' @import broom.mixed
 #' @import lme4
@@ -12,15 +12,16 @@
 #' @noRd
 #' @keywords internal
 #' @export
-modelPlotServer <- function(id,
+downloadExploreServer <- function(id,
                             modelData,
                             modelFit,
                             traj,
                             timePoint,
                             formCode,
                             descTable,
-                            statement
-                            ) {
+                            statement,
+                            download
+) {
   moduleServer(
     id,
     function(input, output, session) {
@@ -57,13 +58,37 @@ modelPlotServer <- function(id,
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T)
       })
 
-      # plot the mean trajectory against the model
-      output$mainPlot <- renderPlot(
-        mainPlot()
+
+      # ------------------------------------------
+      # Add UI to download results
+      output$downloadReport <- downloadHandler(
+        filename = function(){
+          paste0("Explore_Data_", Sys.Date(), ".pdf")
+        },
+        content = function(file) {
+          # Copy the report file to a temporary directory before processing it, in
+          # case we don't have write permissions to the current working dir (which
+          # can happen when deployed).
+          tempReport <- file.path("www/exploreData.Rmd")
+          file.copy("exploreData.Rmd", tempReport, overwrite = TRUE)
+
+          # Set up parameters to pass to Rmd document
+          params <- list(formCode = formCode(),
+                         descTable = descTable(),
+                         # modelResults = modelResults(),
+                         statement = statement(),
+                         plot = mainPlot()
+          )
+
+          # Knit the document, passing in the `params` list, and eval it in a
+          # child of the global environment (this isolates the code in the document
+          # from the code in this app).
+          rmarkdown::render(tempReport, output_file = file,
+                            params = params,
+                            envir = new.env(parent = globalenv())
+          )
+        }
       )
-
-
-      return(df.plot)
     }
   )
 }

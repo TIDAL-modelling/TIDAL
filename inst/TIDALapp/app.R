@@ -74,7 +74,10 @@ overview_page <-   tabPanel(
         tabPanel("Model Results",
                  TIDAL:::modelResultsUI("modelResults")),
         tabPanel("Plot",
-        TIDAL:::modelPlotUI("modelPlot")))
+        TIDAL:::modelPlotUI("modelPlot")),
+        tabPanel("Download Results",
+        TIDAL::downloadExploreUI("downloadExplore"))
+        )
       ))
         )
     )
@@ -145,8 +148,16 @@ server <- function(input, output, session) {
                                                 formCode = selectedDataServer$modelForm,
                                                 descTable = modelRunServer$mainTable,
                                                 statement = modelResultsServer$statement
-
                                                 )
+  downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
+                                             modelData = modelRunServer$data,
+                                             modelFit = modelRunServer$fit,
+                                             traj = selectedDataServer$traj,
+                                             timePoint = selectedDataServer$timePoint,
+                                             formCode = selectedDataServer$modelForm,
+                                             descTable = modelRunServer$mainTable,
+                                             statement = modelResultsServer$statement
+  )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                               modelData = modelRunServer$data,
                                                formCode = selectedDataServer$modelForm,

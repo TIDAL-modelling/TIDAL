@@ -1,4 +1,4 @@
-#' Plot model - data exploration page
+#' UI to download results from explore data page
 #'
 #' @import broom.mixed
 #' @import lme4
@@ -11,11 +11,9 @@
 #' @noRd
 #' @keywords internal
 #' @export
-modelPlotUI <- function(id, label = "Model Plot") {
+downloadExploreUI <- function(id, label = "data") {
   ns <- NS(id)
-
   tagList(
-    plotOutput(ns("mainPlot"))
+    downloadButton(ns("downloadReport"), "Download Results")
   )
 }
-
