@@ -143,7 +143,8 @@ server <- function(input, output, session) {
                                                 SubjectID = selectedDataServer$ID,
                                                 traj = selectedDataServer$traj,
                                                 age = selectedDataServer$age,
-                                                timePoint = selectedDataServer$timePoint)
+                                                timePoint = selectedDataServer$timePoint
+                                                )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                               modelData = modelRunServer$data,
                                                formCode = selectedDataServer$modelForm,

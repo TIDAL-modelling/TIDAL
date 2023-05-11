@@ -15,7 +15,8 @@ modelPlotUI <- function(id, label = "Model Plot") {
   ns <- NS(id)
 
   tagList(
-    plotOutput(ns("mainPlot"))
+    plotOutput(ns("mainPlot")),
+    downloadButton(ns("downloadReport"), "Download Results")
   )
 }
 
