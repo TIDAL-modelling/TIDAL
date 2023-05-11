@@ -13,51 +13,18 @@
 #' @keywords internal
 #' @export
 downloadExploreServer <- function(id,
-                            modelData,
-                            modelFit,
-                            traj,
-                            timePoint,
-                            formCode,
                             descTable,
+                            warningMsg,
+                            formCodeRender,
                             statement,
-                            download
-) {
+                            fixedTab,
+                            randomTab,
+                            N,
+                            mainPlot
+                            ) {
   moduleServer(
     id,
     function(input, output, session) {
-
-      # ------------------------------------------
-      # add the "prediction"/model col to dataframe
-      modelDataEdit <- reactive({
-        modelData() %>%
-          mutate(pred = predict(modelFit(), ., re.form = NA))
-      })
-
-      # ------------------------------------------
-      # Get the mean and sd for depression scores at each time point
-      df.plot <- reactive({
-        modelData() %>%
-          group_by(across( !!timePoint() )) %>%
-          summarise(Age = mean(age_original, na.rm = T),
-                    Phenotype = mean(!!sym(traj()), na.rm = T),
-                    SD = sd(!!sym(traj()), na.rm = T),
-                    n = sum(!is.na( !!sym(traj()) ))
-          ) %>%
-          mutate(upper = Phenotype + ( qnorm(0.975)*SD/sqrt(n) ),
-                 lower = Phenotype - ( qnorm(0.975)*SD/sqrt(n) ))
-
-      })
-
-      # ------------------------------------------
-      mainPlot <- reactive({
-        ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
-          theme_light()+
-          geom_point()+
-          geom_line() +
-          geom_errorbar(aes(ymin = lower, ymax = upper)) +
-          geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T)
-      })
-
 
       # ------------------------------------------
       # Add UI to download results
@@ -73,11 +40,15 @@ downloadExploreServer <- function(id,
           file.copy("exploreData.Rmd", tempReport, overwrite = TRUE)
 
           # Set up parameters to pass to Rmd document
-          params <- list(formCode = formCode(),
-                         descTable = descTable(),
-                         # modelResults = modelResults(),
-                         statement = statement(),
-                         plot = mainPlot()
+          params <- list(
+            descTable = descTable(),
+            warningMsg = warningMsg(),
+            formCodeRender = formCodeRender(),
+            statement = statement(),
+            fixedTab = fixedTab(),
+            randomTab = randomTab(),
+            N = N(),
+            mainPlot = mainPlot()
           )
 
           # Knit the document, passing in the `params` list, and eval it in a

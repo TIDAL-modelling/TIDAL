@@ -14,6 +14,8 @@
 downloadExploreUI <- function(id, label = "data") {
   ns <- NS(id)
   tagList(
-    downloadButton(ns("downloadReport"), "Download Results")
+    p("When you have run your model, please click below to generate a pdf pop out with the descriptive statistics, model results and plot. Then save this pdf to your computer."),
+    br(),
+    downloadButton(ns("downloadReport"), "Open summary report")
   )
 }

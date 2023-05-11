@@ -16,10 +16,7 @@ modelPlotServer <- function(id,
                             modelData,
                             modelFit,
                             traj,
-                            timePoint,
-                            formCode,
-                            descTable,
-                            statement
+                            timePoint
                             ) {
   moduleServer(
     id,
@@ -63,7 +60,11 @@ modelPlotServer <- function(id,
       )
 
 
-      return(df.plot)
+      return(
+        list(
+        df.plot = df.plot,
+        mainPlot = mainPlot)
+        )
     }
   )
 }

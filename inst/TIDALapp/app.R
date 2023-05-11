@@ -144,24 +144,22 @@ server <- function(input, output, session) {
                                                 modelData = modelRunServer$data,
                                                 modelFit = modelRunServer$fit,
                                                 traj = selectedDataServer$traj,
-                                                timePoint = selectedDataServer$timePoint,
-                                                formCode = selectedDataServer$modelForm,
-                                                descTable = modelRunServer$mainTable,
-                                                statement = modelResultsServer$statement
+                                                timePoint = selectedDataServer$timePoint
                                                 )
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
-                                             modelData = modelRunServer$data,
-                                             modelFit = modelRunServer$fit,
-                                             traj = selectedDataServer$traj,
-                                             timePoint = selectedDataServer$timePoint,
-                                             formCode = selectedDataServer$modelForm,
                                              descTable = modelRunServer$mainTable,
-                                             statement = modelResultsServer$statement
+                                             warningMsg = modelRunServer$warning,
+                                             formCodeRender = modelResultsServer$modelFormRender,
+                                             statement = modelResultsServer$statement,
+                                             fixedTab = modelResultsServer$fixedTab,
+                                             randomTab = modelResultsServer$randomTab,
+                                             N = modelResultsServer$N,
+                                             mainPlot = modelPlotServer$mainPlot
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                               modelData = modelRunServer$data,
                                                formCode = selectedDataServer$modelForm,
-                                               dfPlot = modelPlotServer,
+                                               dfPlot = modelPlotServer$df.plot,
                                                traj = selectedDataServer$traj,
                                                age = selectedDataServer$age,
                                                timePoint = selectedDataServer$timePoint,
