@@ -29,16 +29,30 @@ downloadExploreServer <- function(id,
       ns <- NS(id)
 
       # ------------------------------------------
+      # Suffix for name:
+      name <- reactive({
+        if(input$suffix != ""){
+          paste0("_", input$suffix, "_")
+        }else{
+          "_"
+        }
+      })
+
+      # ------------------------------------------
       # Add UI to download results
       output$buttonHere <- renderUI({
         req(mainPlot())
-        downloadButton(ns("downloadReport"), "Download report")
+        tagList(
+          textInput(ns("suffix"),
+                    "File name suffix:"
+          ),
+          downloadButton(ns("downloadReport"), "Download report")
+          )
       })
-
 
       output$downloadReport <- downloadHandler(
         filename = function(){
-          paste0("Explore_Data_", Sys.Date(), ".pdf")
+          paste0("Explore_Data", name(), Sys.Date(), ".pdf")
         },
         content = function(file) {
           # Copy the report file to a temporary directory before processing it, in
