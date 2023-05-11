@@ -34,10 +34,14 @@ modelResultsServer <- function(id,
       # ------------------------------------------
       # Message that "The time variable `age` has been mean centred to `meanAge`, which is the mean age across all time assessments. This aids model convergence."
       output$ageMean <- renderText({
+        req(modelData())
         ageVar <- age()
-        ageMean <- round(mean(modelData()[,age()] , na.rm = T ), 2)
+        ageMeanVal <- modelData() %>%
+          pull(sym(age())) %>%
+          mean(na.rm = T) %>%
+          round(2)
 
-        paste0('The time variable "',ageVar,'" has been mean centred to ',ageMean,', which is the mean value across all time assessments. This aids model convergence.')
+        paste0('The time variable "',ageVar,'" has been mean centred to ',ageMeanVal,', which is the mean value across all time assessments. This aids model convergence.')
       })
 
       # ------------------------------------------
