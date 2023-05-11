@@ -35,15 +35,15 @@ selectDataServer <- function(id, dataFormatted) {
           req(data())
         # Render UI elements
         tagList(
-          selectInput(ns("ID"), "Participant ID variable:", choices = names(data())),
-          selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(select(data(), where(is.numeric)) ) ),
-          selectInput(ns("age"), "Variable for age at time point (continous):", choices = names(select(data(), where(is.numeric)) ) ),
-          selectInput(ns("timePoint"), "Variable for time point (categorical):", choices = names(data()) ),
+          selectInput(ns("ID"), "Participant ID variable:", choices = names(data()), selected = names(select(data(), where(is.numeric)) )[1]),
+          selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[3]),
+          selectInput(ns("age"), "Variable for age at time point (continous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[2]),
+          selectInput(ns("timePoint"), "Variable for time point (categorical):", choices = names(data()) , selected = names(data())[2]),
           selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic")),
           actionButton(ns("button"), "Run Model")
         )
       })
-     
+
       # add what type of model to run and input the different formula here
       # This only runs when the user clicks on the button
       modelForm <- eventReactive(input$button, {
