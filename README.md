@@ -1,4 +1,4 @@
-# Tool to Implement Developmental Analyses of Longitudinal Data 
+# Tool to Implement Developmental Analyses of Longitudinal Data
 
 <p align="center">
 <img width="600" alt="Screenshot 2023-02-03 at 13 00 15" src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png">
@@ -90,4 +90,24 @@ View trajectories for specific individuals. Choose from a random sample, specifi
 * Allow users to input an x-axis value (eg. age) and recieve y-axis value (eg. depression score), for mean values from a user specified model.
 * Allow users to download tables and plots (also to edit colours in the plots)
 * Return an R script at the end of analysis with the code ran to generate tables and plots downloaded.
+
+
+## Authors, contributors and funders
+* Amelia J. Edmondson-Stait<sup>1</sup>, Ellen J. Thompson<sup>2</sup>, Eileen Y. Xu<sup>1</sup>, Richard M. A. Parker <sup>3</sup>, Ahmed Elhakeem<sup>3</sup>,  Liana Romaniuk<sup>1</sup>, Iona Beange<sup>1</sup>, Rebecca M. Pearson<sup>3,4</sup>, Andrew M. McIntosh<sup>1</sup>, Thalia C. Eley<sup>2</sup>, Kate Tilling<sup>3</sup>, Heather C. Whalley<sup>1,5</sup>, Alex S. F. Kwong<sup>1</sup>
+* Affiliations:
+     <ol type="1">
+        <li>Division of Psychiatry, University of Edinburgh</li>
+        <li>Social Genetic and Developmental Psychiatry Centre, King’s College London</li>
+        <li>Medical Research Council Integrative Epidemiology Unit, University of Bristol</li>
+        <li>Department of Psychology, Manchester Metropolitan University</li>
+        <li>Generation Scotland: Scottish Family Health Study (GS:SFHS), University of Edinburgh</li>
+     </ol>
+* We would also like to acknowledge cohort participants and those who have given feedback to our tool, including clinicians, teachers, researchers and our young people advisory group.
+* This project is funded by The Wellcome Trust and Social Finance, Grant Ref: 226686/Z/22/Z.
+
+
+
+
+
+
   
