@@ -46,12 +46,9 @@ modelRunServer <- function(id,
 
         # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
         # Run the mixed model
-        fit <- try(lmer(formula = formCode(), REML=F , data = newModelData()))
-        if(class(fit) == "try-error"){
-          output$errorObs <- renderText({
-            "The model doesn't run. This could be because there is too much missing data or too few time points."
-          })
-        }else{
+        fit <- try(lmer(formula = formCode(), REML=F , data = newModelData()), silent = TRUE)
+
+        if(class(fit) != "try-error"){
           # Inspect warnings from the model
           message <- summary(fit)$optinfo$conv$lme4$messages %>% paste0(collapse = ", ")
 
@@ -69,15 +66,18 @@ modelRunServer <- function(id,
         }
 
         return(fit)
-
       })
 
       # Output message
       warning <- reactive({
-        if( any(str_detect(as.character(summary(fit())$call), "optimizer")) ){
-          'The lme4 &quot;bobyqa&quot; optimiser was used. Please see more info <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.'
+        if(class(fit()) != "try-error"){
+          if( any(str_detect(as.character(summary(fit())$call), "optimizer")) ){
+            'The lme4 &quot;bobyqa&quot; optimiser was used. Please see more info <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.'
+          }else{
+            ""
+          }
         }else{
-          ""
+          "The model doesn't run. This could be because there is too much missing data or too few time points."
         }
       })
 
