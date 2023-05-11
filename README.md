@@ -1,4 +1,4 @@
-# Tool to Implement Developmental Analyses of Longitudinal Data 
+# Tool to Implement Developmental Analyses of Longitudinal Data
 
 <p align="center">
 <img width="600" alt="Screenshot 2023-02-03 at 13 00 15" src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png">
@@ -103,7 +103,7 @@ View trajectories for specific individuals. Choose from a random sample, specifi
         <li>Generation Scotland: Scottish Family Health Study (GS:SFHS), University of Edinburgh</li>
      </ol>
 * We would also like to acknowledge cohort participants and those who have given feedback to our tool, including clinicians, teachers, researchers and our young people advisory group.
-* This project is funded by The Wellcome Trust and Social Finance.
+* This project is funded by The Wellcome Trust and Social Finance, Grant Ref: 226686/Z/22/Z.
 
 
 
