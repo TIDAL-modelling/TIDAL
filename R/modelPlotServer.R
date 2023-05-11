@@ -15,11 +15,11 @@
 modelPlotServer <- function(id,
                             modelData,
                             modelFit,
-                            SubjectID,
                             traj,
                             timePoint,
-                            age,
-                            download
+                            formCode,
+                            descTable,
+                            statement
                             ) {
   moduleServer(
     id,
@@ -48,14 +48,18 @@ modelPlotServer <- function(id,
       })
 
       # ------------------------------------------
-      # plot the mean trajectory against the model
-      output$mainPlot <- renderPlot(
+      mainPlot <- reactive({
         ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
           theme_light()+
           geom_point()+
           geom_line() +
           geom_errorbar(aes(ymin = lower, ymax = upper)) +
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T)
+      })
+
+      # plot the mean trajectory against the model
+      output$mainPlot <- renderPlot(
+        mainPlot()
       )
 
       # ------------------------------------------
@@ -72,7 +76,12 @@ modelPlotServer <- function(id,
           file.copy("exploreData.Rmd", tempReport, overwrite = TRUE)
 
           # Set up parameters to pass to Rmd document
-          params <- list(testResult = df.plot)
+          params <- list(formCode = formCode(),
+                         descTable = descTable(),
+                         # modelResults = modelResults(),
+                         statement = statement(),
+                         plot = mainPlot()
+                         )
 
           # Knit the document, passing in the `params` list, and eval it in a
           # child of the global environment (this isolates the code in the document

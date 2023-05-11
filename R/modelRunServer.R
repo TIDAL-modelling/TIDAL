@@ -84,7 +84,7 @@ modelRunServer <- function(id,
 
       # ------------------------------------------
       # show descriptive statistics
-      output$desc <- renderTable({
+      mainTable <- reactive({
         req(newModelData())
         newModelData() %>%
           group_by(across( !!timePoint() )) %>%
@@ -94,6 +94,10 @@ modelRunServer <- function(id,
                     median = median(!!sym(traj()), na.rm = T),
                     IQR = IQR(!!sym(traj()), na.rm = T)
           )
+      })
+
+      output$desc <- renderTable({
+        mainTable()
       })
 
       # ------------------------------------------
@@ -127,7 +131,8 @@ modelRunServer <- function(id,
         list(
           fit = fit,
           data = newModelData,
-          warning = warning
+          warning = warning,
+          mainTable = mainTable
           ))
     }
   )

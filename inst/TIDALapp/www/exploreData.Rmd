@@ -3,7 +3,11 @@ title: "My Shiny App Report"
 output:
   pdf_document: default
 params:
-  testResult: ""
+  plot: NA
+  descTable : NA
+  statement: NA
+  formCode: NA
+
 ---
 
 # Introduction
@@ -17,7 +21,13 @@ Here are the results based on the input provided:
 
 ## Plots
 ```{r}
-params$testResult
+library(knitr)
+params$plot
+kable(params$descTable)
+params$statement
+params$formCode
 ```
+
+
 
 

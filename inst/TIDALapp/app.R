@@ -140,10 +140,12 @@ server <- function(input, output, session) {
   modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
                                                 modelData = modelRunServer$data,
                                                 modelFit = modelRunServer$fit,
-                                                SubjectID = selectedDataServer$ID,
                                                 traj = selectedDataServer$traj,
-                                                age = selectedDataServer$age,
-                                                timePoint = selectedDataServer$timePoint
+                                                timePoint = selectedDataServer$timePoint,
+                                                formCode = selectedDataServer$modelForm,
+                                                descTable = modelRunServer$mainTable,
+                                                statement = modelResultsServer$statement
+
                                                 )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                               modelData = modelRunServer$data,

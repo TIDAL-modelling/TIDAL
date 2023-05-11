@@ -33,7 +33,7 @@ modelResultsServer <- function(id,
 
       # ------------------------------------------
       # Message that "The time variable `age` has been mean centred to `meanAge`, which is the mean age across all time assessments. This aids model convergence."
-      output$ageMean <- renderText({
+      statement <- reactive({
         req(modelData())
         ageVar <- age()
         ageMeanVal <- modelData() %>%
@@ -41,7 +41,12 @@ modelResultsServer <- function(id,
           mean(na.rm = T) %>%
           round(2)
 
-        paste0('The time variable "',ageVar,'" has been mean centred to ',ageMeanVal,', which is the mean value across all time assessments. This aids model convergence.')
+        statement <- paste0('The time variable "',ageVar,'" has been mean centred to ',ageMeanVal,', which is the mean value across all time assessments. This aids model convergence.')
+        return(statement)
+      })
+
+      output$ageMean <- renderText({
+        statement()
       })
 
       # ------------------------------------------
@@ -79,6 +84,11 @@ modelResultsServer <- function(id,
                " and the number of groups (people) is ",
                 format(summary(modelFit())$ngrps[[1]], big.mark=",", scientific=FALSE) ,
                ".")
+      )
+      return(
+        list(
+        statement = statement
+        )
       )
 
     }
