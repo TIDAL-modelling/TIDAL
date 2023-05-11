@@ -26,8 +26,16 @@ downloadExploreServer <- function(id,
     id,
     function(input, output, session) {
 
+      ns <- NS(id)
+
       # ------------------------------------------
       # Add UI to download results
+      output$buttonHere <- renderUI({
+        req(mainPlot())
+        downloadButton(ns("downloadReport"), "Download report")
+      })
+
+
       output$downloadReport <- downloadHandler(
         filename = function(){
           paste0("Explore_Data_", Sys.Date(), ".pdf")
