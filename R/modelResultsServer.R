@@ -15,7 +15,9 @@
 #' @export
 modelResultsServer <- function(id,
                            modelFit,
-                           warningMsg
+                           warningMsg,
+                           modelData ,
+                           age
 ) {
 
   moduleServer(
@@ -26,6 +28,16 @@ modelResultsServer <- function(id,
       # paste the formula text
       output$formulaText <- renderText({
         paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(modelFit())$call)[2])
+      })
+
+
+      # ------------------------------------------
+      # Message that "The time variable `age` has been mean centred to `meanAge`, which is the mean age across all time assessments. This aids model convergence."
+      output$ageMean <- renderText({
+        ageVar <- age()
+        ageMean <- round(mean(modelData()[,age()] , na.rm = T ), 2)
+
+        paste0('The time variable "',ageVar,'" has been mean centred to ',ageMean,', which is the mean value across all time assessments. This aids model convergence.')
       })
 
       # ------------------------------------------

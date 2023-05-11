@@ -18,7 +18,8 @@ modelResultsUI <- function(id, label = "Model") {
 
   tagList(
     htmlOutput(ns("formulaText")),
-    p("The time variable `age` has been mean centred to `meanAge`, which is the mean age across all time assessments. This aids model convergence."),
+    br(),
+    textOutput(ns("ageMean")),
     br(),
     htmlOutput(ns("warning")),
     br(),
