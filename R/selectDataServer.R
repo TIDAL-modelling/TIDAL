@@ -39,6 +39,10 @@ selectDataServer <- function(id, dataFormatted) {
           selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[3]),
           selectInput(ns("age"), "Variable for age at time point (continous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[2]),
           selectInput(ns("timePoint"), "Variable for time point (categorical):", choices = names(data()) , selected = names(data())[2]),
+          selectInput(ns("covars"), "Covariates (optional):",
+                      choices = names(data())[ !names(data()) %in% c(input$ID, input$traj, input$age, input$timePoint) ] ,
+                      selected = NULL,
+                      multiple = TRUE),
           selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic")),
           actionButton(ns("button"), "Run Model")
         )
@@ -48,14 +52,18 @@ selectDataServer <- function(id, dataFormatted) {
       # This only runs when the user clicks on the button
       modelForm <- eventReactive(input$button, {
         if(input$modelType == "Linear"){
-          paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
+          form <- paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
         } else if(input$modelType == "Quadratic"){
-          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")" )
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")" )
         } else if(input$modelType == "Cubic"){
-          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
         } else if(input$modelType == "Quartic"){
-          paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
         }
+        if(!is.null(input$covars)){
+          form <- paste0(form, " + ", paste0(input$covars, collapse = " + "))
+        }
+        form
       })
 
 
@@ -68,7 +76,8 @@ selectDataServer <- function(id, dataFormatted) {
           traj = reactive({ input$traj }),
           age = reactive({ input$age }),
           timePoint = reactive({ input$timePoint }),
-          modelType = reactive({ input$modelType })
+          modelType = reactive({ input$modelType }),
+          covars = reactive({ input$covars })
         )
       )
     }
