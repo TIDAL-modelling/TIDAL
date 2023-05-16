@@ -17,6 +17,7 @@ modelRunServer <- function(id,
                            button,
                            modelData,
                            formCode,
+                           formCodeCovars,
                            age,
                            traj,
                            timePoint
@@ -42,11 +43,11 @@ modelRunServer <- function(id,
       # Run the model
       # only do this when the action button in the side panel is clicked
       fit <- eventReactive(button(), {
-        req(formCode())
+        req(formCodeCovars())
 
         # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
         # Run the mixed model
-        fit <- try(lmer(formula = formCode(), REML=F , data = newModelData()), silent = TRUE)
+        fit <- try(lmer(formula = formCodeCovars(), REML=F , data = newModelData()), silent = TRUE)
 
         if(class(fit) != "try-error"){
           # Inspect warnings from the model
@@ -66,6 +67,11 @@ modelRunServer <- function(id,
         }
 
         return(fit)
+      })
+
+      fitBasic <- eventReactive(button(), {
+        req(formCode())
+        fitBasic <- lmer(formula = formCode(), REML=F , data = newModelData())
       })
 
       # Output message
@@ -130,6 +136,7 @@ modelRunServer <- function(id,
       return(
         list(
           fit = fit,
+          fitBasic = fitBasic,
           data = newModelData,
           warning = warning,
           mainTable = mainTable

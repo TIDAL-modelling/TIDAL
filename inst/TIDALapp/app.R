@@ -132,17 +132,19 @@ server <- function(input, output, session) {
                                               button = selectedDataServer$button,
                                               modelData = selectedDataServer$data,
                                               formCode = selectedDataServer$modelForm,
+                                              formCodeCovars = selectedDataServer$modelFormCovars,
                                               traj = selectedDataServer$traj,
                                               age = selectedDataServer$age,
                                               timePoint = selectedDataServer$timePoint)
   modelResultsServer <- TIDAL:::modelResultsServer("modelResults",
                                                    modelFit = modelRunServer$fit,
+
                                                    warningMsg = modelRunServer$warning,
                                                    modelData = selectedDataServer$data,
                                                    age = selectedDataServer$age)
   modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
                                                 modelData = modelRunServer$data,
-                                                modelFit = modelRunServer$fit,
+                                                modelFitBasic = modelRunServer$fitBasic,
                                                 traj = selectedDataServer$traj,
                                                 timePoint = selectedDataServer$timePoint
                                                 )

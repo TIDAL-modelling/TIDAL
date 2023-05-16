@@ -14,7 +14,7 @@
 #' @export
 modelPlotServer <- function(id,
                             modelData,
-                            modelFit,
+                            modelFitBasic,
                             traj,
                             timePoint
                             ) {
@@ -26,7 +26,7 @@ modelPlotServer <- function(id,
       # add the "prediction"/model col to dataframe
       modelDataEdit <- reactive({
         modelData() %>%
-          mutate(pred = predict(modelFit(), ., re.form = NA))
+          mutate(pred = predict(modelFitBasic(), ., re.form = NA))
       })
 
       # ------------------------------------------

@@ -60,9 +60,16 @@ selectDataServer <- function(id, dataFormatted) {
         } else if(input$modelType == "Quartic"){
           form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
         }
-        if(!is.null(input$covars)){
-          form <- paste0(form, " + ", paste0(input$covars, collapse = " + "))
-        }
+        form
+      })
+
+      modelFormCovars <- reactive({
+        req(modelForm())
+      if(!is.null(input$covars)){
+        form <- paste0(modelForm(), " + ", paste0(input$covars, collapse = " + "))
+      } else {
+        form <- modelForm()
+      }
         form
       })
 
@@ -72,6 +79,7 @@ selectDataServer <- function(id, dataFormatted) {
           button = reactive({ input$button }),
           data = data,
           modelForm = modelForm,
+          modelFormCovars = modelFormCovars,
           ID = reactive({ input$ID }),
           traj = reactive({ input$traj }),
           age = reactive({ input$age }),
