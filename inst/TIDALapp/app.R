@@ -138,7 +138,6 @@ server <- function(input, output, session) {
                                               timePoint = selectedDataServer$timePoint)
   modelResultsServer <- TIDAL:::modelResultsServer("modelResults",
                                                    modelFit = modelRunServer$fit,
-
                                                    warningMsg = modelRunServer$warning,
                                                    modelData = selectedDataServer$data,
                                                    age = selectedDataServer$age)
