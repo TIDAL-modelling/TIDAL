@@ -57,7 +57,7 @@ modelRunServer <- function(id,
           # rerun the model with a different optimiser
 
           if( str_detect(message, "converge|Rescale|singular") ) {
-            fit <- lmer(formula = formCode(), REML=F , data = newModelData(),
+            fit <- lmer(formula = formCodeCovars(), REML=F , data = newModelData(),
                         control=lmerControl(optimizer="bobyqa",
                                             optCtrl=list(maxfun=2e5)))
           }else{
