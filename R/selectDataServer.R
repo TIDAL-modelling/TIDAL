@@ -39,7 +39,11 @@ selectDataServer <- function(id, dataFormatted) {
           selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[3]),
           selectInput(ns("age"), "Variable for age at time point (continous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[2]),
           selectInput(ns("timePoint"), "Variable for time point (categorical):", choices = names(data()) , selected = names(data())[2]),
-          selectInput(ns("covars"), "Covariates (optional):",
+          selectInput(ns("covarsCat"), "Categorical Confounders (optional):",
+                      choices = names(data())[ !names(data()) %in% c(input$ID, input$traj, input$age, input$timePoint) ] ,
+                      selected = NULL,
+                      multiple = TRUE),
+          selectInput(ns("covarsCont"), "Continous Confounders (optional):",
                       choices = names(data())[ !names(data()) %in% c(input$ID, input$traj, input$age, input$timePoint) ] ,
                       selected = NULL,
                       multiple = TRUE),
@@ -65,9 +69,21 @@ selectDataServer <- function(id, dataFormatted) {
 
       modelFormCovars <- reactive({
         req(modelForm())
-      if(!is.null(input$covars)){
-        form <- paste0(modelForm(), " + ", paste0(input$covars, collapse = " + "))
-      } else {
+      if(!(is.null(input$covarsCat) & is.null(input$covarsCont))){
+        form <- paste0(modelForm(),
+                       " + as.numeric(",
+                       paste0(input$covarsCont, ") + as.numeric("), ")",
+                       " + as.factor(",
+                       paste0(input$covarsCat, collapse = ") + as.factor("), ")")
+      }else if((is.null(input$covarsCat)) & (!is.null(input$covarsCont))){
+        form <- paste0(modelForm(),
+                       " + as.numeric(",
+                       paste0(input$covarsCont, ") + as.numeric("), ")")
+      }else if((!is.null(input$covarsCat)) & (is.null(input$covarsCont))){
+        form <- paste0(modelForm(),
+                       " + as.factor(",
+                       paste0(input$covarsCat, collapse = ") + as.factor("), ")")
+      }else {
         form <- modelForm()
       }
         form
@@ -84,8 +100,7 @@ selectDataServer <- function(id, dataFormatted) {
           traj = reactive({ input$traj }),
           age = reactive({ input$age }),
           timePoint = reactive({ input$timePoint }),
-          modelType = reactive({ input$modelType }),
-          covars = reactive({ input$covars })
+          modelType = reactive({ input$modelType })
         )
       )
     }
