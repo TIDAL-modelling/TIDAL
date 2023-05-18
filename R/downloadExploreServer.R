@@ -9,6 +9,7 @@
 #' @import tidyr
 #' @import purrr
 #' @import tinytex
+#' @import rmarkdown
 #'
 #' @noRd
 #' @keywords internal
