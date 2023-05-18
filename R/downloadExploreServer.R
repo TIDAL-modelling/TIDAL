@@ -8,6 +8,7 @@
 #' @import shinyjs
 #' @import tidyr
 #' @import purrr
+#' @import tinytex
 #'
 #' @noRd
 #' @keywords internal
