@@ -119,7 +119,7 @@ modelCondServer <- function(id,
       modelDataEdit <- eventReactive(input$button,{
 
         # select the index for the column that the user wants to split the analysis on
-        i <- which(colnames(modelData()) %in% input$condition)
+        colSplit <- which(colnames(modelData()) %in% input$condition)
 
         # add the "predicted" column to this dataset (it's not really a prediction because its the same dataset, it just shows the model)
         # add a column for coloring the plot by the split by variable
@@ -129,12 +129,40 @@ modelCondServer <- function(id,
         ######### MANUALLY CALCULATE PREDICT WITH COVARIATES??!!
         ###############################################################
         ###############################################################
-        age <- modelData() %>% pull(!!age())
-        adjustedScore <- age * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
+        ageVec <- modelData() %>% pull(!!age())
+        var <- input$condition
 
-        modelDataEdit <-  modelData() %>%
-          mutate(pred = adjustedScore) %>%
-          mutate(Group_Level = .[[i]] )
+        # Number of factor levels
+        n <- length(unique(pull(modelData(), !!var)))
+
+        # Score when covariates set to zero
+        zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
+
+        # row index of model coefficients table for the variable of interest
+        rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                     pattern = var) &
+                            str_detect(string = row.names(summary(fit())$coefficients),
+                                       pattern = age(), negate = T))
+
+        predCovs <- lapply(1:(n-1), function(i){
+          ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
+        })
+
+        names(predCovs) <- unique(str_sub(str_subset(row.names(summary(fit())$coefficients), var), -1))
+
+        for(i in 1:(n-1)){
+          modelData()[,paste0(var, names(predCovs)[i])] <- predCovs[[i]]
+        }
+
+        modelDataEdit1 <- modelData() %>%
+                            mutate(pred = zero)
+
+        for(i in 1:(n-1)){
+          modelDataEdit1[modelDataEdit1[,var] == names(predCovs)[i],"pred"] <- modelDataEdit1[modelDataEdit1[,var] == names(predCovs)[i],paste0(var, names(predCovs)[i])]
+        }
+
+        modelDataEdit <-  modelDataEdit1 %>%
+          mutate(Group_Level = .[[colSplit]] )
 
         return(modelDataEdit)
       })
