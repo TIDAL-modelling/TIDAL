@@ -70,39 +70,45 @@ modelCondServer <- function(id,
       ######### DIFFERENT FOR CONTINUOUS AND CATEGORICAL SPLIT
       ###############################################################
       ###############################################################
-      # either factorise or make numeric the input$condition depending on the input$varType option
-
 
       fit <- eventReactive(input$button,{
 
+        # either factorise or make numeric the input$condition depending on the input$varType option
+        if(input$varType == "cat"){
+          cond <- paste0("as.factor(", input$condition, ")")
+        }else if(input$varType == "cont"){
+          cond <- paste0("as.numeric(", input$condition, ")")
+        }
+
+
         if(modelType() == "Linear"){
           fit <- lmer(formula = paste0(formCodeCovars(),
-                                       "+ as.factor(", input$condition, ")",
-                                       " + ", age(), "*as.factor(", input$condition, ")"
+                                       "+ ", cond,
+                                       " + ", age(), "*", cond
           ),
           REML=F , data = modelData())
         } else if(modelType() == "Quadratic"){
           fit <- lmer(formula = paste0(formCodeCovars(),
-                                       "+ as.factor(", input$condition, ")",
-                                       " + ", age(), "*as.factor(", input$condition, ")",
-                                       " + I(", age(), "^2)*as.factor(", input$condition, ")"
+                                       "+ ", cond,
+                                       " + ", age(), "*", cond,
+                                       " + I(", age(), "^2)*", cond
           ),
           REML=F , data = modelData())
         } else if(modelType() == "Cubic"){
           fit <- lmer(formula = paste0(formCodeCovars(),
-                                       "+ as.factor(", input$condition, ")",
-                                       " + ", age(), "*as.factor(", input$condition, ")",
-                                       " + I(", age(), "^2)*as.factor(", input$condition, ")",
-                                       " + I(", age(), "^3)*as.factor(", input$condition, ")"
+                                       "+ ", cond,
+                                       " + ", age(), "*", cond,
+                                       " + I(", age(), "^2)*", cond,
+                                       " + I(", age(), "^3)*", cond
           ),
           REML=F , data = modelData())
         } else if(modelType() == "Quartic"){
           fit <- lmer(formula = paste0(formCodeCovars(),
-                                       "+ as.factor(", input$condition, ")",
-                                       " + ", age(), "*as.factor(", input$condition, ")",
-                                       " + I(", age(), "^2)*as.factor(", input$condition, ")",
-                                       " + I(", age(), "^3)*as.factor(", input$condition, ")",
-                                       " + I(", age(), "^4)*as.factor(", input$condition, ")"
+                                       "+ ", cond,
+                                       " + ", age(), "*", cond,
+                                       " + I(", age(), "^2)*", cond,
+                                       " + I(", age(), "^3)*", cond,
+                                       " + I(", age(), "^4)*", cond
           ),
           REML=F , data = modelData())
         }
