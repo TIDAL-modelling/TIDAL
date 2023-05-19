@@ -53,11 +53,26 @@ modelCondServer <- function(id,
       })
 
       # ---------------------------------------
-      # If the user has selected a variable that is already a covariate print a warning message and don't run anything further
+      # If the user has selected a variable that is already a covariate print a warning message
+      # and don't run anything further
+      ###############################################################
+      ###############################################################
+      ######### ADD WARNING MESSAGE
+      ###############################################################
+      ###############################################################
 
 
       # ---------------------------------------
-      # paste the formula depending on whether covariates are wanted or not
+      # paste the formula
+
+      ###############################################################
+      ###############################################################
+      ######### DIFFERENT FOR CONTINUOUS AND CATEGORICAL SPLIT
+      ###############################################################
+      ###############################################################
+      # either factorise or make numeric the input$condition depending on the input$varType option
+
+
       fit <- eventReactive(input$button,{
 
         if(modelType() == "Linear"){
@@ -101,6 +116,12 @@ modelCondServer <- function(id,
 
         # add the "predicted" column to this dataset (it's not really a prediction because its the same dataset, it just shows the model)
         # add a column for coloring the plot by the split by variable
+
+        ###############################################################
+        ###############################################################
+        ######### MANUALLY CALCULATE PREDICT WITH COVARIATES??!!
+        ###############################################################
+        ###############################################################
         modelDataEdit <- modelData() %>%
           mutate(pred = predict(fit(), ., re.form = NA)) %>%
           mutate(Group_Level = .[[i]] )
@@ -130,6 +151,12 @@ modelCondServer <- function(id,
       })
 
       # ---------------------------------------
+      ###############################################################
+      ###############################################################
+      ######### DIFFERENT FOR CONTINUOUS AND CATEGORICAL SPLIT
+      ###############################################################
+      ###############################################################
+
       # Plot the split by variable plot
       output$modelCondPlot <- renderPlot({
         ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
