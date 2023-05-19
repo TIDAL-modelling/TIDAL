@@ -65,13 +65,13 @@ modelCondServer <- function(id,
       # ---------------------------------------
       # paste the formula
 
-      ###############################################################
-      ###############################################################
-      ######### DIFFERENT FOR CONTINUOUS AND CATEGORICAL SPLIT
-      ###############################################################
-      ###############################################################
-
       fit <- eventReactive(input$button,{
+
+        ###############################################################
+        ###############################################################
+        #   EDIT TO USE THE SAME OPTIMISER AS PREVIOUSLY, IE. If warning message previously contains optimiser then use that below...
+        ###############################################################
+        ###############################################################
 
         # either factorise or make numeric the input$condition depending on the input$varType option
         if(input$varType == "cat"){
@@ -115,6 +115,7 @@ modelCondServer <- function(id,
         return(fit)
       })
 
+
       modelDataEdit <- eventReactive(input$button,{
 
         # select the index for the column that the user wants to split the analysis on
@@ -128,8 +129,11 @@ modelCondServer <- function(id,
         ######### MANUALLY CALCULATE PREDICT WITH COVARIATES??!!
         ###############################################################
         ###############################################################
-        modelDataEdit <- modelData() %>%
-          mutate(pred = predict(fit(), ., re.form = NA)) %>%
+        age <- modelData() %>% pull(!!age())
+        adjustedScore <- age * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
+
+        modelDataEdit <-  modelData() %>%
+          mutate(pred = adjustedScore) %>%
           mutate(Group_Level = .[[i]] )
 
         return(modelDataEdit)
@@ -159,18 +163,28 @@ modelCondServer <- function(id,
       # ---------------------------------------
       ###############################################################
       ###############################################################
-      ######### DIFFERENT FOR CONTINUOUS AND CATEGORICAL SPLIT
+      ######### DIFFERENT FOR CONTINUOUS AND CATEGORICAL SPLIT - change continuous plot to percentiles or ± 1 SDs
       ###############################################################
       ###############################################################
 
       # Plot the split by variable plot
-      output$modelCondPlot <- renderPlot({
+        output$modelCondPlotCat <- renderPlot({
+            ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
+              theme_light()+
+              geom_point()+
+              geom_line() +
+              geom_errorbar(aes(ymin = lower, ymax = upper)) +
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = factor(Group_Level) ) , na.rm=T)+
+              scale_colour_discrete(na.translate = F)
+      })
+
+      output$modelCondPlotCont <- renderPlot({
         ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
           theme_light()+
           geom_point()+
           geom_line() +
           geom_errorbar(aes(ymin = lower, ymax = upper)) +
-          geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = factor(Group_Level) ) , na.rm=T)+
+          geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
           scale_colour_discrete(na.translate = F)
       })
     }

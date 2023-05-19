@@ -28,7 +28,7 @@ modelPlotServer <- function(id,
       modelDataEdit <- reactive({
 
         age <- modelData() %>% pull(!!age())
-        adjustedScore <- modelData()[,age] * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
+        adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
 
         modelData() %>%
           mutate(pred = adjustedScore)
