@@ -43,7 +43,7 @@ selectDataServer <- function(id, dataFormatted) {
                       choices = names(data())[ !names(data()) %in% c(input$ID, input$traj, input$age, input$timePoint) ] ,
                       selected = NULL,
                       multiple = TRUE),
-          selectInput(ns("covarsCont"), "Continous Confounders (optional):",
+          selectInput(ns("covarsCont"), "Continuous Confounders (optional):",
                       choices = names(data())[ !names(data()) %in% c(input$ID, input$traj, input$age, input$timePoint) ] ,
                       selected = NULL,
                       multiple = TRUE),
