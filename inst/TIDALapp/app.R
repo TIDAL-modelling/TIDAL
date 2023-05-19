@@ -143,7 +143,8 @@ server <- function(input, output, session) {
                                                    age = selectedDataServer$age)
   modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
                                                 modelData = modelRunServer$data,
-                                                modelFitBasic = modelRunServer$fitBasic,
+                                                modelFit = modelRunServer$fit,
+                                                age = selectedDataServer$age,
                                                 traj = selectedDataServer$traj,
                                                 timePoint = selectedDataServer$timePoint
                                                 )
