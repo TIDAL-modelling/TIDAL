@@ -160,7 +160,7 @@ server <- function(input, output, session) {
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                               modelData = modelRunServer$data,
-                                               formCode = selectedDataServer$modelForm,
+                                               formCodeCovars = selectedDataServer$modelFormCovars,
                                                dfPlot = modelPlotServer$df.plot,
                                                traj = selectedDataServer$traj,
                                                age = selectedDataServer$age,

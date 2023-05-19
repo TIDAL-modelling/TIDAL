@@ -13,7 +13,7 @@
 #' @export
 modelCondServer <- function(id,
                             modelData,
-                            formCode,
+                            formCodeCovars,
                             dfPlot,
                             traj,
                             age,
@@ -26,52 +26,68 @@ modelCondServer <- function(id,
 
       ns <- NS(id)
 
-      observeEvent(modelData(),{
+      vars <- reactive({
+        req(modelData())
+        if(input$varType == "cat"){
+          colnames(modelData())[apply(modelData(), 2, function(x) length(unique(x))) < 40]
+        }else if(input$varType == "cont"){
+          colnames(modelData())[!apply(modelData(), 2, function(x) length(unique(x))) <= 2]
+        }else{
+          colnames(modelData())
+        }
+    })
 
+      observeEvent(vars(),{
+        req(modelData())
         # allow the user to select a variable from the column names of the dataset
         # critically this should be categorical variables (for the plot to split by a factor)
         # hacky way to choose a categorical variable is below
         # user can only select columns with unique values of length < 40. 40 being an arbitary number
         # but any more than this may not be very useful or visible on a plot, 40 is already a lot.
+
         updateSelectInput(
           session,
           "condition",
-          choices = colnames(modelData())[apply(modelData(), 2, function(x) length(unique(x))) < 40]
+          choices = vars()
         )
       })
+
+      # ---------------------------------------
+      # If the user has selected a variable that is already a covariate print a warning message and don't run anything further
+
 
       # ---------------------------------------
       # paste the formula depending on whether covariates are wanted or not
       fit <- eventReactive(input$button,{
 
         if(modelType() == "Linear"){
-          fit <- lmer(formula = paste0(formCode(),
-                                       "+ factor(", input$condition, ")",
-                                       " + ", age(), "*factor(", input$condition, ")"
+          fit <- lmer(formula = paste0(formCodeCovars(),
+                                       "+ as.factor(", input$condition, ")",
+                                       " + ", age(), "*as.factor(", input$condition, ")"
           ),
           REML=F , data = modelData())
         } else if(modelType() == "Quadratic"){
-          fit <- lmer(formula = paste0(formCode(),
-                                       "+ factor(", input$condition, ")",
-                                       " + ", age(), "*factor(", input$condition, ")",
-                                       " + I(", age(), "^2)*factor(", input$condition, ")"
+          fit <- lmer(formula = paste0(formCodeCovars(),
+                                       "+ as.factor(", input$condition, ")",
+                                       " + ", age(), "*as.factor(", input$condition, ")",
+                                       " + I(", age(), "^2)*as.factor(", input$condition, ")"
           ),
           REML=F , data = modelData())
         } else if(modelType() == "Cubic"){
-          fit <- lmer(formula = paste0(formCode(),
-                                       "+ factor(", input$condition, ")",
-                                       " + ", age(), "*factor(", input$condition, ")",
-                                       " + I(", age(), "^2)*factor(", input$condition, ")",
-                                       " + I(", age(), "^3)*factor(", input$condition, ")"
+          fit <- lmer(formula = paste0(formCodeCovars(),
+                                       "+ as.factor(", input$condition, ")",
+                                       " + ", age(), "*as.factor(", input$condition, ")",
+                                       " + I(", age(), "^2)*as.factor(", input$condition, ")",
+                                       " + I(", age(), "^3)*as.factor(", input$condition, ")"
           ),
           REML=F , data = modelData())
         } else if(modelType() == "Quartic"){
-          fit <- lmer(formula = paste0(formCode(),
-                                       "+ factor(", input$condition, ")",
-                                       " + ", age(), "*factor(", input$condition, ")",
-                                       " + I(", age(), "^2)*factor(", input$condition, ")",
-                                       " + I(", age(), "^3)*factor(", input$condition, ")",
-                                       " + I(", age(), "^4)*factor(", input$condition, ")"
+          fit <- lmer(formula = paste0(formCodeCovars(),
+                                       "+ as.factor(", input$condition, ")",
+                                       " + ", age(), "*as.factor(", input$condition, ")",
+                                       " + I(", age(), "^2)*as.factor(", input$condition, ")",
+                                       " + I(", age(), "^3)*as.factor(", input$condition, ")",
+                                       " + I(", age(), "^4)*as.factor(", input$condition, ")"
           ),
           REML=F , data = modelData())
         }
