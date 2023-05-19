@@ -168,25 +168,32 @@ modelCondServer <- function(id,
       ###############################################################
 
       # Plot the split by variable plot
-        output$modelCondPlotCat <- renderPlot({
-            ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
-              theme_light()+
-              geom_point()+
-              geom_line() +
-              geom_errorbar(aes(ymin = lower, ymax = upper)) +
-              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = factor(Group_Level) ) , na.rm=T)+
-              scale_colour_discrete(na.translate = F)
+      plot <- eventReactive(input$button, {
+
+        if(input$varType == "cat"){
+          ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
+            theme_light()+
+            geom_point()+
+            geom_line() +
+            geom_errorbar(aes(ymin = lower, ymax = upper)) +
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = factor(Group_Level) ) , na.rm=T)+
+            scale_colour_discrete(na.translate = F)
+        }else if(input$varType == "cont"){
+          ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
+            theme_light()+
+            geom_point()+
+            geom_line() +
+            geom_errorbar(aes(ymin = lower, ymax = upper)) +
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
+            scale_colour_discrete(na.translate = F)
+        }
+
       })
 
-      output$modelCondPlotCont <- renderPlot({
-        ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
-          theme_light()+
-          geom_point()+
-          geom_line() +
-          geom_errorbar(aes(ymin = lower, ymax = upper)) +
-          geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
-          scale_colour_discrete(na.translate = F)
-      })
+      output$modelCondPlot <- renderPlot({
+        plot()
+        })
+
     }
   )
 }

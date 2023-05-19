@@ -47,16 +47,7 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                      )
             ),
             tabPanel("Plot",
-                     tagList(
-                       conditionalPanel(
-                       condition = paste0("input['", ns("varType"), "'] == 'cat'"),
-                       plotOutput(ns("modelCondPlotCat"))
-                     ),
-                        conditionalPanel(
-                       condition = paste0("input['", ns("varType"), "'] == 'cont'"),
-                       plotOutput(ns("modelCondPlotCont"))
-                     )
-                    )
+                     plotOutput(ns("modelCondPlot"))
             )
           )
         )
