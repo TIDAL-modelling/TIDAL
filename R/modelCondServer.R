@@ -129,18 +129,12 @@ modelCondServer <- function(id,
         ######### MANUALLY CALCULATE PREDICT WITH COVARIATES??!!
         ###############################################################
         ###############################################################
+
         ageVec <- modelData() %>% pull(!!age())
-        var <- input$condition
-
-        # Number of factor levels
-        n <- length(unique(pull(modelData(), !!var)))
-
-        # Score when covariates set to zero
+        n <- length(unique(pull(dataLong, !!sym(input$condition))))
         zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
-
-        # row index of model coefficients table for the variable of interest
         rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                     pattern = var) &
+                                     pattern = input$condition) &
                             str_detect(string = row.names(summary(fit())$coefficients),
                                        pattern = age(), negate = T))
 
@@ -148,32 +142,27 @@ modelCondServer <- function(id,
           ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
         })
 
-        names(predCovs) <- unique(str_sub(str_subset(row.names(summary(fit())$coefficients), var), -1))
+        num <-  unique(str_sub(str_subset(row.names(summary(fit())$coefficients), input$condition), -1))
+        names(predCovs) <- paste0(input$condition, "_", num)
 
-        for(i in 1:(n-1)){
-          modelData()[,paste0(var, names(predCovs)[i])] <- predCovs[[i]]
-        }
-
-        modelDataEdit1 <- modelData() %>%
-                            mutate(pred = zero)
-
-        for(i in 1:(n-1)){
-          modelDataEdit1[modelDataEdit1[,var] == names(predCovs)[i],"pred"] <- modelDataEdit1[modelDataEdit1[,var] == names(predCovs)[i],paste0(var, names(predCovs)[i])]
-        }
-
-        modelDataEdit <-  modelDataEdit1 %>%
-          mutate(Group_Level = .[[colSplit]] )
+        modelDataEdit <- cbind(modelData(), do.call(cbind, predCovs)) %>%
+                          mutate(zero = zero) %>%
+                          mutate(Group_Level = .[[colSplit]] ) %>%
+          mutate(pred =  eval(parse(text =
+            paste0(paste0("ifelse(", input$condition, " == ", num, ", ", input$condition, "_",num,",", collapse = " "), "zero", paste0(rep(")", length(num)), collapse = ""), collapse = "")
+          )))
 
         return(modelDataEdit)
       })
       # ---------------
       # model results
       output$modelStatsFixed <- renderTable(
-        cbind(
-          tidy(fit(), "fixed"),
-          confint(fit(), "beta_", method = "Wald")) %>%
-          mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
-          mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
+        # cbind(
+        #   tidy(fit(), "fixed"),
+        #   confint(fit(), "beta_", method = "Wald")) %>%
+        #   mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
+        #   mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
+        head(modelDataEdit())
       )
 
       output$modelStatsRandom <- renderTable(
