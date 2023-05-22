@@ -85,7 +85,7 @@ overview_page <-   tabPanel(
 )
 
 intervention_page <- tabPanel(
-  title = "Group Interactions",
+  title = "Interaction Variable",
   fluidPage(
     TIDAL:::modelCondUI("modelCond")
   )

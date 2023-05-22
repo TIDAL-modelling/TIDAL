@@ -135,8 +135,10 @@ modelCondServer <- function(id,
         # add a column for coloring the plot by the split by variable
 
         ageVec <- modelData() %>% pull(!!age())
-        n <- length(unique(pull(modelData(), !!sym(input$condition))))
         zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
+
+        if(input$varType == "cat"){
+        n <- length(unique(pull(modelData(), !!sym(input$condition))))
         rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                      pattern = input$condition) &
                             str_starts(string = row.names(summary(fit())$coefficients),
@@ -155,7 +157,10 @@ modelCondServer <- function(id,
           mutate(pred =  eval(parse(text =
             paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero", paste0(rep(")", length(num)), collapse = ""), collapse = "")
           )))
-
+        }else if(input$varType == "cont"){
+          modelDataEdit <- modelData() %>%
+            mutate(pred = zero)
+        }
         return(modelDataEdit)
       })
       # ---------------
