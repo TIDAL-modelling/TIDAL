@@ -131,25 +131,25 @@ modelCondServer <- function(id,
         ###############################################################
 
         ageVec <- modelData() %>% pull(!!age())
-        n <- length(unique(pull(dataLong, !!sym(input$condition))))
+        n <- length(unique(pull(modelData(), !!sym(input$condition))))
         zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
         rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                      pattern = input$condition) &
-                            str_detect(string = row.names(summary(fit())$coefficients),
+                            str_starts(string = row.names(summary(fit())$coefficients),
                                        pattern = age(), negate = T))
 
         predCovs <- lapply(1:(n-1), function(i){
           ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
         })
 
-        num <-  unique(str_sub(str_subset(row.names(summary(fit())$coefficients), input$condition), -1))
+        num <-  unique(str_split(str_subset(row.names(summary(fit())$coefficients), input$condition), "\\)", simplify = T)[,2])
         names(predCovs) <- paste0(input$condition, "_", num)
 
         modelDataEdit <- cbind(modelData(), do.call(cbind, predCovs)) %>%
                           mutate(zero = zero) %>%
                           mutate(Group_Level = .[[colSplit]] ) %>%
           mutate(pred =  eval(parse(text =
-            paste0(paste0("ifelse(", input$condition, " == ", num, ", ", input$condition, "_",num,",", collapse = " "), "zero", paste0(rep(")", length(num)), collapse = ""), collapse = "")
+            paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero", paste0(rep(")", length(num)), collapse = ""), collapse = "")
           )))
 
         return(modelDataEdit)
@@ -157,11 +157,11 @@ modelCondServer <- function(id,
       # ---------------
       # model results
       output$modelStatsFixed <- renderTable(
-        # cbind(
-        #   tidy(fit(), "fixed"),
-        #   confint(fit(), "beta_", method = "Wald")) %>%
-        #   mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
-        #   mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
+      #   cbind(
+      #     tidy(fit(), "fixed"),
+      #     confint(fit(), "beta_", method = "Wald")) %>%
+      #     mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
+      #     mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
         head(modelDataEdit())
       )
 
