@@ -15,7 +15,7 @@ modelPlotUI <- function(id, label = "Model Plot") {
   ns <- NS(id)
 
   tagList(
-    p("Plot of model (note covariates are not included in this plot)"),
+    p("Plot of model (note covariates are set to 0)"),
     plotOutput(ns("mainPlot"))
   )
 }
