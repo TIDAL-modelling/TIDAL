@@ -62,6 +62,17 @@ modelCondServer <- function(id,
       ###############################################################
 
 
+
+      # ---------------------------------------
+      # allow the user to change the reference value for the categorical variable, by default i think it's the first item of the factor levels
+      ###############################################################
+      ###############################################################
+      ######### change reference value
+      ###############################################################
+      ###############################################################
+
+
+
       # ---------------------------------------
       # paste the formula
 
@@ -124,12 +135,6 @@ modelCondServer <- function(id,
         # add the "predicted" column to this dataset (it's not really a prediction because its the same dataset, it just shows the model)
         # add a column for coloring the plot by the split by variable
 
-        ###############################################################
-        ###############################################################
-        ######### MANUALLY CALCULATE PREDICT WITH COVARIATES??!!
-        ###############################################################
-        ###############################################################
-
         ageVec <- modelData() %>% pull(!!age())
         n <- length(unique(pull(modelData(), !!sym(input$condition))))
         zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
@@ -157,12 +162,11 @@ modelCondServer <- function(id,
       # ---------------
       # model results
       output$modelStatsFixed <- renderTable(
-      #   cbind(
-      #     tidy(fit(), "fixed"),
-      #     confint(fit(), "beta_", method = "Wald")) %>%
-      #     mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
-      #     mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
-        head(modelDataEdit())
+        cbind(
+          tidy(fit(), "fixed"),
+          confint(fit(), "beta_", method = "Wald")) %>%
+          mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
+          mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
       )
 
       output$modelStatsRandom <- renderTable(
