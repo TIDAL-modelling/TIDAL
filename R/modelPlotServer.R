@@ -17,7 +17,8 @@ modelPlotServer <- function(id,
                             modelFit,
                             age,
                             traj,
-                            timePoint
+                            timePoint,
+                            modelType
                             ) {
   moduleServer(
     id,
@@ -28,7 +29,23 @@ modelPlotServer <- function(id,
       modelDataEdit <- reactive({
 
         age <- modelData() %>% pull(!!age())
-        adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
+
+
+        if(modelType() == "Linear"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
+        } else if(modelType() == "Quadratic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1] +
+            age^2 * summary(modelFit())$coefficients[3,1]
+        } else if(modelType() == "Cubic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            age^2 * summary(modelFit())$coefficients[3,1] +
+            age^3 * summary(modelFit())$coefficients[4,1]
+        } else if(modelType() == "Quartic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            age^2 * summary(modelFit())$coefficients[3,1] +
+            age^3 * summary(modelFit())$coefficients[4,1] +
+            age^4 * summary(modelFit())$coefficients[5,1]
+        }
 
         modelData() %>%
           mutate(pred = adjustedScore)
