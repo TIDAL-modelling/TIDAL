@@ -39,6 +39,7 @@ modelCondUI <- function(id, label = "Model Condition Run") {
           tabsetPanel(
             tabPanel("Model Results",
                      tagList(
+                       textOutput(ns("warningCov")),
                        htmlOutput(ns("form")),
                        h4("Fixed Effects"),
                        tableOutput(ns("modelStatsFixed")),

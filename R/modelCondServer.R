@@ -55,12 +55,12 @@ modelCondServer <- function(id,
       # ---------------------------------------
       # If the user has selected a variable that is already a covariate print a warning message
       # and don't run anything further
-      ###############################################################
-      ###############################################################
-      ######### ADD WARNING MESSAGE
-      ###############################################################
-      ###############################################################
-
+      output$warningCov <- renderText({
+        if(str_detect(formCodeCovars(), input$condition)){
+          paste0("Error: You have chosen to condition on a variable that was chosen as a covariate on the previous page.\n
+                 Please go back and remove it as a covariate or choose another variable.")
+        }
+      })
 
 
       # ---------------------------------------
@@ -70,7 +70,6 @@ modelCondServer <- function(id,
       ######### change reference value
       ###############################################################
       ###############################################################
-
 
 
       # ---------------------------------------
@@ -161,24 +160,35 @@ modelCondServer <- function(id,
       })
       # ---------------
       # model results
-      output$modelStatsFixed <- renderTable(
+      output$modelStatsFixed <- renderTable({
+        if(str_detect(formCodeCovars(), input$condition)){
+          data.frame(NULL)
+        }else{
         cbind(
           tidy(fit(), "fixed"),
           confint(fit(), "beta_", method = "Wald")) %>%
           mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
           mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
-      )
+        }
+      })
 
-      output$modelStatsRandom <- renderTable(
+      output$modelStatsRandom <- renderTable({
+        if(str_detect(formCodeCovars(), input$condition)){
+          data.frame(NULL)
+        }else{
         as.data.frame(VarCorr(fit()),
                       order = "lower.tri")
-      )
+        }
+      })
 
       # ---------------------------------------
       # Paste the model formula for the user to see (don't want it to appear straight away - could improve this)
       output$form<- renderText({
+        if(str_detect(formCodeCovars(), input$condition)){
+          ""
+        }else{
         paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(fit())$call)[2])
-
+        }
       })
 
       # ---------------------------------------
@@ -212,7 +222,11 @@ modelCondServer <- function(id,
       })
 
       output$modelCondPlot <- renderPlot({
+        if(str_detect(formCodeCovars(), input$condition)){
+
+        }else{
         plot()
+        }
         })
 
     }
