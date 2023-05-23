@@ -147,7 +147,8 @@ server <- function(input, output, session) {
                                              age = selectedDataServer$age,
                                              traj = selectedDataServer$traj,
                                              timePoint = selectedDataServer$timePoint,
-                                             modelType = selectedDataServer$modelType
+                                             modelType = selectedDataServer$modelType,
+                                             button = selectedDataServer$button
   )
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
                                                          descTable = modelRunServer$mainTable,

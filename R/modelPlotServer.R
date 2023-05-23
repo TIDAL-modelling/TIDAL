@@ -18,7 +18,8 @@ modelPlotServer <- function(id,
                             age,
                             traj,
                             timePoint,
-                            modelType
+                            modelType,
+                            button
                             ) {
   moduleServer(
     id,
@@ -26,7 +27,7 @@ modelPlotServer <- function(id,
 
       # ------------------------------------------
       # add the "prediction"/model col to dataframe
-      modelDataEdit <- reactive({
+      modelDataEdit <- eventReactive(button(), {
 
         age <- modelData() %>% pull(!!age())
 

@@ -135,6 +135,12 @@ modelCondServer <- function(id,
         # add a column for coloring the plot by the split by variable
 
         ageVec <- modelData() %>% pull(!!age())
+
+        ###############################################################
+        ###############################################################
+        #   edit for non-linear models
+        ###############################################################
+        ###############################################################
         zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
 
         if(input$varType == "cat"){
