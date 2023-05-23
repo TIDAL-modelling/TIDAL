@@ -141,7 +141,21 @@ modelCondServer <- function(id,
         #   edit for non-linear models
         ###############################################################
         ###############################################################
-        zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
+        if(modelType() == "Linear"){
+          zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
+        } else if(modelType() == "Quadratic"){
+          zero  <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] +
+            ageVec^2 * summary(fit())$coefficients[3,1]
+        } else if(modelType() == "Cubic"){
+          zero  <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+            ageVec^2 * summary(fit())$coefficients[3,1] +
+            ageVec^3 * summary(fit())$coefficients[4,1]
+        } else if(modelType() == "Quartic"){
+          zero  <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+            ageVec^2 * summary(fit())$coefficients[3,1] +
+            ageVec^3 * summary(fit())$coefficients[4,1] +
+            ageVec^4 * summary(fit())$coefficients[5,1]
+        }
 
         if(input$varType == "cat"){
         n <- length(unique(pull(modelData(), !!sym(input$condition))))
@@ -151,17 +165,40 @@ modelCondServer <- function(id,
                                        pattern = age(), negate = T))
 
         predCovs <- lapply(1:(n-1), function(i){
-          ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
+
+          if(modelType() == "Linear"){
+            ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
+          } else if(modelType() == "Quadratic"){
+            ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
+              ageVec^2 * summary(fit())$coefficients[3,1]
+          } else if(modelType() == "Cubic"){
+            ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
+              ageVec^2 * summary(fit())$coefficients[3,1] +
+              ageVec^3 * summary(fit())$coefficients[4,1]
+          } else if(modelType() == "Quartic"){
+            ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]  +
+              ageVec^2 * summary(fit())$coefficients[3,1] +
+              ageVec^3 * summary(fit())$coefficients[4,1] +
+              ageVec^4 * summary(fit())$coefficients[5,1]
+          }
+
         })
 
-        num <-  unique(str_split(str_subset(row.names(summary(fit())$coefficients), input$condition), "\\)", simplify = T)[,2])
+        num <- str_subset(row.names(summary(fit())$coefficients), input$condition) %>%
+                  str_split(., "\\)", simplify = T)  %>%
+                  as.data.frame() %>%
+                  filter(!str_detect(V1, "\\^")) %>%
+                  pull(V2) %>%
+                  unique()
+
         names(predCovs) <- paste0(input$condition, "_", num)
 
         modelDataEdit <- cbind(modelData(), do.call(cbind, predCovs)) %>%
                           mutate(zero = zero) %>%
                           mutate(Group_Level = .[[colSplit]] ) %>%
           mutate(pred =  eval(parse(text =
-            paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero", paste0(rep(")", length(num)), collapse = ""), collapse = "")
+            paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero",
+                   paste0(rep(")", length(num)), collapse = ""), collapse = "")
           )))
         }else if(input$varType == "cont"){
           modelDataEdit <- modelData() %>%
@@ -180,6 +217,7 @@ modelCondServer <- function(id,
           confint(fit(), "beta_", method = "Wald")) %>%
           mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
           mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
+          # head(modelDataEdit())
         }
       })
 

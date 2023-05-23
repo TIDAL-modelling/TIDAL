@@ -31,7 +31,7 @@ modelCondUI <- function(id, label = "Model Condition Run") {
           "Instructions",
           tagList(
             h4("Split by variable analysis"),
-            p("Using the model made on the previous page explore some variables which may influence the trajectory. Select from a list of variables (ie. column names) of the dataset to explore the trajectory by.")
+            p("Using the model made on the previous page explore some variables which may influence the trajectory. Select from a list of variables (ie. column names) of the dataset to explore the trajectory by. If you have included variables as covariates in the previous page a warning message will occur if you try and explore the trajectory further by this variable.")
           )
         ),
         tabPanel(
