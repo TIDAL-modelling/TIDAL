@@ -155,7 +155,9 @@ server <- function(input, output, session) {
                                              fixedTab = modelResultsServer$fixedTab,
                                              randomTab = modelResultsServer$randomTab,
                                              N = modelResultsServer$N,
-                                             mainPlot = modelPlotServer$mainPlot
+                                             mainPlot = modelPlotServer$mainPlot,
+                                             phenotype = selectedDataServer$traj,
+                                             modelType = selectedDataServer$modelType
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                               modelData = modelRunServer$data,

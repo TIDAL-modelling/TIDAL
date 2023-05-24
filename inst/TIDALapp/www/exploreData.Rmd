@@ -1,5 +1,5 @@
 ---
-title: "Data Exploration"
+title: ""
 output:
   pdf_document: default
 params:
@@ -11,38 +11,81 @@ params:
   randomTab : NA
   N : NA
   mainPlot : NA
-
+  phenotype : NA
+  modelType : NA
 ---
+
+
+``` {r, echo=F, warning=F}
+library(knitr)
+include_graphics("TIDAL.png")
+```
+
+# TIDAL Data Exploration
+
 
 ## Descriptive Statistics
 
+Descriptive statistics of the variable "`r params$phenotype`" for each time point in your data.
+
 ```{r, echo=F, warning=F}
-library(knitr)
-kable(params$descTable)
+
+kable(params$descTable, digits = 3)
 ```
+
+time_point: Time point of data collectio
+
+N: Number of measurements (e.g. people) at each time point 
+
+mean: Mean `r params$phenotype`
+
+SD: standard deviation of `r params$phenotype` 
+
+median: Median of `r params$phenotype` 
+
+IQR: Interquartile range of `r params$phenotype`
+
 
 ## Model Results
-`r params$formCode`
 
-`r params$warningMsg`
+`r params$modelType` model was run using [lme4](https://cran.r-project.org/web/packages/lme4/index.html) with
+`r params$formCode`. 
+
+`r strsplit(params$warningMsg, " Please")[[1]][1]` For more information on lme4 optimisers, see [here](https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html). The use of alternative lme4 optimisers is currently not supported.
+
 
 ### Number of observations and groups
+
 `r params$statement`
 
-### Fixed Effects
+`r params$N`
 
-```{r, echo=F}
-kable(params$fixedTab)
-```
-
-### Random Effects 
-```{r, echo=F}
-kable(params$randomTab)
-```
 
 ## Plot
+
 ```{r, echo = F}
 params$mainPlot
 ```
 
+`r params$modelType` `r params$formCode`. "Phenotype" on the y-axis is `r params$phenotype`. Note covariates are not included in this plot (yet).
+
+
+
+### Fixed Effects
+
+Fixed effects can be interpreted as the effects of time/age (and any additional covariates) on `r params$phenotype`.
+
+```{r, echo=F}
+kable(params$fixedTab, digits = 3)
+```
+
+
+
+### Random Effects
+
+Random effects can be interpreted as the effects on `r params$phenotype` due to variation between subjects.
+
+```{r, echo=F}
+kable(params$randomTab, digits = 3)
+```
 

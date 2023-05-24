@@ -22,7 +22,9 @@ downloadExploreServer <- function(id,
                             fixedTab,
                             randomTab,
                             N,
-                            mainPlot
+                            mainPlot,
+                            phenotype,
+                            modelType
                             ) {
   moduleServer(
     id,
@@ -72,7 +74,9 @@ downloadExploreServer <- function(id,
             fixedTab = fixedTab(),
             randomTab = randomTab(),
             N = N(),
-            mainPlot = mainPlot()
+            mainPlot = mainPlot(),
+            phenotype = phenotype(),
+            modelType = modelType()
           )
 
           # Knit the document, passing in the `params` list, and eval it in a
