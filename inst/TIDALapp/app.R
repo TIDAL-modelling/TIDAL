@@ -111,6 +111,31 @@ singeTraj_page <-  tabPanel(
   )
 )
 
+importantTimepoint_page <- tabPanel(
+  title = "Important Time Points",
+  fluidPage(
+    tabsetPanel(
+      tabPanel("Instructions",
+               tagList(
+                 h4("Important Time Points"),
+                 p("Investigate time points where the velocity of the trajectory is at it's highest and where symptoms are their maximum.
+              No user input is required as the previous model is carried forward.")
+               )),
+      tabPanel("Output",
+              TIDAL:::importantAgeUI("importantAge")
+              )
+    )
+  )
+)
+
+
+  tabPanel(
+  title = "Important Time Points",
+  fluidPage(
+    TIDAL:::importantAgeUI("importantAge")
+  )
+)
+
 
 ui <- navbarPage(
   title = "TIDAL",
@@ -123,7 +148,8 @@ ui <- navbarPage(
   format_page,
   overview_page,
   intervention_page,
-  singeTraj_page
+  singeTraj_page,
+  importantTimepoint_page
 )
 
 # Main server
@@ -175,6 +201,9 @@ server <- function(input, output, session) {
                                                age = selectedDataServer$age,
                                                modelData = modelRunServer$data,
                                                modelFit = modelRunServer$fit)
+  importantAgeServer <- TIDAL:::importantAgeServer("importantAge",
+                                                   modelDataEdit = modelCondServer$modelDataEdit,
+                                                   modelType = selectedDataServer$modelType)
 }
 
 # Run the application
