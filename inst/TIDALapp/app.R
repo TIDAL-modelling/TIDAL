@@ -131,6 +131,7 @@ server <- function(input, output, session) {
   wide2longServer <- TIDAL:::wide2longServer("wide2long")
   selectedDataServer <- TIDAL:::selectDataServer("select", dataFormatted=wide2longServer)
   modelRunServer <- TIDAL:::modelRunServer("modelRun",
+                                           covariateChoice = selectedDataServer$covariateChoice,
                                            button = selectedDataServer$button,
                                            modelData = selectedDataServer$data,
                                            formCode = selectedDataServer$modelForm,

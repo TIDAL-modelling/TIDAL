@@ -52,6 +52,10 @@ selectDataServer <- function(id, dataFormatted) {
         )
       })
 
+      covariateChoice <- reactive({
+        any(c(input$ID, input$traj, input$age, input$timePoint) %in% c(input$covarsCat, input$covarsCont ))
+      })
+
       # add what type of model to run and input the different formula here
       # This only runs when the user clicks on the button
       modelForm <- eventReactive(input$button, {
@@ -100,7 +104,8 @@ selectDataServer <- function(id, dataFormatted) {
           traj = reactive({ input$traj }),
           age = reactive({ input$age }),
           timePoint = reactive({ input$timePoint }),
-          modelType = reactive({ input$modelType })
+          modelType = reactive({ input$modelType }),
+          covariateChoice = covariateChoice
         )
       )
     }
