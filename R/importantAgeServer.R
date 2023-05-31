@@ -54,9 +54,7 @@ importantAgeServer <- function(id,
             return(list(maxSymptoms = maxSymptoms,
                         maxSymY = maxSymY))
           }
-        }
-
-        if(modelType() == "Cubic"){
+        }else if(modelType() == "Cubic"){
           b_intercept <- tidy(modelFit(), "fixed") %>%
             filter(term %in% "(Intercept)") %>%
             pull(estimate)
@@ -92,9 +90,40 @@ importantAgeServer <- function(id,
             maxSymY = maxSymY
           ))
 
-        }
-      })
+        } else if(modelType() == "Quartic"){
+          b_intercept <- tidy(modelFit(), "fixed") %>%
+            filter(term %in% "(Intercept)") %>%
+            pull(estimate)
 
+          b_age <- tidy(modelFit(), "fixed") %>%
+            filter(term %in% age()) %>%
+            pull(estimate)
+
+          b_age_2 <- tidy(modelFit(), "fixed") %>%
+            filter(term %in% paste0("I(",age(),"^2)")) %>%
+            pull(estimate)
+
+          b_age_3 <- tidy(modelFit(), "fixed") %>%
+            filter(term %in% paste0("I(",age(),"^3)")) %>%
+            pull(estimate)
+
+          b_age_4 <- tidy(modelFit(), "fixed") %>%
+            filter(term %in% paste0("I(",age(),"^4)")) %>%
+            pull(estimate)
+
+          # Age at increased velocity (peak velocity)
+          velPeak <- -6 * b_age_3 - sqrt((6 * b_age_3)^2 - 4 * (12 * b_age_4) * (2 * b_age_2)) / (24 * b_age_4) + mean(pull(modelDataEdit(), age_original))
+
+          # Age at decreased velocity
+          velMin <- -6 * b_age_3 + sqrt((6 * b_age_3)^2 - 4 * (12 * b_age_4) * (2 * b_age_2)) / (24 * b_age_4) + mean(pull(modelDataEdit(), age_original))
+
+          return(list(
+            velPeak = velPeak,
+            velMin = velMin
+          ))
+        }
+
+      })
 
       output$peakVelText <- renderText({
         if(modelType() == "Linear"){
@@ -110,39 +139,35 @@ importantAgeServer <- function(id,
             paste0("Age at peak velocity: ", round(valuesList()$velMin, 2), " and ", round(valuesList()$velPeak, 2))
           }
         } else if(modelType() == "Quartic"){
-
+          paste0("Age at peak velocity: ", round(valuesList()$velMin, 2), " and ", round(valuesList()$velPeak, 2))
         }
       })
 
       output$peakVelPlot <- renderPlot({
-        if(modelType() == "Cubic"){
+        if(modelType() == "Cubic" | modelType() == "Quartic"){
           ggplot(modelDataEdit()) +
             geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
             geom_vline(xintercept = valuesList()$velMin, colour="red", linetype = "longdash") +
             geom_vline(xintercept = valuesList()$velPeak, colour="red", linetype = "longdash") +
             theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
                   axis.line = element_line(colour = "grey50"))
-
-        } else if(modelType() == "Quartic"){
-
         }
       })
 
 
       output$maxSymText <- renderText({
         if(modelType() == "Linear"){
-        "Age at Maximum Symptoms cannot be calculated for linear models."
+        "Age at maximum symptoms cannot be calculated for linear models."
         } else if(modelType() == "Quadratic"){
           if(is.na(valuesList()$maxSymptoms)){
             "No real roots. Age at maximum symptoms cannot be determined."
           }else{
             paste0("Age at maximum symptoms: ", round(valuesList()$maxSymptoms, 2))
           }
-
         } else if(modelType() == "Cubic"){
           paste0("Age at maximum symptoms: ", round(valuesList()$maxSymptoms, 2))
         } else if(modelType() == "Quartic"){
-
+          "Calculating age at maximum symptoms for quartic models is still in development."
         }
       })
 
@@ -154,8 +179,6 @@ importantAgeServer <- function(id,
             geom_vline(xintercept = valuesList()$maxSymptoms, colour="red", linetype = "longdash") +
             theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
                   axis.line = element_line(colour = "grey50"))
-        } else if(modelType() == "Quartic"){
-
         }
       })
 
