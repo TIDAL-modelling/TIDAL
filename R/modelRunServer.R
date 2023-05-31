@@ -14,6 +14,7 @@
 #' @keywords internal
 #' @export
 modelRunServer <- function(id,
+                           covariateChoice,
                            button,
                            modelData,
                            formCode,
@@ -27,6 +28,12 @@ modelRunServer <- function(id,
     id,
     function(input, output, session) {
 
+
+      output$covChoiceWarning <- renderText({
+        if(covariateChoice()){
+          "<b style='color:red;'>Error: Do not choose a covariate that is already selected as a variable.</b>"
+        }
+      })
       # ------------------------------------------
       #### Run the model
 
