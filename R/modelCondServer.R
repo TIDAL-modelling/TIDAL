@@ -128,6 +128,8 @@ modelCondServer <- function(id,
 
       modelDataEdit <- eventReactive(input$button,{
 
+        # select the index for the column that the user wants to split the analysis on
+        colSplit <- which(colnames(modelData()) %in% input$condition)
 
         # add the "predicted" column to this dataset (it's not really a prediction because its the same dataset, it just shows the model)
         # add a column for coloring the plot by the split by variable
@@ -192,10 +194,11 @@ modelCondServer <- function(id,
         names(predCovs) <- paste0(input$condition, "_", num)
 
         modelDataEdit <- cbind(modelData(), do.call(cbind, predCovs)) %>%
-                          mutate(zero = zero) %>%
+          mutate(zero = zero) %>%
+          mutate(!!input$condition := as.factor(.[[colSplit]]) ) %>%
           mutate(pred =  eval(parse(text =
-            paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero",
-                   paste0(rep(")", length(num)), collapse = ""), collapse = "")
+                                      paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero",
+                                             paste0(rep(")", length(num)), collapse = ""), collapse = "")
           )))
         }else if(input$varType == "cont"){
           modelDataEdit <- modelData() %>%
@@ -209,14 +212,11 @@ modelCondServer <- function(id,
         if(str_detect(formCodeCovars(), input$condition)){
           data.frame(NULL)
         }else{
-        # cbind(
-        #   tidy(fit(), "fixed"),
-        #   confint(fit(), "beta_", method = "Wald")) %>%
-        #   mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
-        #   mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
-          modelDataEdit() %>%
-            pull(!!sym(input$condition)) %>%
-            unique()
+        cbind(
+          tidy(fit(), "fixed"),
+          confint(fit(), "beta_", method = "Wald")) %>%
+          mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
+          mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
         }
       })
 
@@ -245,18 +245,6 @@ modelCondServer <- function(id,
       ######### DIFFERENT FOR CONTINUOUS AND CATEGORICAL SPLIT - change continuous plot to percentiles or ± 1 SDs
       ###############################################################
       ###############################################################
-      lab <- reactive({
-        modelDataEdit() %>%
-          pull(!!sym(input$condition)) %>%
-          unique() %>%
-          as.character()
-      })
-
-      colours <- reactive({
-        sample(c("red", "blue", "green", "yellow"), length(lab()), replace = TRUE)
-      })
-
-
       # Plot the split by variable plot
       plot <- eventReactive(input$button, {
 
@@ -266,8 +254,8 @@ modelCondServer <- function(id,
             geom_point()+
             geom_line() +
             geom_errorbar(aes(ymin = lower, ymax = upper)) +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = factor(!!sym(input$condition)) ) , na.rm=T) +
-            scale_color_manual(labels = lab(), values = colours())
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+            theme(legend.text = element_text(color = "black", size = 10))
         }else if(input$varType == "cont"){
           ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
             theme_light()+
@@ -275,7 +263,8 @@ modelCondServer <- function(id,
             geom_line() +
             geom_errorbar(aes(ymin = lower, ymax = upper)) +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
-            scale_colour_discrete(na.translate = F)
+            scale_colour_discrete(na.translate = F) +
+            theme(legend.text = element_text(color = "black", size = 10))
         }
 
       })
