@@ -86,7 +86,8 @@ modelPlotServer <- function(id,
       return(
         list(
         df.plot = df.plot,
-        mainPlot = mainPlot)
+        mainPlot = mainPlot,
+        modelDataEdit = modelDataEdit)
         )
     }
   )

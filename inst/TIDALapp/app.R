@@ -203,9 +203,10 @@ server <- function(input, output, session) {
                                                modelData = modelRunServer$data,
                                                modelFit = modelRunServer$fit)
   importantAgeServer <- TIDAL:::importantAgeServer("importantAge",
-                                                   modelDataEdit = modelCondServer$modelDataEdit,
+                                                   modelDataEdit = modelPlotServer$modelDataEdit,
                                                    modelType = selectedDataServer$modelType,
-                                                   modelFit = modelRunServer$fit)
+                                                   modelFit = modelRunServer$fit,
+                                                   age = selectedDataServer$age)
 }
 
 # Run the application
