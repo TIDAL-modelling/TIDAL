@@ -19,10 +19,10 @@ importantAgeUI <- function(id, label = "Model") {
   tagList(
           h4("Age at Peak Velocity"),
           textOutput(ns("peakVelText")),
-          plotOutput(ns("peakVelPlot")),
+          plotOutput(ns("peakVelPlot"), width = "50%"),
           h4("Age at Maximum Symptoms"),
           textOutput(ns("maxSymText")),
-          plotOutput(ns("maxSymPlot"))
+          plotOutput(ns("maxSymPlot"), width = "50%")
          )
 }
 
