@@ -10,6 +10,7 @@
 #' @import purrr
 #' @import tinytex
 #' @import rmarkdown
+#' @import kableExtra
 #'
 #' @noRd
 #' @keywords internal

@@ -18,6 +18,8 @@ params:
 
 ``` {r, echo=F, warning=F}
 library(knitr)
+library(kableExtra)
+
 include_graphics("TIDAL.png")
 ```
 
@@ -26,6 +28,7 @@ include_graphics("TIDAL.png")
 For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
 
 Date generated: `r Sys.Date()`
+File uploaded:
 
 ## Descriptive Statistics
 
@@ -33,20 +36,12 @@ Descriptive statistics of the variable "`r params$phenotype`" for each time poin
 
 ```{r, echo=F, warning=F}
 
-kable(params$descTable, digits = 3)
+kbl(params$descTable, digits = 3) %>%
+  kable_styling(latex_options = "hold_position")
+
 ```
 
-time_point: Time point of data collection
-
-N: Number of measurements (e.g. people) at each time point 
-
-mean: Mean `r params$phenotype`
-
-SD: standard deviation of `r params$phenotype` 
-
-median: Median of `r params$phenotype` 
-
-IQR: Interquartile range of `r params$phenotype`
+time_point: Time point of data collection. N: Number of measurements (e.g. people) at each time point. mean: Mean `r params$phenotype`. SD: standard deviation of `r params$phenotype`. median: Median of `r params$phenotype`. IQR: Interquartile range of `r params$phenotype`
 
 
 ## Model Results
@@ -79,7 +74,8 @@ params$mainPlot
 Fixed effects can be interpreted as the effects of time/age (and any additional covariates/confounders) on `r params$phenotype`.
 
 ```{r, echo=F}
-kable(params$fixedTab, digits = 3)
+kbl(params$fixedTab[,3:ncol(params$fixedTab)], digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
 ```
 
 
@@ -89,6 +85,7 @@ kable(params$fixedTab, digits = 3)
 Random effects can be interpreted as the effects on `r params$phenotype` due to variation between subjects.
 
 ```{r, echo=F}
-kable(params$randomTab, digits = 3)
+kbl(params$randomTab, digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
 ```
 
