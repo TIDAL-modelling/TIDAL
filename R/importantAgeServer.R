@@ -23,69 +23,7 @@ importantAgeServer <- function(id,
 
       ns <- NS(id)
 
-      peakVelList <- reactive({
-        if(modelType() == "Cubic"){
-          b_intercept <- tidy(modelFit(), "fixed") %>%
-            filter(term %in% "(Intercept)") %>%
-            pull(estimate)
-
-          b_age <- tidy(modelFit(), "fixed") %>%
-            filter(term %in% age()) %>%
-            pull(estimate)
-
-          b_age_2 <- tidy(modelFit(), "fixed") %>%
-            filter(term %in% paste0("I(",age(),"^2)")) %>%
-            pull(estimate)
-
-          b_age_3 <- tidy(modelFit(), "fixed") %>%
-            filter(term %in% paste0("I(",age(),"^3)")) %>%
-            pull(estimate)
-
-          # Age at increased velocity (peak velocity)
-          velPeak <- -2 * b_age_2 / (3 * b_age_3) + mean(pull(modelDataEdit(), age_original))
-          velMin <- 2 * b_age_2 / (3 * b_age_3) + mean(pull(modelDataEdit(), age_original))
-          return(list(
-            velPeak = velPeak,
-            velMin = velMin
-          ))
-
-        }
-      })
-
-
-      output$peakVelText <- renderText({
-        if(modelType() == "Linear"){
-        "Age at peak velocity cannot be calculated for linear models."
-        } else if(modelType() == "Quadratic"){
-        "Age at peak velocity cannot be calculated for quadratic models."
-        } else if(modelType() == "Cubic"){
-          range <- modelDataEdit() %>%
-            pull(!!sym(age()))
-          if(peakVelList()$velPeak > max(range) | peakVelList()$velMin < min(range)){
-            "The peak velocities are outside the data range and therefore cannot be estimated for this model type."
-          }else{
-            paste0("Age at peak velocity: ", round(peakVelList()$velMin, 2), " and ", round(peakVelList()$velPeak, 2))
-          }
-        } else if(modelType() == "Quartic"){
-
-        }
-      })
-
-      output$peakVelPlot <- renderPlot({
-        if(modelType() == "Cubic"){
-          ggplot(modelDataEdit()) +
-            geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
-            geom_vline(xintercept = peakVelList()$velMin, colour="red", linetype = "longdash") +
-            geom_vline(xintercept = peakVelList()$velPeak, colour="red", linetype = "longdash") +
-            theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
-                  axis.line = element_line(colour = "grey50"))
-
-        } else if(modelType() == "Quartic"){
-
-        }
-      })
-
-      maxSymptomsList <- reactive({
+      valuesList <- reactive({
         if(modelType() == "Quadratic"){
           b_intercept <- tidy(modelFit(), "fixed") %>%
             filter(term %in% "(Intercept)") %>%
@@ -117,37 +55,105 @@ importantAgeServer <- function(id,
                         maxSymY = maxSymY))
           }
         }
+
+        if(modelType() == "Cubic"){
+          b_intercept <- tidy(modelFit(), "fixed") %>%
+            filter(term %in% "(Intercept)") %>%
+            pull(estimate)
+
+          b_age <- tidy(modelFit(), "fixed") %>%
+            filter(term %in% age()) %>%
+            pull(estimate)
+
+          b_age_2 <- tidy(modelFit(), "fixed") %>%
+            filter(term %in% paste0("I(",age(),"^2)")) %>%
+            pull(estimate)
+
+          b_age_3 <- tidy(modelFit(), "fixed") %>%
+            filter(term %in% paste0("I(",age(),"^3)")) %>%
+            pull(estimate)
+
+          # Age at increased velocity (peak velocity)
+          velPeak <- -2 * b_age_2 / (3 * b_age_3) + mean(pull(modelDataEdit(), age_original))
+          velMin <- 2 * b_age_2 / (3 * b_age_3) + mean(pull(modelDataEdit(), age_original))
+
+          maxSymptoms <- (-2*b_age_2 - (sqrt(4*(b_age_2^2) - (12*(b_age_3*b_age))))) / (6*b_age_3) + mean(pull(modelDataEdit(), age_original))
+
+          # Depression score at that age:
+          maxSymY <- b_intercept +
+            b_age*(maxSymptoms-mean(pull(modelDataEdit(), age_original))) +
+            b_age_2*((maxSymptoms-mean(pull(modelDataEdit(), age_original)))^2) +
+            b_age_3*((maxSymptoms-mean(pull(modelDataEdit(), age_original)))^3)
+
+          return(list(
+            velPeak = velPeak,
+            velMin = velMin,
+            maxSymptoms = maxSymptoms,
+            maxSymY = maxSymY
+          ))
+
+        }
       })
 
-      output$maxSymText <- renderText({
-        if(modelType() == "Linear"){
-        "Age at Maximum Symptoms cannot be calculated for linear models."
-        } else if(modelType() == "Quadratic"){
-          # req(maxSymptomsList())
-          if(is.na(maxSymptomsList()$maxSymptoms)){
-            "No real roots. Age at maximum symptoms cannot be determined."
-          }else{
-            paste0("Age at maximum symptoms: ", round(maxSymptomsList()$maxSymptoms, 2))
-          }
 
+      output$peakVelText <- renderText({
+        if(modelType() == "Linear"){
+        "Age at peak velocity cannot be calculated for linear models."
+        } else if(modelType() == "Quadratic"){
+        "Age at peak velocity cannot be calculated for quadratic models."
         } else if(modelType() == "Cubic"){
+          range <- modelDataEdit() %>%
+            pull(!!sym(age()))
+          if(valuesList()$velPeak > max(range) | valuesList()$velMin < min(range)){
+            "The peak velocities are outside the data range and therefore cannot be estimated for this model type."
+          }else{
+            paste0("Age at peak velocity: ", round(valuesList()$velMin, 2), " and ", round(valuesList()$velPeak, 2))
+          }
+        } else if(modelType() == "Quartic"){
+
+        }
+      })
+
+      output$peakVelPlot <- renderPlot({
+        if(modelType() == "Cubic"){
+          ggplot(modelDataEdit()) +
+            geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
+            geom_vline(xintercept = valuesList()$velMin, colour="red", linetype = "longdash") +
+            geom_vline(xintercept = valuesList()$velPeak, colour="red", linetype = "longdash") +
+            theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
+                  axis.line = element_line(colour = "grey50"))
 
         } else if(modelType() == "Quartic"){
 
         }
       })
 
-      output$maxSymPlot <- renderPlot({
-        if(modelType() == "Quadratic"){
-          ggplot(modelDataEdit()) +
-            geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
-            geom_hline(yintercept = maxSymptomsList()$maxSymY, colour="red", linetype = "longdash") +
-            geom_vline(xintercept = maxSymptomsList()$maxSymptoms, colour="red", linetype = "longdash") +
-            theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
-                  axis.line = element_line(colour = "grey50"))
+
+      output$maxSymText <- renderText({
+        if(modelType() == "Linear"){
+        "Age at Maximum Symptoms cannot be calculated for linear models."
+        } else if(modelType() == "Quadratic"){
+          if(is.na(valuesList()$maxSymptoms)){
+            "No real roots. Age at maximum symptoms cannot be determined."
+          }else{
+            paste0("Age at maximum symptoms: ", round(valuesList()$maxSymptoms, 2))
+          }
 
         } else if(modelType() == "Cubic"){
+          paste0("Age at maximum symptoms: ", round(valuesList()$maxSymptoms, 2))
+        } else if(modelType() == "Quartic"){
 
+        }
+      })
+
+      output$maxSymPlot <- renderPlot({
+        if(modelType() == "Quadratic" | modelType() == "Cubic"){
+          ggplot(modelDataEdit()) +
+            geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
+            geom_hline(yintercept = valuesList()$maxSymY, colour="red", linetype = "longdash") +
+            geom_vline(xintercept = valuesList()$maxSymptoms, colour="red", linetype = "longdash") +
+            theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
+                  axis.line = element_line(colour = "grey50"))
         } else if(modelType() == "Quartic"){
 
         }
