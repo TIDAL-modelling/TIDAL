@@ -285,6 +285,10 @@ modelCondServer <- function(id,
         }
         })
 
+      return(list(
+        modelDataEdit = modelDataEdit
+        ))
+
     }
   )
 }
