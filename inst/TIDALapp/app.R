@@ -3,7 +3,7 @@
 library(shinythemes)
 
 # Increase maximum file size that can be uploaded
-options(shiny.maxRequestSize = 30*1024^2)
+options(shiny.maxRequestSize = 100*1024^2)
 
 # User interface
 welcome_page <- tabPanel(
@@ -121,9 +121,9 @@ importantTimepoint_page <- tabPanel(
                  p("Investigate time points where the velocity of the trajectory is at it's highest and where symptoms are their maximum.
               No user input is required as the previous model is carried forward.")
                )),
-      tabPanel("Output",
-              TIDAL:::importantAgeUI("importantAge")
-              )
+
+      TIDAL:::importantAgeUI("importantAge")
+
     )
   )
 )
