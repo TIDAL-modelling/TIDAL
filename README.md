@@ -1,7 +1,7 @@
 # Tool to Implement Developmental Analyses of Longitudinal Data
 
 <p align="center">
-<img width="600" alt="Screenshot 2023-02-03 at 13 00 15" src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png">
+<img width="600" alt="Two-tone blue wave TIDAL logo. Below the wave the text reads Tool to Implement Developmental Analyses of Longitudinal data" src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png">
 </p>
 
 <!-- badges: start -->
@@ -9,9 +9,7 @@
 <!-- badges: end -->
 
 
-
-
-## Installation and useage
+## Installation and usage
 
 ### Locally
 
@@ -86,11 +84,17 @@ View trajectories for specific individuals. Choose from a random sample, specifi
 * **Points of acceleration**
   * Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory.
 * **Stability**
-  * Captures within-individual variability in depressive symptoms over time and compare how this varies by different forms of interventions or combinations of interventions. 
+  * Captures within-individual variability in depressive symptoms over time and compare how this varies by different forms of interventions or combinations of interventions.
 * Allow users to input an x-axis value (eg. age) and recieve y-axis value (eg. depression score), for mean values from a user specified model.
 * Allow users to download tables and plots (also to edit colours in the plots)
 * Return an R script at the end of analysis with the code ran to generate tables and plots downloaded.
 
+
+## Links
+
+[FAQs and troubleshooting](FAQs.md)
+
+[Statistics guide](StatsGuide.md)
 
 ## Authors, contributors and funders
 * Amelia J. Edmondson-Stait<sup>1</sup>, Ellen J. Thompson<sup>2</sup>, Eileen Y. Xu<sup>1</sup>, Richard M. A. Parker <sup>3</sup>, Ahmed Elhakeem<sup>3</sup>,  Liana Romaniuk<sup>1</sup>, Iona Beange<sup>1</sup>, Rebecca M. Pearson<sup>3,4</sup>, Andrew M. McIntosh<sup>1</sup>, Thalia C. Eley<sup>2</sup>, Kate Tilling<sup>3</sup>, Heather C. Whalley<sup>1,5</sup>, Alex S. F. Kwong<sup>1</sup>
@@ -104,10 +108,3 @@ View trajectories for specific individuals. Choose from a random sample, specifi
      </ol>
 * We would also like to acknowledge cohort participants and those who have given feedback to our tool, including clinicians, teachers, researchers and our young people advisory group.
 * This project is funded by The Wellcome Trust and Social Finance, Grant Ref: 226686/Z/22/Z.
-
-
-
-
-
-
-  

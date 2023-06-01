@@ -61,7 +61,7 @@ overview_page <-   tabPanel(
                         TIDAL GitHub repository</a>
                         if using the application online.</strong>')
                  ),
-                 p("Either upload a long format dataframe (.csv or .tsv) or use the data frame you formatted on the previous page. If you are uploading a long format dataframe then columns must have unique names. Then select the columns you wish to use as variables in your model. Inspect the descriptive statistics of your trajectory variable at each time point. Select the model type (eg. linear or a polynomial model) and view the plot of the mean trajectory against these models.")
+                 p("Either upload a long format dataframe (comma separated *.csv or tab delimited *.txt or *.tsv) or use the data frame you formatted on the previous page. If you are uploading a long format dataframe then columns must have unique names. Then select the columns you wish to use as variables in your model. Inspect the descriptive statistics of your trajectory variable at each time point. Select the model type (eg. linear or a polynomial model) and view the plot of the mean trajectory against these models.")
                )),
       tabPanel("Output",
     sidebarLayout(
