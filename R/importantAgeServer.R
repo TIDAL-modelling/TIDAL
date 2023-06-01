@@ -152,44 +152,55 @@ importantAgeServer <- function(id,
         "Age at peak velocity cannot be calculated for linear models."
         } else if(modelType() == "Quadratic"){
         "Age at peak velocity cannot be calculated for quadratic models."
-        } else if(modelType() == "Cubic"){
+        } else if(modelType() == "Cubic" | modelType() == "Quartic"){
           range <- modelDataEdit() %>%
-            pull(!!sym(age()))
-          if(valuesList()$velPeak > max(range) | valuesList()$velMin < min(range)){
+            pull(age_original)
+          if(valuesList()$velPeak > max(range) | valuesList()$velMin < min(range) ){
             "The peak velocities are outside the data range and therefore cannot be estimated for this model type."
           }else{
             paste0("Age at peak velocity: ", round(valuesList()$velMin, 2), " and ", round(valuesList()$velPeak, 2))
           }
-        } else if(modelType() == "Quartic"){
-          paste0("Age at peak velocity: ", round(valuesList()$velMin, 2), " and ", round(valuesList()$velPeak, 2))
         }
       })
 
       output$peakVelPlot <- renderPlot({
         req(modelType())
+
         if(modelType() == "Cubic" | modelType() == "Quartic"){
-          ggplot(modelDataEdit()) +
-            geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
-            geom_vline(xintercept = valuesList()$velMin, colour="red", linetype = "longdash") +
-            geom_vline(xintercept = valuesList()$velPeak, colour="red", linetype = "longdash") +
-            theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
-                  axis.line = element_line(colour = "grey50")) +
-            ylab("Score") +
-            xlab("Age")
+          range <- modelDataEdit() %>%
+            pull(age_original)
+          if(valuesList()$velPeak > max(range) | valuesList()$velMin < min(range)  ){
+            ggplot() + theme_void()
+          }else{
+            ggplot(modelDataEdit()) +
+              geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
+              geom_vline(xintercept = valuesList()$velMin, colour="red", linetype = "longdash") +
+              geom_vline(xintercept = valuesList()$velPeak, colour="red", linetype = "longdash") +
+              theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
+                    axis.line = element_line(colour = "grey50")) +
+              ylab("Score") +
+              xlab("Age")
+          }
         }
       })
 
       output$velPlot <- renderPlot({
         req(modelType())
         if(modelType() == "Cubic" | modelType() == "Quartic"){
-        ggplot(valuesList()$modelDataEdit2) +
-          geom_line(aes(x= age_original, y = vel), color = "blue") +
-          geom_vline(xintercept =  valuesList()$velMin, colour="red", linetype = "longdash") +
-          geom_vline(xintercept = valuesList()$velPeak, colour="red", linetype = "longdash") +
-          theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
-                axis.line = element_line(colour = "grey50")) +
-          ylab("Velocity") +
-          xlab("Age")
+          range <- modelDataEdit() %>%
+            pull(age_original)
+          if(valuesList()$velPeak > max(range) | valuesList()$velMin < min(range)  ){
+            ggplot() + theme_void()
+          }else{
+            ggplot(valuesList()$modelDataEdit2) +
+              geom_line(aes(x= age_original, y = vel), color = "blue") +
+              geom_vline(xintercept =  valuesList()$velMin, colour="red", linetype = "longdash") +
+              geom_vline(xintercept = valuesList()$velPeak, colour="red", linetype = "longdash") +
+              theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
+                    axis.line = element_line(colour = "grey50")) +
+              ylab("Velocity") +
+              xlab("Age")
+          }
         }
       })
 
@@ -198,14 +209,12 @@ importantAgeServer <- function(id,
         req(modelType())
         if(modelType() == "Linear"){
         "Age at maximum symptoms cannot be calculated for linear models."
-        } else if(modelType() == "Quadratic"){
+        } else if(modelType() == "Quadratic" | modelType() == "Cubic"){
           if(is.na(valuesList()$maxSymptoms)){
             "No real roots. Age at maximum symptoms cannot be determined."
           }else{
             paste0("Age at maximum symptoms: ", round(valuesList()$maxSymptoms, 2))
           }
-        } else if(modelType() == "Cubic"){
-          paste0("Age at maximum symptoms: ", round(valuesList()$maxSymptoms, 2))
         } else if(modelType() == "Quartic"){
           "Calculating age at maximum symptoms for quartic models is still in development."
         }
@@ -214,17 +223,20 @@ importantAgeServer <- function(id,
       output$maxSymPlot <- renderPlot({
         req(modelType())
         if(modelType() == "Quadratic" | modelType() == "Cubic"){
-          ggplot(modelDataEdit()) +
-            geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
-            geom_hline(yintercept = valuesList()$maxSymY, colour="red", linetype = "longdash") +
-            geom_vline(xintercept = valuesList()$maxSymptoms, colour="red", linetype = "longdash") +
-            theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
-                  axis.line = element_line(colour = "grey50")) +
-            ylab("Score") +
-            xlab("Age")
+          if(is.na(valuesList()$maxSymptoms)){
+            ggplot() + theme_void()
+          }else{
+            ggplot(modelDataEdit()) +
+              geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
+              geom_hline(yintercept = valuesList()$maxSymY, colour="red", linetype = "longdash") +
+              geom_vline(xintercept = valuesList()$maxSymptoms, colour="red", linetype = "longdash") +
+              theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
+                    axis.line = element_line(colour = "grey50")) +
+              ylab("Score") +
+              xlab("Age")
+          }
         }
       })
-
     }
   )
 }
