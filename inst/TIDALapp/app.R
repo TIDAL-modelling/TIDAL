@@ -154,14 +154,16 @@ server <- function(input, output, session) {
                                              button = selectedDataServer$button
   )
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
-                                                         descTable = modelRunServer$mainTable,
-                                                         warningMsg = modelRunServer$warning,
-                                                         formCodeRender = modelResultsServer$modelFormRender,
-                                                         statement = modelResultsServer$statement,
-                                                         fixedTab = modelResultsServer$fixedTab,
-                                                         randomTab = modelResultsServer$randomTab,
-                                                         N = modelResultsServer$N,
-                                                         mainPlot = modelPlotServer$mainPlot
+                                             descTable = modelRunServer$mainTable,
+                                             warningMsg = modelRunServer$warning,
+                                             formCodeRender = modelResultsServer$modelFormRender,
+                                             statement = modelResultsServer$statement,
+                                             fixedTab = modelResultsServer$fixedTab,
+                                             randomTab = modelResultsServer$randomTab,
+                                             N = modelResultsServer$N,
+                                             mainPlot = modelPlotServer$mainPlot,
+                                             phenotype = selectedDataServer$traj,
+                                             modelType = selectedDataServer$modelType
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                              modelData = modelRunServer$data,
@@ -180,7 +182,3 @@ server <- function(input, output, session) {
 
 # Run the application
 shinyApp(ui = ui, server = server)
-
-
-
-
