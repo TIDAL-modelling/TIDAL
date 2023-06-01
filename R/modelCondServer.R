@@ -96,14 +96,18 @@ modelCondServer <- function(id,
                                        "+ ", cond,
                                        " + ", age(), "*", cond
           ),
-          REML=F , data = modelData())
+          REML=F , data = modelData(),
+          control=lmerControl(optimizer="bobyqa",
+                              optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Quadratic"){
           fit <- lmer(formula = paste0(formCodeCovars(),
                                        "+ ", cond,
                                        " + ", age(), "*", cond,
                                        " + I(", age(), "^2)*", cond
           ),
-          REML=F , data = modelData())
+          REML=F , data = modelData(),
+          control=lmerControl(optimizer="bobyqa",
+                              optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Cubic"){
           fit <- lmer(formula = paste0(formCodeCovars(),
                                        "+ ", cond,
@@ -111,7 +115,9 @@ modelCondServer <- function(id,
                                        " + I(", age(), "^2)*", cond,
                                        " + I(", age(), "^3)*", cond
           ),
-          REML=F , data = modelData())
+          REML=F , data = modelData(),
+          control=lmerControl(optimizer="bobyqa",
+                              optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Quartic"){
           fit <- lmer(formula = paste0(formCodeCovars(),
                                        "+ ", cond,
@@ -120,7 +126,9 @@ modelCondServer <- function(id,
                                        " + I(", age(), "^3)*", cond,
                                        " + I(", age(), "^4)*", cond
           ),
-          REML=F , data = modelData())
+          REML=F , data = modelData(),
+          control=lmerControl(optimizer="bobyqa",
+                              optCtrl=list(maxfun=2e5)))
         }
         return(fit)
       })
