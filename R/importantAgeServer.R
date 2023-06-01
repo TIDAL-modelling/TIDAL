@@ -24,6 +24,7 @@ importantAgeServer <- function(id,
       ns <- NS(id)
 
       valuesList <- reactive({
+        req(modelFit())
         if(modelType() == "Quadratic"){
           b_intercept <- tidy(modelFit(), "fixed") %>%
             filter(term %in% "(Intercept)") %>%
@@ -75,6 +76,15 @@ importantAgeServer <- function(id,
           velPeak <- -2 * b_age_2 / (3 * b_age_3) + mean(pull(modelDataEdit(), age_original))
           velMin <- 2 * b_age_2 / (3 * b_age_3) + mean(pull(modelDataEdit(), age_original))
 
+          # Velocity as a new col
+          vel <- b_age +
+            ( 2 * b_age_2 * pull(modelDataEdit(), !!sym(age())) ) +
+            ( 3 * b_age_3 * (pull(modelDataEdit(), !!sym(age())))^2 )
+
+          modelDataEdit2 <- modelDataEdit() %>%
+            mutate(vel = vel)
+
+          # Age at maximum symptoms
           maxSymptoms <- (-2*b_age_2 - (sqrt(4*(b_age_2^2) - (12*(b_age_3*b_age))))) / (6*b_age_3) + mean(pull(modelDataEdit(), age_original))
 
           # Depression score at that age:
@@ -86,6 +96,7 @@ importantAgeServer <- function(id,
           return(list(
             velPeak = velPeak,
             velMin = velMin,
+            modelDataEdit2 = modelDataEdit2,
             maxSymptoms = maxSymptoms,
             maxSymY = maxSymY
           ))
@@ -117,15 +128,26 @@ importantAgeServer <- function(id,
           # Age at decreased velocity
           velMin <- -6 * b_age_3 + sqrt((6 * b_age_3)^2 - 4 * (12 * b_age_4) * (2 * b_age_2)) / (24 * b_age_4) + mean(pull(modelDataEdit(), age_original))
 
+          # Velocity as a new col
+            vel <- b_age +
+            ( 2 * b_age_2 * pull(modelDataEdit(), !!sym(age())) ) +
+            ( 3 * b_age_3 * (pull(modelDataEdit(), !!sym(age())))^2 ) +
+            ( 4 * b_age_4 * (pull(modelDataEdit(), !!sym(age())))^3 )
+
+          modelDataEdit2 <- modelDataEdit() %>%
+              mutate(vel = vel)
+
           return(list(
             velPeak = velPeak,
-            velMin = velMin
+            velMin = velMin,
+            modelDataEdit2 = modelDataEdit2
           ))
         }
 
       })
 
       output$peakVelText <- renderText({
+        req(modelType())
         if(modelType() == "Linear"){
         "Age at peak velocity cannot be calculated for linear models."
         } else if(modelType() == "Quadratic"){
@@ -144,18 +166,36 @@ importantAgeServer <- function(id,
       })
 
       output$peakVelPlot <- renderPlot({
+        req(modelType())
         if(modelType() == "Cubic" | modelType() == "Quartic"){
           ggplot(modelDataEdit()) +
             geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
             geom_vline(xintercept = valuesList()$velMin, colour="red", linetype = "longdash") +
             geom_vline(xintercept = valuesList()$velPeak, colour="red", linetype = "longdash") +
             theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
-                  axis.line = element_line(colour = "grey50"))
+                  axis.line = element_line(colour = "grey50")) +
+            ylab("Score") +
+            xlab("Age")
+        }
+      })
+
+      output$velPlot <- renderPlot({
+        req(modelType())
+        if(modelType() == "Cubic" | modelType() == "Quartic"){
+        ggplot(valuesList()$modelDataEdit2) +
+          geom_line(aes(x= age_original, y = vel), color = "blue") +
+          geom_vline(xintercept =  valuesList()$velMin, colour="red", linetype = "longdash") +
+          geom_vline(xintercept = valuesList()$velPeak, colour="red", linetype = "longdash") +
+          theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
+                axis.line = element_line(colour = "grey50")) +
+          ylab("Velocity") +
+          xlab("Age")
         }
       })
 
 
       output$maxSymText <- renderText({
+        req(modelType())
         if(modelType() == "Linear"){
         "Age at maximum symptoms cannot be calculated for linear models."
         } else if(modelType() == "Quadratic"){
@@ -172,13 +212,16 @@ importantAgeServer <- function(id,
       })
 
       output$maxSymPlot <- renderPlot({
+        req(modelType())
         if(modelType() == "Quadratic" | modelType() == "Cubic"){
           ggplot(modelDataEdit()) +
             geom_line(aes(x= age_original ,  y = pred), na.rm=T, linewidth = 0.75) +
             geom_hline(yintercept = valuesList()$maxSymY, colour="red", linetype = "longdash") +
             geom_vline(xintercept = valuesList()$maxSymptoms, colour="red", linetype = "longdash") +
             theme(text = element_text(size = 20), panel.background = element_rect(fill = "white"),
-                  axis.line = element_line(colour = "grey50"))
+                  axis.line = element_line(colour = "grey50")) +
+            ylab("Score") +
+            xlab("Age")
         }
       })
 

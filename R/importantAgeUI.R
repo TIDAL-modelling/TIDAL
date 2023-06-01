@@ -16,14 +16,16 @@ importantAgeUI <- function(id, label = "Model") {
   # invoke later.
   ns <- NS(id)
 
-  tagList(
-          h4("Age at Peak Velocity"),
-          textOutput(ns("peakVelText")),
-          plotOutput(ns("peakVelPlot"), width = "50%"),
-          h4("Age at Maximum Symptoms"),
-          textOutput(ns("maxSymText")),
-          plotOutput(ns("maxSymPlot"), width = "50%")
-         )
+  tabPanel("Output",
+  fluidRow(column(12, h4("Age at Peak Velocity"))),
+  fluidRow(column(12, textOutput(ns("peakVelText")))),
+  fluidRow(column(12, align="center", plotOutput(ns("peakVelPlot"), width = "50%", height = 300))),
+  fluidRow(column(12, align="center", plotOutput(ns("velPlot"), width = "50%", height = 300))),
+  fluidRow(column(12, h4("Age at Maximum Symptoms"))),
+  fluidRow(column(12, textOutput(ns("maxSymText")))),
+  fluidRow(column(12, align="center", plotOutput(ns("maxSymPlot"), width = "50%", height = 300)))
+  )
+
 }
 
 
