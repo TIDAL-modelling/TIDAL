@@ -118,8 +118,8 @@ importantTimepoint_page <- tabPanel(
       tabPanel("Instructions",
                tagList(
                  h4("Important Time Points"),
-                 p("Investigate time points where the velocity of the trajectory is at it's highest and where symptoms are their maximum.
-              No user input is required as the previous model is carried forward.")
+                 p("Determine the age where symptoms or scores are their maximum.
+              No user input is required as the model determined on the Data Exploration page is carried forward.")
                )),
 
       TIDAL:::importantAgeUI("importantAge")
