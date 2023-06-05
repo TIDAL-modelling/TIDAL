@@ -203,7 +203,9 @@ server <- function(input, output, session) {
                                                subject = selectedDataServer$ID,
                                                age = selectedDataServer$age,
                                                modelData = modelRunServer$data,
-                                               modelFit = modelRunServer$fit)
+                                               modelFit = modelRunServer$fit,
+                                               modelType = selectedDataServer$modelType,
+                                               cov = selectedDataServer$covars)
   importantAgeServer <- TIDAL:::importantAgeServer("importantAge",
                                                    modelDataEdit = modelPlotServer$modelDataEdit,
                                                    modelType = selectedDataServer$modelType,

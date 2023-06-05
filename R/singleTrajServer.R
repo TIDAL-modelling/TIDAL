@@ -17,7 +17,9 @@ singleTrajServer <- function(id,
                              subject,
                              age,
                              modelData,
-                             modelFit) {
+                             modelFit,
+                             modelType,
+                             cov) {
   # create a module server
   moduleServer(
     # id is the id of the module
@@ -100,10 +102,30 @@ singleTrajServer <- function(id,
 
       # add the "prediction"/model col to dataframe
       modelDataEdit <- reactive({
+
+        age <- modelData() %>% pull(!!age())
+
+        if(modelType() == "Linear"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
+        } else if(modelType() == "Quadratic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1] +
+            age^2 * summary(modelFit())$coefficients[3,1]
+        } else if(modelType() == "Cubic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            age^2 * summary(modelFit())$coefficients[3,1] +
+            age^3 * summary(modelFit())$coefficients[4,1]
+        } else if(modelType() == "Quartic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            age^2 * summary(modelFit())$coefficients[3,1] +
+            age^3 * summary(modelFit())$coefficients[4,1] +
+            age^4 * summary(modelFit())$coefficients[5,1]
+        }
+
+
         # Not all participants were included in the prediction,
         # I assume because they didn't have enough data?
         modelDataEdit <- modelData() %>%
-          mutate(pred = predict(modelFit(), ., re.form = NA)) %>%
+          mutate(pred = adjustedScore) %>%
           filter(!!sym(subject()) %in% row.names(rand()))
 
         return(modelDataEdit)
@@ -157,6 +179,7 @@ singleTrajServer <- function(id,
             filter(!!sym(subject()) == x) %>%
             nrow()
 
+          if(is.null(cov()) ){
           # get the random effects for each participant
           effects <- sapply(1:ncol(rand()), function(i){
             filter(rand(), row.names(rand()) %in% x)[,i]
@@ -165,6 +188,16 @@ singleTrajServer <- function(id,
           agesPoly <- sapply(1:(ncol(rand())-1), function(i){
             ages^i
           })
+          } else {
+            # get the random effects for each participant
+            effects <- sapply(which(!str_detect(colnames(rand()), cov())), function(i){
+              filter(rand(), row.names(rand()) %in% x)[,i]
+            })
+
+            agesPoly <- sapply(which(!str_detect(colnames(rand()), cov()))[-length(which(!str_detect(colnames(rand()), cov())))], function(i){
+              ages^i
+            })
+          }
 
           pred_individual <- sapply(1:nrow(agesPoly), function(y){
             sapply(1:ncol(agesPoly), function(i){

@@ -52,8 +52,13 @@ selectDataServer <- function(id, dataFormatted) {
         )
       })
 
+      covars <- reactive({
+        c(input$covarsCat, input$covarsCont)
+      })
+
       covariateChoice <- reactive({
-        any(c(input$ID, input$traj, input$age, input$timePoint) %in% c(input$covarsCat, input$covarsCont ))
+        ( any(c(input$ID, input$traj, input$age, input$timePoint) %in% c(input$covarsCat, input$covarsCont )) |
+              any(input$covarsCat %in% input$covarsCont) )
       })
 
       # add what type of model to run and input the different formula here
@@ -105,7 +110,8 @@ selectDataServer <- function(id, dataFormatted) {
           age = reactive({ input$age }),
           timePoint = reactive({ input$timePoint }),
           modelType = reactive({ input$modelType }),
-          covariateChoice = covariateChoice
+          covariateChoice = covariateChoice,
+          covars = covars
         )
       )
     }

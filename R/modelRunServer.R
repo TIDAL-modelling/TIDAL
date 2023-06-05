@@ -31,7 +31,7 @@ modelRunServer <- function(id,
 
       output$covChoiceWarning <- renderText({
         if(covariateChoice()){
-          "<b style='color:red;'>Error: Do not choose a covariate that is already selected as a variable.</b>"
+          "<b style='color:red;'>Error: Do not choose a covariate that is already selected as a variable or choose the same covariate as both continuous and categorical.</b>"
         }
       })
       # ------------------------------------------
