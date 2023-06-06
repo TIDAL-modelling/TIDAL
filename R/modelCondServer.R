@@ -18,7 +18,8 @@ modelCondServer <- function(id,
                             traj,
                             age,
                             timePoint,
-                            modelType) {
+                            modelType,
+                            modelFit) {
 
   moduleServer(
     id,
@@ -284,6 +285,90 @@ modelCondServer <- function(id,
         plot()
         }
         })
+
+      ###############################################################
+      # Score for a given set of ages - Alternative Model Results Tab
+      # ------------------------------------------
+      # Allow the user to select the ages they want to calculate scores for
+      output$selectAgeScore <- renderUI({
+        ageOrig <- modelDataEdit() %>%
+          pull(age_original)
+        checkboxGroupInput(ns("ageInputScore"),
+                           "What ages do you want to calculate scores for?",
+                           seq(round(min(ageOrig)),round(max(ageOrig))),
+                           inline = TRUE)
+      })
+
+      # ------------------------------------------
+      # Calculate the score at a given age (intercept + slope etc)
+      score <- reactive({
+        ageOrig <- modelDataEdit() %>% pull(age_original)
+
+        score <- sapply(as.numeric(input$ageInputScore), function(x){
+          if(modelType() == "Linear"){
+            (summary(modelFit())$coefficients[1,1] +
+               (x - mean(ageOrig)) * summary(modelFit())$coefficients[2,1]) %>%
+              round(2)
+          } else if(modelType() == "Quadratic"){
+            ( summary(modelFit())$coefficients[1,1] +
+                (x - mean(ageOrig)) * summary(modelFit())$coefficients[2,1] +
+                (x - mean(ageOrig))^2 * summary(modelFit())$coefficients[3,1]) %>%
+              round(2)
+          } else if(modelType() == "Cubic"){
+            (summary(modelFit())$coefficients[1,1] +
+               (x - mean(ageOrig)) * summary(modelFit())$coefficients[2,1] +
+               (x - mean(ageOrig))^2 * summary(modelFit())$coefficients[3,1] +
+               (x - mean(ageOrig))^3 * summary(modelFit())$coefficients[4,1] )%>%
+              round(2)
+          } else if(modelType() == "Quartic"){
+            ( summary(modelFit())$coefficients[1,1] +
+                (x - mean(ageOrig)) * summary(modelFit())$coefficients[2,1] +
+                (x - mean(ageOrig))^2 * summary(modelFit())$coefficients[3,1] +
+                (x - mean(ageOrig))^3 * summary(modelFit())$coefficients[4,1] +
+                (x - mean(ageOrig))^4 * summary(modelFit())$coefficients[5,1]) %>%
+              round(2)
+          }
+        })
+        return(score)
+      })
+
+      # ------------------------------------------
+      # Plot the score at the given age
+      output$plotScore <- renderPlot({
+        if(input$varType == "cat"){
+          ggplot() +
+            theme_light()+
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+            theme(legend.text = element_text(color = "black", size = 10)) +
+            geom_vline(xintercept = as.numeric(input$ageInputScore), color = "red", linetype = "dashed") +
+            geom_hline(yintercept = score(), color = "red", linetype = "dashed") +
+            ylab("Score") +
+            xlab("Age")
+
+        }else if(input$varType == "cont"){
+          ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
+            theme_light()+
+            geom_point()+
+            geom_line() +
+            geom_errorbar(aes(ymin = lower, ymax = upper)) +
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
+            scale_colour_discrete(na.translate = F) +
+            theme(legend.text = element_text(color = "black", size = 10))
+        }
+      })
+
+      # ------------------------------------------
+      # Return a table of the score for all the ages
+      # --- Age | Score -----
+      # Change "Score" to the actual column name from the dataframe - which the user previously specified
+      # output$tableScore <- renderTable({
+      #   data.frame(Age = input$ageInputScore,
+      #              Score = score())
+      # })
+
+
+      # ------------------------------------------
+
 
       return(list(
         modelDataEdit = modelDataEdit

@@ -205,7 +205,8 @@ server <- function(input, output, session) {
                                              traj = selectedDataServer$traj,
                                              age = selectedDataServer$age,
                                              timePoint = selectedDataServer$timePoint,
-                                             modelType = selectedDataServer$modelType)
+                                             modelType = selectedDataServer$modelType,
+                                             modelFit = modelRunServer$fit)
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
                                                subject = selectedDataServer$ID,
                                                age = selectedDataServer$age,

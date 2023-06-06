@@ -49,7 +49,15 @@ modelCondUI <- function(id, label = "Model Condition Run") {
             ),
             tabPanel("Plot",
                      plotOutput(ns("modelCondPlot"))
-            )
+            ),
+            tabPanel("Alternative Model Results",
+                     tagList(
+                       tagList(
+                         uiOutput(ns("selectAgeScore")),
+                         plotOutput(ns("plotScore")),
+                         tableOutput(ns("tableScore"))
+                       )
+                     ))
           )
         )
       )
