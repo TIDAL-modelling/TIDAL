@@ -349,7 +349,7 @@ modelCondServer <- function(id,
                   (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1]
               }
             })
-          }) %>% do.call(cbind,.)
+          })
          return( list(score = score, scoreCovs = scoreCovs) )
         }else{
           return(list(scoreCont = score))
@@ -366,7 +366,7 @@ modelCondServer <- function(id,
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
             theme(legend.text = element_text(color = "black", size = 10)) +
             geom_vline(xintercept = as.numeric(input$ageInputScore), color = "red", linetype = "dashed") +
-            geom_hline(yintercept = c(score()$score, score()$scoreCovs) , color = "red", linetype = "dashed") +
+            geom_hline(yintercept = c(score()$score, unlist(score()$scoreCovs)) , color = "red", linetype = "dashed") +
             ylab("Score") +
             xlab("Age")
 
@@ -388,10 +388,13 @@ modelCondServer <- function(id,
       # Return a table of the score for all the ages
       # --- Age | Score -----
       # Change "Score" to the actual column name from the dataframe - which the user previously specified
-      # output$tableScore <- renderTable({
-      #   data.frame(Age = input$ageInputScore,
-      #              Score = score())
-      # })
+      output$tableScore <- renderTable({
+        cbind(
+          data.frame(Age = input$ageInputScore,
+                   ScoreZero = score()$score),
+          do.call(cbind, score()$scoreCovs)
+        )
+      })
 
 
       # ------------------------------------------
