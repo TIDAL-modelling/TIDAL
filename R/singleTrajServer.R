@@ -190,11 +190,11 @@ singleTrajServer <- function(id,
           })
           } else {
             # get the random effects for each participant
-            effects <- sapply(which(!str_detect(colnames(rand()), cov())), function(i){
+            effects <- sapply(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|"))), function(i){
               filter(rand(), row.names(rand()) %in% x)[,i]
             })
 
-            agesPoly <- sapply(which(!str_detect(colnames(rand()), cov()))[-length(which(!str_detect(colnames(rand()), cov())))], function(i){
+            agesPoly <- sapply(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|")))[-length(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|"))))], function(i){
               ages^i
             })
           }
