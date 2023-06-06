@@ -77,6 +77,8 @@ overview_page <-   tabPanel(
                               TIDAL:::modelResultsUI("modelResults")),
                      tabPanel("Plot",
                               TIDAL:::modelPlotUI("modelPlot")),
+                     tabPanel("Alternative Model Results",
+                              TIDAL:::datExAltUI("datExAlt")),
                      tabPanel("Download Results",
                               TIDAL::downloadExploreUI("downloadExplore"))
                    )
@@ -179,6 +181,11 @@ server <- function(input, output, session) {
                                              modelType = selectedDataServer$modelType,
                                              button = selectedDataServer$button
   )
+  datExAltServer <- TIDAL:::datExAltServer("datExAlt",
+                                           modelDataEdit = modelPlotServer$modelDataEdit,
+                                           modelFit = modelRunServer$fit,
+                                           modelType = selectedDataServer$modelType
+                                           )
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
                                              descTable = modelRunServer$mainTable,
                                              warningMsg = modelRunServer$warning,
