@@ -97,7 +97,7 @@ intervention_page <- tabPanel(
 
 
 singeTraj_page <-  tabPanel(
-  title = "Individiual Trajectories",
+  title = "Individual Trajectories",
   fluidPage(
     tabsetPanel(
       tabPanel("Instructions",
