@@ -358,7 +358,11 @@ modelCondServer <- function(id,
 
       # ------------------------------------------
       # Plot the score at the given age
-      output$plotScore <- renderPlot({
+      plotScoreAll <- eventReactive(input$ageInputScore, {
+
+        # improve the plot
+        #https://stackoverflow.com/questions/72563038/geom-vline-for-values-over-a-threshold-on-y-axis
+
         if(input$varType == "cat"){
           req(score()$scoreCovs)
           ggplot() +
@@ -383,17 +387,31 @@ modelCondServer <- function(id,
             xlab("Age")
         }
       })
+      output$plotScore <- renderPlot({
+        plotScoreAll()
+      })
 
       # ------------------------------------------
       # Return a table of the score for all the ages
       # --- Age | Score -----
       # Change "Score" to the actual column name from the dataframe - which the user previously specified
-      output$tableScore <- renderTable({
-        cbind(
+      tableScoreAll <- eventReactive(input$ageInputScore, {
+        if(input$varType == "cat"){
+          req(score()$scoreCovs)
+          cbind(
+            data.frame(Age = input$ageInputScore,
+                       ScoreZero = score()$score),
+            do.call(cbind, score()$scoreCovs)
+          )
+        }else if(input$varType == "cont"){
+          req(score()$scoreCont)
           data.frame(Age = input$ageInputScore,
-                   ScoreZero = score()$score),
-          do.call(cbind, score()$scoreCovs)
-        )
+                     Score = score()$scoreCont)
+        }
+      })
+
+      output$tableScore <- renderTable({
+        tableScoreAll()
       })
 
 
