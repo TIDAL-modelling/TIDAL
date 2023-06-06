@@ -18,8 +18,7 @@ modelCondServer <- function(id,
                             traj,
                             age,
                             timePoint,
-                            modelType,
-                            modelFit) {
+                            modelType) {
 
   moduleServer(
     id,
@@ -145,11 +144,6 @@ modelCondServer <- function(id,
 
         ageVec <- modelData() %>% pull(!!age())
 
-        ###############################################################
-        ###############################################################
-        #   edit for non-linear models
-        ###############################################################
-        ###############################################################
         if(modelType() == "Linear"){
           zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
         } else if(modelType() == "Quadratic"){
@@ -306,54 +300,87 @@ modelCondServer <- function(id,
 
         score <- sapply(as.numeric(input$ageInputScore), function(x){
           if(modelType() == "Linear"){
-            (summary(modelFit())$coefficients[1,1] +
-               (x - mean(ageOrig)) * summary(modelFit())$coefficients[2,1]) %>%
+            (summary(fit())$coefficients[1,1] +
+               (x - mean(ageOrig)) * summary(fit())$coefficients[2,1]) %>%
               round(2)
           } else if(modelType() == "Quadratic"){
-            ( summary(modelFit())$coefficients[1,1] +
-                (x - mean(ageOrig)) * summary(modelFit())$coefficients[2,1] +
-                (x - mean(ageOrig))^2 * summary(modelFit())$coefficients[3,1]) %>%
+            ( summary(fit())$coefficients[1,1] +
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
+                (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1]) %>%
               round(2)
           } else if(modelType() == "Cubic"){
-            (summary(modelFit())$coefficients[1,1] +
-               (x - mean(ageOrig)) * summary(modelFit())$coefficients[2,1] +
-               (x - mean(ageOrig))^2 * summary(modelFit())$coefficients[3,1] +
-               (x - mean(ageOrig))^3 * summary(modelFit())$coefficients[4,1] )%>%
+            (summary(fit())$coefficients[1,1] +
+               (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
+               (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+               (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] )%>%
               round(2)
           } else if(modelType() == "Quartic"){
-            ( summary(modelFit())$coefficients[1,1] +
-                (x - mean(ageOrig)) * summary(modelFit())$coefficients[2,1] +
-                (x - mean(ageOrig))^2 * summary(modelFit())$coefficients[3,1] +
-                (x - mean(ageOrig))^3 * summary(modelFit())$coefficients[4,1] +
-                (x - mean(ageOrig))^4 * summary(modelFit())$coefficients[5,1]) %>%
+            ( summary(fit())$coefficients[1,1] +
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
+                (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+                (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
+                (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1]) %>%
               round(2)
           }
         })
-        return(score)
+
+        if(input$varType == "cat"){
+          n <- length(unique(pull(modelData(), !!sym(input$condition))))
+          rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                       pattern = input$condition) &
+                              str_starts(string = row.names(summary(fit())$coefficients),
+                                         pattern = age(), negate = T))
+
+          scoreCovs <- lapply(1:(n-1), function(i){
+            sapply(as.numeric(input$ageInputScore), function(x){
+              if(modelType() == "Linear"){
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
+              } else if(modelType() == "Quadratic"){
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
+                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1]
+              } else if(modelType() == "Cubic"){
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
+                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+                  (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1]
+              } else if(modelType() == "Quartic"){
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]  +
+                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+                  (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
+                  (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1]
+              }
+            })
+          }) %>% do.call(cbind,.)
+         return( list(score = score, scoreCovs = scoreCovs) )
+        }else{
+          return(list(scoreCont = score))
+        }
       })
 
       # ------------------------------------------
       # Plot the score at the given age
       output$plotScore <- renderPlot({
         if(input$varType == "cat"){
+          req(score()$scoreCovs)
           ggplot() +
             theme_light()+
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
             theme(legend.text = element_text(color = "black", size = 10)) +
             geom_vline(xintercept = as.numeric(input$ageInputScore), color = "red", linetype = "dashed") +
-            geom_hline(yintercept = score(), color = "red", linetype = "dashed") +
+            geom_hline(yintercept = c(score()$score, score()$scoreCovs) , color = "red", linetype = "dashed") +
             ylab("Score") +
             xlab("Age")
 
         }else if(input$varType == "cont"){
-          ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
+          req(score()$scoreCont)
+          ggplot() +
             theme_light()+
-            geom_point()+
-            geom_line() +
-            geom_errorbar(aes(ymin = lower, ymax = upper)) +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
             scale_colour_discrete(na.translate = F) +
-            theme(legend.text = element_text(color = "black", size = 10))
+            theme(legend.text = element_text(color = "black", size = 10)) +
+            geom_vline(xintercept = as.numeric(input$ageInputScore), color = "red", linetype = "dashed") +
+            geom_hline(yintercept = score()$scoreCont, color = "red", linetype = "dashed") +
+            ylab("Score") +
+            xlab("Age")
         }
       })
 
