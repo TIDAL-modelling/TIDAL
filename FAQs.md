@@ -45,5 +45,5 @@ If you are *only* running a linear model, ensure that there are at least 3 time 
 <details>
     <summary>I am having problems installing TIDAL</summary>
 
-Check that your R version is up-to-date. TIDAL requires you to have R version 2.10 or newer. If if you are a Mac user, you may need to install the compiler [CMake](https://cmake.org/) which should solve any issues with compiling R packages from source. 
+Check that your R version is up-to-date. TIDAL requires you to have R version 2.10 or newer. If you are a Mac user or installing TIDAL within the terminal/command line, you may need to install the compiler [CMake](https://cmake.org/) which should solve any issues with compiling R packages from source. 
 </details>
