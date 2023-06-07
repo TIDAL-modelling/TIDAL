@@ -358,6 +358,7 @@ modelCondServer <- function(id,
 
       # ------------------------------------------
       # Plot the score at the given age
+
       plotScoreAll <- eventReactive(input$ageInputScore, {
 
         # improve the plot
@@ -365,6 +366,52 @@ modelCondServer <- function(id,
 
         if(input$varType == "cat"){
           req(score()$scoreCovs)
+
+          # data_lines <-
+          #   rbind(data.frame(
+          #     x = rep(0, length(input$ageInputScore)),
+          #     y = score()$score,
+          #     xend = input$ageInputScore,
+          #     yend = score()$score,
+          #     col = as.character(input$ageInputScore)
+          #   ),
+          #   lapply(score$scoreCovs, function(y){
+          #     data.frame(
+          #       x = rep(0, length(input$ageInputScore)),
+          #       y = y,
+          #       xend = input$ageInputScore,
+          #       yend = y,
+          #       col = as.character(input$ageInputScore)
+          #     )
+          #   }) %>% do.call(rbind,.)
+          #   )
+
+          # palette <- c("#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF", "#FF6600", "#00FF66",
+          #              "#0066FF", "#FFCC00", "#FF6633", "#66FF33", "#3366FF", "#FF9900", "#FF3366", "#66FF66",
+          #              "#6699FF", "#FFCC33", "#FF3399", "#99FF99", "#99CCFF", "#FFCC66", "#FF66CC", "#CCFFCC",
+          #              "#CCCCFF", "#FF9933", "#FF66FF", "#CCFF66", "#CC66FF", "#FFCC99", "#FF99CC", "#99FFFF",
+          #              "#CC99FF", "#FFCC99", "#FF99CC", "#99FFFF", "#CC99FF", "#FFCCCC", "#FF99FF", "#CCFFFF",
+          #              "#FFCCFF", "#CCCCFF")
+          #
+          # data_lines <-
+          #   data.frame(
+          #     x = as.numeric(rep(floor(min(modelDataEdit()$age_original)), length(input$ageInputScore))),
+          #     y = as.numeric(score()$score),
+          #     xend = as.numeric(input$ageInputScore),
+          #     yend = as.numeric(score()$score),
+          #     col = palette[1:length(input$ageInputScore)]
+          #   )
+          #
+          # ggplot() +
+          #   theme_light()+
+          #   geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+          #   theme(legend.text = element_text(color = "black", size = 10)) +
+          #   geom_segment(data = data_lines, show.legend = FALSE,
+          #                aes(x = x, y = y, xend = xend, yend = yend, col = col), linetype = "dashed", alpha = 0.6) +
+          #   ylab("Score") +
+          #   xlab("Age") +
+          #   scale_x_continuous(expand = expansion(mult = c(0, 0.01)))
+
           ggplot() +
             theme_light()+
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
