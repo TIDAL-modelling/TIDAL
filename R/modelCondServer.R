@@ -427,7 +427,7 @@ modelCondServer <- function(id,
         }else if(input$varType == "cont"){
           req(score()$scoreCont)
           df <- t(data.frame( input$ageInputScore, score()$scoreCont ))
-          rowname <- paste0("Score (", traj(), ") [", input$condition, " ]")
+          rowname <- paste0("Score (", traj(), ") [", input$condition, "]")
           rownames(df) <- c("Age", rowname)
           df
         }
