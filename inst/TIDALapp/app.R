@@ -77,7 +77,7 @@ overview_page <-   tabPanel(
                               TIDAL:::modelResultsUI("modelResults")),
                      tabPanel("Plot",
                               TIDAL:::modelPlotUI("modelPlot")),
-                     tabPanel("Alternative Model Results",
+                     tabPanel("Scores At Ages",
                               TIDAL:::datExAltUI("datExAlt")),
                      tabPanel("Download Results",
                               TIDAL::downloadExploreUI("downloadExplore"))
