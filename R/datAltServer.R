@@ -16,7 +16,8 @@
 datExAltServer <- function(id,
                            modelDataEdit,
                            modelFit,
-                           modelType
+                           modelType,
+                           colName
 
 ) {
 
@@ -80,10 +81,8 @@ datExAltServer <- function(id,
 
         ggplot() +
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T) +
-          # geom_vline(xintercept = as.numeric(input$ageInput), color = "red", linetype = "dashed") +
-          # geom_hline(yintercept = score(), color = "red", linetype = "dashed") +
           geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
-          ylab("Score") +
+          ylab(paste0("Score (", colName(), ")")) +
           xlab("Age")
       })
 
@@ -92,11 +91,11 @@ datExAltServer <- function(id,
       # --- Age | Score -----
       # Change "Score" to the actual column name from the dataframe - which the user previously specified
       output$table <- renderTable({
-        data.frame(Age = input$ageInput,
-                   Score = score())
-      })
-
-
+        df <- t(data.frame( input$ageInput, score() ))
+        rowname <- paste0("Score (", colName(), ")")
+        rownames(df) <- c("Age", rowname)
+        df
+      }, colnames = FALSE, rownames = TRUE)
       # ------------------------------------------
     }
   )

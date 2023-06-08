@@ -184,7 +184,8 @@ server <- function(input, output, session) {
   datExAltServer <- TIDAL:::datExAltServer("datExAlt",
                                            modelDataEdit = modelPlotServer$modelDataEdit,
                                            modelFit = modelRunServer$fit,
-                                           modelType = selectedDataServer$modelType
+                                           modelType = selectedDataServer$modelType,
+                                           colName = selectedDataServer$traj
                                            )
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
                                              descTable = modelRunServer$mainTable,
