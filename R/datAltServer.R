@@ -74,10 +74,15 @@ datExAltServer <- function(id,
       # ------------------------------------------
       # Plot the score at the given age
       output$plot <- renderPlot({
+        # points of intersection of age and score
+        points <- data.frame(x = as.numeric(input$ageInput),
+                             y = as.numeric(score()))
+
         ggplot() +
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T) +
-          geom_vline(xintercept = as.numeric(input$ageInput), color = "red", linetype = "dashed") +
-          geom_hline(yintercept = score(), color = "red", linetype = "dashed") +
+          # geom_vline(xintercept = as.numeric(input$ageInput), color = "red", linetype = "dashed") +
+          # geom_hline(yintercept = score(), color = "red", linetype = "dashed") +
+          geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
           ylab("Score") +
           xlab("Age")
       })
