@@ -370,70 +370,33 @@ modelCondServer <- function(id,
         if(input$varType == "cat"){
           req(score()$scoreCovs)
 
-          # data_lines <-
-          #   rbind(data.frame(
-          #     x = rep(0, length(input$ageInputScore)),
-          #     y = score()$score,
-          #     xend = input$ageInputScore,
-          #     yend = score()$score,
-          #     col = as.character(input$ageInputScore)
-          #   ),
-          #   lapply(score$scoreCovs, function(y){
-          #     data.frame(
-          #       x = rep(0, length(input$ageInputScore)),
-          #       y = y,
-          #       xend = input$ageInputScore,
-          #       yend = y,
-          #       col = as.character(input$ageInputScore)
-          #     )
-          #   }) %>% do.call(rbind,.)
-          #   )
+          # points of intersection of age and score
+          points <- data.frame(x = as.numeric(input$ageInputScore),
+                               y = c(score()$score, unlist(score()$scoreCovs))
+          )
 
-          # palette <- c("#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF", "#FF6600", "#00FF66",
-          #              "#0066FF", "#FFCC00", "#FF6633", "#66FF33", "#3366FF", "#FF9900", "#FF3366", "#66FF66",
-          #              "#6699FF", "#FFCC33", "#FF3399", "#99FF99", "#99CCFF", "#FFCC66", "#FF66CC", "#CCFFCC",
-          #              "#CCCCFF", "#FF9933", "#FF66FF", "#CCFF66", "#CC66FF", "#FFCC99", "#FF99CC", "#99FFFF",
-          #              "#CC99FF", "#FFCC99", "#FF99CC", "#99FFFF", "#CC99FF", "#FFCCCC", "#FF99FF", "#CCFFFF",
-          #              "#FFCCFF", "#CCCCFF")
-          #
-          # data_lines <-
-          #   data.frame(
-          #     x = as.numeric(rep(floor(min(modelDataEdit()$age_original)), length(input$ageInputScore))),
-          #     y = as.numeric(score()$score),
-          #     xend = as.numeric(input$ageInputScore),
-          #     yend = as.numeric(score()$score),
-          #     col = palette[1:length(input$ageInputScore)]
-          #   )
-          #
-          # ggplot() +
-          #   theme_light()+
-          #   geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
-          #   theme(legend.text = element_text(color = "black", size = 10)) +
-          #   geom_segment(data = data_lines, show.legend = FALSE,
-          #                aes(x = x, y = y, xend = xend, yend = yend, col = col), linetype = "dashed", alpha = 0.6) +
-          #   ylab("Score") +
-          #   xlab("Age") +
-          #   scale_x_continuous(expand = expansion(mult = c(0, 0.01)))
-
-          ggplot() +
+            ggplot() +
             theme_light()+
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
             theme(legend.text = element_text(color = "black", size = 10)) +
-            geom_vline(xintercept = as.numeric(input$ageInputScore), color = "red", linetype = "dashed") +
-            geom_hline(yintercept = c(score()$score, unlist(score()$scoreCovs)) , color = "red", linetype = "dashed") +
-            ylab("Score") +
+            geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
+            ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
 
         }else if(input$varType == "cont"){
+          # points of intersection of age and score
+          points <- data.frame(x = as.numeric(input$ageInputScore),
+                               y = score()$scoreCont
+          )
+
           req(score()$scoreCont)
           ggplot() +
             theme_light()+
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
             scale_colour_discrete(na.translate = F) +
             theme(legend.text = element_text(color = "black", size = 10)) +
-            geom_vline(xintercept = as.numeric(input$ageInputScore), color = "red", linetype = "dashed") +
-            geom_hline(yintercept = score()$scoreCont, color = "red", linetype = "dashed") +
-            ylab("Score") +
+            geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
+            ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
         }
       })
@@ -453,17 +416,31 @@ modelCondServer <- function(id,
                        ScoreZero = score()$score),
             do.call(cbind, score()$scoreCovs)
           )
+
+          df <- t(
+                  cbind(
+                    data.frame( input$ageInputScore,
+                                score()$score  ),
+                    do.call(cbind, score()$scoreCovs)
+                    )
+                  )
+          rowname <- paste0("Score (", traj(), ")")
+          levelNames <- as.character(unique(pull(modelDataEdit(), input$condition)))
+          rownames(df) <- c("Age", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
+          df
+
         }else if(input$varType == "cont"){
           req(score()$scoreCont)
-          data.frame(Age = input$ageInputScore,
-                     Score = score()$scoreCont)
+          df <- t(data.frame( input$ageInput, score()$scoreCont ))
+          rowname <- paste0("Score (", traj(), ") [", input$condition, " ]")
+          rownames(df) <- c("Age", rowname)
+          df
         }
       })
 
       output$tableScore <- renderTable({
         tableScoreAll()
-      })
-
+      }, colnames = FALSE, rownames = TRUE)
 
       # ------------------------------------------
 
