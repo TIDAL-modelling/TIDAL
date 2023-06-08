@@ -51,13 +51,22 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                      plotOutput(ns("modelCondPlot"))
             ),
             tabPanel("Scores At Ages",
-                     tagList(
                        tagList(
                          uiOutput(ns("selectAgeScore")),
                          plotOutput(ns("plotScore")),
                          tableOutput(ns("tableScore"))
                        )
-                     ))
+            ),
+            tabPanel("Area Under Curve",
+                     tagList(
+                       textOutput(ns("AUCoverview")),
+                       p(""),
+                       p(""),
+                       uiOutput(ns("AUCagesUI")),
+                       plotOutput(ns("AUCplot")),
+                       tableOutput(ns("AUCtable"))
+                     )
+            )
           )
         )
       )
