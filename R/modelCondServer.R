@@ -287,6 +287,8 @@ modelCondServer <- function(id,
       output$selectAgeScore <- renderUI({
         ageOrig <- modelDataEdit() %>%
           pull(age_original)
+        ageOrig <- ageOrig[!is.na(ageOrig)]
+
         checkboxGroupInput(ns("ageInputScore"),
                            "What ages do you want to calculate scores for?",
                            seq(round(min(ageOrig)),round(max(ageOrig))),
@@ -297,6 +299,7 @@ modelCondServer <- function(id,
       # Calculate the score at a given age (intercept + slope etc)
       score <- reactive({
         ageOrig <- modelDataEdit() %>% pull(age_original)
+        ageOrig <- ageOrig[!is.na(ageOrig)]
 
         score <- sapply(as.numeric(input$ageInputScore), function(x){
           if(modelType() == "Linear"){
