@@ -50,7 +50,6 @@ modelCondUI <- function(id, label = "Model Condition Run") {
             tabPanel("Plot",
                      tagList(
                      checkboxInput(ns("plotCheckbox"), "Do you want an overlay of the descriptive plot?", TRUE, width = '100%'),
-                     textOutput(ns("test")),
                      plotOutput(ns("modelCondPlot"))
                      )
             ),
@@ -65,10 +64,13 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                      tagList(
                        textOutput(ns("AUCoverview")),
                        p(""),
+                       uiOutput(ns("levelsAUCUI")),
                        p(""),
                        uiOutput(ns("AUCagesUI")),
                        plotOutput(ns("AUCplot")),
-                       tableOutput(ns("AUCtable"))
+                       tableOutput(ns("AUCtable")),
+
+                       textOutput(ns("test"))
                      )
             )
           )

@@ -531,7 +531,7 @@ modelCondServer <- function(id,
 
       # ------------------------------------------
       # Plot AUC
-      plotAUC <- eventReactive(input$AUCages, {
+      plotAUC <- eventReactive(c(input$button, input$AUCages), {
 
         if(input$varType == "cat"){
           req(AUC()$AUCCovs)
@@ -578,7 +578,7 @@ modelCondServer <- function(id,
       })
 
 
-      tableAUC <- eventReactive(input$AUCages, {
+      tableAUC <- eventReactive(c(input$button, input$AUCages), {
         if(input$varType == "cat"){
           req(AUC()$AUCCovs)
           df <- t(
@@ -610,6 +610,29 @@ modelCondServer <- function(id,
       output$AUCtable <- renderTable({
         tableAUC()
       }, colnames = FALSE, rownames = TRUE)
+
+      # ------
+      # User select which 2 levels of their factor they want to see a difference between
+      # if input var is categorical
+      output$levelsAUCUI <- renderUI({
+        if(input$varType == "cat"){
+          selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference between:",
+                      sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
+                      multiple = TRUE,
+                      options = list(maxItems = 2))
+        }else{
+
+        }
+      })
+
+      difference <- reactive({
+        levelChoice <- as.character(input$levelsAUC)
+       as.numeric( tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[1])),1] ) - as.numeric(tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[2])),1])
+      })
+
+      output$test <- renderText({
+        difference()
+      })
 
 
       return(list(
