@@ -275,13 +275,17 @@ modelCondServer <- function(id,
             ggplot() +
               theme_light()+
               geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
-              theme(legend.text = element_text(color = "black", size = 10))
+              theme(legend.text = element_text(color = "black", size = 10)) +
+              ylab("Phenotype") +
+              xlab("Age")
           }else if(input$varType == "cont"){
             ggplot() +
               theme_light()+
               geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
               scale_colour_discrete(na.translate = F) +
-              theme(legend.text = element_text(color = "black", size = 10))
+              theme(legend.text = element_text(color = "black", size = 10)) +
+              ylab("Phenotype") +
+              xlab("Age")
           }
         }
 
@@ -306,7 +310,7 @@ modelCondServer <- function(id,
 
         checkboxGroupInput(ns("ageInputScore"),
                            "What ages do you want to calculate scores for?",
-                           seq(round(min(ageOrig)),round(max(ageOrig))),
+                           seq(round(min(ageOrig, na.rm =T)),round(max(ageOrig, na.rm =T))),
                            inline = TRUE)
       })
 
@@ -435,7 +439,7 @@ modelCondServer <- function(id,
                     )
                   )
           rowname <- paste0("Score (", traj(), ")")
-          levelNames <- as.character(unique(pull(modelDataEdit(), input$condition)))
+          levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), input$condition))))
           rownames(df) <- c("Age", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
           df
 
@@ -472,9 +476,9 @@ modelCondServer <- function(id,
 
         sliderInput(ns("AUCages"),
                     "Select the age range to calculate AUC for:",
-                    min = round(min(ageOrig)),
-                    max = round(max(ageOrig)),
-                    value = c(round(min(ageOrig)),round(max(ageOrig)))
+                    min = round(min(ageOrig, na.rm =T)),
+                    max = round(max(ageOrig, na.rm =T)),
+                    value = c(round(min(ageOrig, na.rm =T)),round(max(ageOrig, na.rm =T)))
                     )
       })
 
@@ -547,7 +551,7 @@ modelCondServer <- function(id,
                   text = element_text(size = 14)) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age") +
-            scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original)), round(max(modelDataEdit()$age_original)), by = 1),
+            scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original, na.rm =T)), round(max(modelDataEdit()$age_original, na.rm =T)), by = 1),
                                expand = c(0, 0))+
             scale_y_continuous(expand = c(0, 0))
 
@@ -567,7 +571,7 @@ modelCondServer <- function(id,
                   text = element_text(size = 14)) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age") +
-            scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original)), round(max(modelDataEdit()$age_original)), by = 1),
+            scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original, na.rm =T)), round(max(modelDataEdit()$age_original, na.rm =T)), by = 1),
                                expand = c(0, 0)) +
             scale_y_continuous(expand = c(0, 0))
           }
@@ -590,7 +594,7 @@ modelCondServer <- function(id,
           )
 
           rowname <- paste0("AUC (", traj(), ")")
-          levelNames <- as.character(unique(pull(modelDataEdit(), input$condition)))
+          levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), input$condition))))
           rownames(df) <- c("Age Range", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
           df
 
@@ -616,7 +620,7 @@ modelCondServer <- function(id,
       # if input var is categorical
       output$levelsAUCUI <- renderUI({
         if(input$varType == "cat"){
-          selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference between:",
+          selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference in AUC between:",
                       sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
                       multiple = TRUE,
                       options = list(maxItems = 2))
@@ -631,7 +635,7 @@ modelCondServer <- function(id,
       })
 
       output$test <- renderText({
-        difference()
+       paste0("The difference between the two factor levels you selected is: ", round( difference() ,2) ,". Please note this section is in development, we will change it to a table output with a statistical test summary.")
       })
 
 

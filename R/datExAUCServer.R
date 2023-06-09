@@ -42,9 +42,9 @@ output$AUCagesUI <- renderUI({
 
   sliderInput(ns("AUCages"),
               "Select the age range to calculate AUC for:",
-              min = round(min(ageOrig)),
-              max = round(max(ageOrig)),
-              value = c(round(min(ageOrig)),round(max(ageOrig)))
+              min = round(min(ageOrig, na.rm =T)),
+              max = round(max(ageOrig, na.rm =T)),
+              value = c(round(min(ageOrig, na.rm =T)),round(max(ageOrig, na.rm =T)))
   )
 })
 
@@ -90,7 +90,7 @@ plotAUC <- eventReactive(input$AUCages, {
             text = element_text(size = 14)) +
       ylab(paste0("Score (", traj(), ")")) +
       xlab("Age") +
-      scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original)), round(max(modelDataEdit()$age_original)), by = 1),
+      scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original, na.rm =T)), round(max(modelDataEdit()$age_original, na.rm =T)), by = 1),
                          expand = c(0, 0)) +
       scale_y_continuous(expand = c(0, 0))
 
