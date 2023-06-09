@@ -1,4 +1,4 @@
-#' Show fixed and random effects
+#' Display score at an age for the data exploration page
 #'
 #' @import broom.mixed
 #' @import lme4

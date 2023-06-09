@@ -1,4 +1,4 @@
-#' Run model - data exploration page
+#' Display score at an age for the data exploration page
 #'
 #' @import broom.mixed
 #' @import lme4
