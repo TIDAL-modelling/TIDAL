@@ -1,0 +1,31 @@
+---
+title: ""
+output:
+  pdf_document: default
+params:
+  descTable : NA
+  warningMsg : NA
+  formCodeRender : NA
+  statement : NA
+  fixedTab : NA
+  randomTab : NA
+  N : NA
+  mainPlot : NA
+  phenotype : NA
+  modelType : NA
+---
+
+
+``` {r, echo=F, warning=F}
+library(knitr)
+library(kableExtra)
+
+include_graphics("TIDAL.png")
+```
+
+# TIDAL Interaction Variable
+
+For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
+
+Date generated: `r Sys.Date()`
+File uploaded:

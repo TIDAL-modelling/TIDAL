@@ -278,6 +278,18 @@ modelCondServer <- function(id,
         }
         })
 
+      return(
+        list(
+          condType = reactive({ input$varType }),
+          cond = reactive({ input$condition }),
+          condPlot = output$modelCondPlot,
+          condModelForm = output$form,
+          condFixed = output$modelStatsFixed,
+          condRandom = output$modelStatsRandom,
+          modelDataEdit = modelDataEdit
+        )
+      )
+
     }
   )
 }
