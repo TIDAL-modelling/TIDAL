@@ -280,19 +280,6 @@ modelCondServer <- function(id,
         }
         })
 
-<<<<<<< HEAD
-      return(
-        list(
-          condType = reactive({ input$varType }),
-          cond = reactive({ input$condition }),
-          condPlot = output$modelCondPlot,
-          condModelForm = output$form,
-          condFixed = output$modelStatsFixed,
-          condRandom = output$modelStatsRandom,
-          modelDataEdit = modelDataEdit
-        )
-      )
-=======
       ###############################################################
       # Score for a given set of ages - Alternative Model Results Tab
       # ------------------------------------------
@@ -478,10 +465,17 @@ modelCondServer <- function(id,
       # ------------------------------------------
 
 
-      return(list(
-        modelDataEdit = modelDataEdit
-        ))
->>>>>>> dev
+      return(
+        list(
+          condType = reactive({ input$varType }),
+          cond = reactive({ input$condition }),
+          condPlot = output$modelCondPlot,
+          condModelForm = output$form,
+          condFixed = output$modelStatsFixed,
+          condRandom = output$modelStatsRandom,
+          modelDataEdit = modelDataEdit
+        )
+      )
 
     }
   )
