@@ -14,6 +14,7 @@
 #' @keywords internal
 #' @export
 modelRunServer <- function(id,
+                           covariateChoice,
                            button,
                            modelData,
                            formCode,
@@ -27,6 +28,12 @@ modelRunServer <- function(id,
     id,
     function(input, output, session) {
 
+
+      output$covChoiceWarning <- renderText({
+        if(covariateChoice()){
+          "<b style='color:red;'>Error: Do not choose a covariate that is already selected as a variable or choose the same covariate as both continuous and categorical.</b>"
+        }
+      })
       # ------------------------------------------
       #### Run the model
 
@@ -47,24 +54,29 @@ modelRunServer <- function(id,
 
         # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
         # Run the mixed model
-        fit <- try(lmer(formula = formCodeCovars(), REML=F , data = newModelData()), silent = TRUE)
-
-        if(class(fit) != "try-error"){
-          # Inspect warnings from the model
-          message <- summary(fit)$optinfo$conv$lme4$messages %>% paste0(collapse = ", ")
-
-          # If the model returns a warning about not converging, need to rescale variables or is.singular then
-          # rerun the model with a different optimiser
-
-          if( str_detect(message, "converge|Rescale|singular") ) {
-            fit <- lmer(formula = formCodeCovars(), REML=F , data = newModelData(),
+        fit <- try(lmer(formula = formCodeCovars(),
+                        REML=F ,
+                        data = newModelData(),
                         control=lmerControl(optimizer="bobyqa",
-                                            optCtrl=list(maxfun=2e5)))
-          }else{
-            fit <- fit
-          }
+                                            optCtrl=list(maxfun=2e5)) ),
+                   silent = TRUE)
 
-        }
+        # if(class(fit) != "try-error"){
+        #   # Inspect warnings from the model
+        #   message <- summary(fit)$optinfo$conv$lme4$messages %>% paste0(collapse = ", ")
+        #
+        #   # If the model returns a warning about not converging, need to rescale variables or is.singular then
+        #   # rerun the model with a different optimiser
+        #
+        #   if( str_detect(message, "converge|Rescale|singular") ) {
+        #     fit <- lmer(formula = formCodeCovars(), REML=F , data = newModelData(),
+        #                 control=lmerControl(optimizer="bobyqa",
+        #                                     optCtrl=list(maxfun=2e5)))
+        #   }else{
+        #     fit <- fit
+        #   }
+        #
+        # }
 
         return(fit)
       })
@@ -77,11 +89,11 @@ modelRunServer <- function(id,
       # Output message
       warning <- reactive({
         if(class(fit()) != "try-error"){
-          if( any(str_detect(as.character(summary(fit())$call), "optimizer")) ){
-            'The lme4 &quot;bobyqa&quot; optimiser was used. Please see more info <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.'
-          }else{
-            ""
-          }
+          # if( any(str_detect(as.character(summary(fit())$call), "optimizer")) ){
+            'The lme4 &quot;bobyqa&quot; optimiser was used by default. Please see more info <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.'
+          # }else{
+          #   ""
+          # }
         }else{
           "The model doesn't run. This could be because there is too much missing data or too few time points."
         }

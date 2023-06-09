@@ -3,7 +3,7 @@
 library(shinythemes)
 
 # Increase maximum file size that can be uploaded
-options(shiny.maxRequestSize = 30*1024^2)
+options(shiny.maxRequestSize = 100*1024^2)
 
 # User interface
 welcome_page <- tabPanel(
@@ -77,6 +77,8 @@ overview_page <-   tabPanel(
                               TIDAL:::modelResultsUI("modelResults")),
                      tabPanel("Plot",
                               TIDAL:::modelPlotUI("modelPlot")),
+                     tabPanel("Alternative Model Results",
+                              TIDAL:::datExAltUI("datExAlt")),
                      tabPanel("Download Results",
                               TIDAL::downloadExploreUI("downloadExplore"))
                    )
@@ -95,7 +97,7 @@ intervention_page <- tabPanel(
 
 
 singeTraj_page <-  tabPanel(
-  title = "Individiual Trajectories",
+  title = "Individual Trajectories",
   fluidPage(
     tabsetPanel(
       tabPanel("Instructions",
@@ -111,6 +113,31 @@ singeTraj_page <-  tabPanel(
   )
 )
 
+importantTimepoint_page <- tabPanel(
+  title = "Important Time Points",
+  fluidPage(
+    tabsetPanel(
+      tabPanel("Instructions",
+               tagList(
+                 h4("Important Time Points"),
+                 p("Determine the age where symptoms or scores are their maximum.
+              No user input is required as the model determined on the Data Exploration page is carried forward.")
+               )),
+
+      TIDAL:::importantAgeUI("importantAge")
+
+    )
+  )
+)
+
+
+  tabPanel(
+  title = "Important Time Points",
+  fluidPage(
+    TIDAL:::importantAgeUI("importantAge")
+  )
+)
+
 
 ui <- navbarPage(
   title = "TIDAL",
@@ -123,7 +150,8 @@ ui <- navbarPage(
   format_page,
   overview_page,
   intervention_page,
-  singeTraj_page
+  singeTraj_page,
+  importantTimepoint_page
 )
 
 # Main server
@@ -131,6 +159,7 @@ server <- function(input, output, session) {
   wide2longServer <- TIDAL:::wide2longServer("wide2long")
   selectedDataServer <- TIDAL:::selectDataServer("select", dataFormatted=wide2longServer)
   modelRunServer <- TIDAL:::modelRunServer("modelRun",
+                                           covariateChoice = selectedDataServer$covariateChoice,
                                            button = selectedDataServer$button,
                                            modelData = selectedDataServer$data,
                                            formCode = selectedDataServer$modelForm,
@@ -152,6 +181,11 @@ server <- function(input, output, session) {
                                              modelType = selectedDataServer$modelType,
                                              button = selectedDataServer$button
   )
+  datExAltServer <- TIDAL:::datExAltServer("datExAlt",
+                                           modelDataEdit = modelPlotServer$modelDataEdit,
+                                           modelFit = modelRunServer$fit,
+                                           modelType = selectedDataServer$modelType
+                                           )
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
                                              descTable = modelRunServer$mainTable,
                                              warningMsg = modelRunServer$warning,
@@ -176,7 +210,14 @@ server <- function(input, output, session) {
                                                subject = selectedDataServer$ID,
                                                age = selectedDataServer$age,
                                                modelData = modelRunServer$data,
-                                               modelFit = modelRunServer$fit)
+                                               modelFit = modelRunServer$fit,
+                                               modelType = selectedDataServer$modelType,
+                                               cov = selectedDataServer$covars)
+  importantAgeServer <- TIDAL:::importantAgeServer("importantAge",
+                                                   modelDataEdit = modelPlotServer$modelDataEdit,
+                                                   modelType = selectedDataServer$modelType,
+                                                   modelFit = modelRunServer$fit,
+                                                   age = selectedDataServer$age)
 }
 
 # Run the application

@@ -11,12 +11,12 @@ selectDataServer <- function(id, dataFormatted) {
       ns <- NS(id)
 
       # if the user wants to upload a file, add a UI for this
-        output$uploadFile <- renderUI({
-          if (input$select == "Upload a long format dataset"){
+      output$uploadFile <- renderUI({
+        if (input$select == "Upload a long format dataset"){
           tagList(
             fileInput(ns("uploadFile"), NULL)
           )
-      }
+        }
       })
       # if the user wants to use data formatted on previous page, from wide to long format then save this as "data()"
       data <- reactive ({
@@ -32,24 +32,33 @@ selectDataServer <- function(id, dataFormatted) {
 
       # Allow the user to assign the variables below from the column names in their dataframe
       output$additional <- renderUI({
-          req(data())
+        req(data())
         # Render UI elements
         tagList(
           selectInput(ns("ID"), "Participant ID variable:", choices = names(data()), selected = names(select(data(), where(is.numeric)) )[1]),
           selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[3]),
-          selectInput(ns("age"), "Variable for age at time point (continous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[2]),
+          selectInput(ns("age"), "Variable for age at time point (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[2]),
           selectInput(ns("timePoint"), "Variable for time point (categorical):", choices = names(data()) , selected = names(data())[2]),
           selectInput(ns("covarsCat"), "Categorical Confounders (optional):",
-                      choices = names(data())[ !names(data()) %in% c(input$ID, input$traj, input$age, input$timePoint) ] ,
+                      choices = names(data()) ,
                       selected = NULL,
                       multiple = TRUE),
           selectInput(ns("covarsCont"), "Continuous Confounders (optional):",
-                      choices = names(data())[ !names(data()) %in% c(input$ID, input$traj, input$age, input$timePoint) ] ,
+                      choices = names(data()) ,
                       selected = NULL,
                       multiple = TRUE),
           selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic")),
           actionButton(ns("button"), "Run Model")
         )
+      })
+
+      covars <- reactive({
+        c(input$covarsCat, input$covarsCont)
+      })
+
+      covariateChoice <- reactive({
+        ( any(c(input$ID, input$traj, input$age, input$timePoint) %in% c(input$covarsCat, input$covarsCont )) |
+              any(input$covarsCat %in% input$covarsCont) )
       })
 
       # add what type of model to run and input the different formula here
@@ -69,23 +78,23 @@ selectDataServer <- function(id, dataFormatted) {
 
       modelFormCovars <- reactive({
         req(modelForm())
-      if( (!is.null(input$covarsCat)) & (!is.null(input$covarsCont)) ){
-        form <- paste0(modelForm(),
-                       " + as.factor(",
-                       paste0(input$covarsCat, collapse = ") + as.factor("), ")",
-                       " + as.numeric(",
-                       paste0(input$covarsCont, collapse = ") + as.numeric("), ")")
-      }else if((is.null(input$covarsCat)) & (!is.null(input$covarsCont))){
-        form <- paste0(modelForm(),
-                       " + as.numeric(",
-                       paste0(input$covarsCont, collapse = ") + as.numeric("), ")")
-      }else if((!is.null(input$covarsCat)) & (is.null(input$covarsCont))){
-        form <- paste0(modelForm(),
-                       " + as.factor(",
-                       paste0(input$covarsCat, collapse = ") + as.factor("), ")")
-      }else {
-        form <- modelForm()
-      }
+        if( (!is.null(input$covarsCat)) & (!is.null(input$covarsCont)) ){
+          form <- paste0(modelForm(),
+                         " + as.factor(",
+                         paste0(input$covarsCat, collapse = ") + as.factor("), ")",
+                         " + as.numeric(",
+                         paste0(input$covarsCont, collapse = ") + as.numeric("), ")")
+        }else if((is.null(input$covarsCat)) & (!is.null(input$covarsCont))){
+          form <- paste0(modelForm(),
+                         " + as.numeric(",
+                         paste0(input$covarsCont, collapse = ") + as.numeric("), ")")
+        }else if((!is.null(input$covarsCat)) & (is.null(input$covarsCont))){
+          form <- paste0(modelForm(),
+                         " + as.factor(",
+                         paste0(input$covarsCat, collapse = ") + as.factor("), ")")
+        }else {
+          form <- modelForm()
+        }
         form
       })
 
@@ -100,7 +109,9 @@ selectDataServer <- function(id, dataFormatted) {
           traj = reactive({ input$traj }),
           age = reactive({ input$age }),
           timePoint = reactive({ input$timePoint }),
-          modelType = reactive({ input$modelType })
+          modelType = reactive({ input$modelType }),
+          covariateChoice = covariateChoice,
+          covars = covars
         )
       )
     }

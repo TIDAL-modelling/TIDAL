@@ -66,7 +66,7 @@ modelResultsServer <- function(id,
           tidy(modelFit(), "fixed"),
           confint(modelFit(), "beta_", method = "Wald")) %>%
           mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
-          mutate(p.z = ifelse(p.z <= 0, "p < 0.001", p.z))
+          mutate(p.z = ifelse(p.z <= 0, "p < 0.001", round(p.z, 3)))
       })
       output$modelStatsFixed <- renderTable(
         fixedTab()
@@ -81,7 +81,8 @@ modelResultsServer <- function(id,
 
       randomTab <- reactive({
         as.data.frame(VarCorr(modelFit()),
-                      order = "lower.tri")
+                      order = "lower.tri") %>%
+          mutate(across(where(is.numeric), round, 3))
       })
 
       output$modelStatsRandom <- renderTable(
