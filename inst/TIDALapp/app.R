@@ -193,7 +193,8 @@ server <- function(input, output, session) {
                                            modelDataEdit = modelPlotServer$modelDataEdit,
                                            modelFit = modelRunServer$fit,
                                            modelType = selectedDataServer$modelType,
-                                           traj = selectedDataServer$traj
+                                           traj = selectedDataServer$traj,
+                                           button = selectedDataServer$button
   )
 
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",

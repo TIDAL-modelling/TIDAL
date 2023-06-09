@@ -15,7 +15,8 @@ datExAUCServer <- function(id,
                            modelDataEdit,
                            modelFit,
                            modelType,
-                           traj) {
+                           traj,
+                           button) {
 
   moduleServer(
     id,
@@ -74,7 +75,7 @@ AUC <- reactive({
 
 # ------------------------------------------
 # Plot AUC
-plotAUC <- eventReactive(input$AUCages, {
+plotAUC <- eventReactive(c(input$AUCages, button()), {
 
     req(AUC())
 
@@ -101,7 +102,7 @@ output$AUCplot <- renderPlot({
 })
 
 
-tableAUC <- eventReactive(input$AUCages, {
+tableAUC <- eventReactive(c(input$AUCages, button()), {
 
     req(AUC())
     df <- t(

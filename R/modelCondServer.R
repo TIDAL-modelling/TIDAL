@@ -635,7 +635,11 @@ modelCondServer <- function(id,
       })
 
       output$test <- renderText({
+        if(input$varType == "cat"){
        paste0("The difference between the two factor levels you selected is: ", round( difference() ,2) ,". Please note this section is in development, we will change it to a table output with a statistical test summary.")
+        }else{
+
+        }
       })
 
 
