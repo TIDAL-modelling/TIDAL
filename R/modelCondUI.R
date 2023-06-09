@@ -17,7 +17,10 @@ modelCondUI <- function(id, label = "Model Condition Run") {
   sidebarLayout(
     sidebarPanel(
       tagList(
-        selectInput(ns("condition"), "Select the condition to split trajectory on.", choices = c()  ),
+        radioButtons(ns("varType"), "Explore a categorical or continuous variable?",
+                     c("Categorical" = "cat",
+                       "Continuous" = "cont")),
+        selectInput(ns("condition"), "Select the variable:", choices = c()  ),
         p("Be aware that it may take a while for the model to run."),
         actionButton(ns("button"), "Run Model")
       )
@@ -28,7 +31,7 @@ modelCondUI <- function(id, label = "Model Condition Run") {
           "Instructions",
           tagList(
             h4("Split by variable analysis"),
-            p("Using the model made on the previous page explore some factors which may influence the trajectory. Select from a list of variables (ie. column names) of the dataset to split the trajectory by.")
+            p("Using the model made on the previous page explore some variables which may influence the trajectory. Select from a list of variables (ie. column names) of the dataset to explore the trajectory by. If you have included variables as covariates in the previous page a warning message will occur if you try and explore the trajectory further by this variable.")
           )
         ),
         tabPanel(
@@ -36,6 +39,7 @@ modelCondUI <- function(id, label = "Model Condition Run") {
           tabsetPanel(
             tabPanel("Model Results",
                      tagList(
+                       textOutput(ns("warningCov")),
                        htmlOutput(ns("form")),
                        h4("Fixed Effects"),
                        tableOutput(ns("modelStatsFixed")),
@@ -45,7 +49,15 @@ modelCondUI <- function(id, label = "Model Condition Run") {
             ),
             tabPanel("Plot",
                      plotOutput(ns("modelCondPlot"))
-            )
+            ),
+            tabPanel("Alternative Model Results",
+                     tagList(
+                       tagList(
+                         uiOutput(ns("selectAgeScore")),
+                         plotOutput(ns("plotScore")),
+                         tableOutput(ns("tableScore"))
+                       )
+                     ))
           )
         )
       )

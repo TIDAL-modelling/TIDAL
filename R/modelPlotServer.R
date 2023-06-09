@@ -15,10 +15,11 @@
 modelPlotServer <- function(id,
                             modelData,
                             modelFit,
-                            SubjectID,
+                            age,
                             traj,
                             timePoint,
-                            age
+                            modelType,
+                            button
                             ) {
   moduleServer(
     id,
@@ -26,9 +27,29 @@ modelPlotServer <- function(id,
 
       # ------------------------------------------
       # add the "prediction"/model col to dataframe
-      modelDataEdit <- reactive({
+      modelDataEdit <- eventReactive(button(), {
+
+        age <- modelData() %>% pull(!!age())
+
+
+        if(modelType() == "Linear"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
+        } else if(modelType() == "Quadratic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1] +
+            age^2 * summary(modelFit())$coefficients[3,1]
+        } else if(modelType() == "Cubic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            age^2 * summary(modelFit())$coefficients[3,1] +
+            age^3 * summary(modelFit())$coefficients[4,1]
+        } else if(modelType() == "Quartic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            age^2 * summary(modelFit())$coefficients[3,1] +
+            age^3 * summary(modelFit())$coefficients[4,1] +
+            age^4 * summary(modelFit())$coefficients[5,1]
+        }
+
         modelData() %>%
-          mutate(pred = predict(modelFit(), ., re.form = NA))
+          mutate(pred = adjustedScore)
       })
 
       # ------------------------------------------
@@ -47,16 +68,27 @@ modelPlotServer <- function(id,
       })
 
       # ------------------------------------------
-      # plot the mean trajectory against the model
-      output$mainPlot <- renderPlot(
+      mainPlot <- reactive({
         ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
           theme_light()+
           geom_point()+
           geom_line() +
           geom_errorbar(aes(ymin = lower, ymax = upper)) +
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T)
+      })
+
+      # plot the mean trajectory against the model
+      output$mainPlot <- renderPlot(
+        mainPlot()
       )
-      return(df.plot)
+
+
+      return(
+        list(
+        df.plot = df.plot,
+        mainPlot = mainPlot,
+        modelDataEdit = modelDataEdit)
+        )
     }
   )
 }

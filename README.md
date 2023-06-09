@@ -32,7 +32,7 @@ https://tidal.shinyapps.io/tidalapp/
 To use this tool online please do not upload any sensitive data. Only use the [synthetic datasets](data/), described below.
 
 ## Synthetic datasets
-  * [Documentation and description of data](https://github.com/AmeliaES/TIDAL/blob/documentation/data/README.md)
+  * [Documentation and description of data](https://github.com/AmeliaES/TIDAL/blob/main/data/README.md)
   * To save the dataset click on the link below (right click to open in new tab) and then click `File` -> `Save Page As...` and save as a .csv file.
        * [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/emot_reg_emot_simulated.csv)
 

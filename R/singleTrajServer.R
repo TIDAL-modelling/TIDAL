@@ -1,8 +1,25 @@
+#' Server for individual trajectories
+#'
+#' @import broom.mixed
+#' @import lme4
+#' @import dplyr
+#' @import ggplot2
+#' @import data.table
+#' @import shinyjs
+#' @import tidyr
+#' @import magrittr
+#' @import stringr
+#'
+#' @noRd
+#' @keywords internal
+#' @export
 singleTrajServer <- function(id,
                              subject,
                              age,
                              modelData,
-                             modelFit) {
+                             modelFit,
+                             modelType,
+                             cov) {
   # create a module server
   moduleServer(
     # id is the id of the module
@@ -29,9 +46,9 @@ singleTrajServer <- function(id,
             )
           })
           output$specificIDs <- renderUI({
-                     })
+          })
           output$specificVar <- renderUI({
-                     })
+          })
         } else if (input$choice == "Select specific individuals"){
           output$specificIDs <- renderUI({
             textAreaInput(ns("SelectIDs"), "Input IDs (if multiple IDs separate with a comma)", rows = 2)
@@ -46,10 +63,10 @@ singleTrajServer <- function(id,
             var <- colnames(modelData())[apply(modelData(), 2, function(x) length(unique(x))) < 40]
 
             tagList(
-            selectInput(ns("catVars"), "Choose a variable of interest:", choices = var),
-            selectInput(ns("catLevels"), "Choose a level of interest from that variable:", choices = c()),
-            sliderInput(ns("NRandVar"), "Number of random individuals to sample",
-                        value = 3, min = 1, max = 30)
+              selectInput(ns("catVars"), "Choose a variable of interest:", choices = var),
+              selectInput(ns("catLevels"), "Choose a level of interest from that variable:", choices = c()),
+              sliderInput(ns("NRandVar"), "Number of random individuals to sample",
+                          value = 3, min = 1, max = 30)
             )
           })
           output$specificIDs <- renderUI({
@@ -85,94 +102,121 @@ singleTrajServer <- function(id,
 
       # add the "prediction"/model col to dataframe
       modelDataEdit <- reactive({
+
+        age <- modelData() %>% pull(!!age())
+
+        if(modelType() == "Linear"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
+        } else if(modelType() == "Quadratic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1] +
+            age^2 * summary(modelFit())$coefficients[3,1]
+        } else if(modelType() == "Cubic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            age^2 * summary(modelFit())$coefficients[3,1] +
+            age^3 * summary(modelFit())$coefficients[4,1]
+        } else if(modelType() == "Quartic"){
+          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            age^2 * summary(modelFit())$coefficients[3,1] +
+            age^3 * summary(modelFit())$coefficients[4,1] +
+            age^4 * summary(modelFit())$coefficients[5,1]
+        }
+
+
         # Not all participants were included in the prediction,
         # I assume because they didn't have enough data?
         modelDataEdit <- modelData() %>%
-          mutate(pred = predict(modelFit(), ., re.form = NA)) %>%
+          mutate(pred = adjustedScore) %>%
           filter(!!sym(subject()) %in% row.names(rand()))
 
         return(modelDataEdit)
       })
 
-       # -----------------------------------------------
-       # Select the IDs from input (for individuals that we can get model estimates for):
-        IDs <- reactive({
-          if(input$choice == "Random Sample"){
+      # -----------------------------------------------
+      # Select the IDs from input (for individuals that we can get model estimates for):
+      IDs <- reactive({
+        if(input$choice == "Random Sample"){
           IDs <- modelDataEdit() %>%
             sample_n(input$NRand) %>%
             pull(!!sym(subject()))
-          }else if(input$choice == "Select specific individuals"){
-            IDs <- strsplit(input$SelectIDs, ",")[[1]] %>% # split string by commas
-                      str_remove_all(., "\n") %>%  # remove any new lines (if present)
-                      str_trim()                   # remove any white space (if present)
-          }else if(input$choice  == "A specific variable"){
-            IDs <- modelDataEdit() %>%
-              filter(!!sym(input$catVars) == input$catLevels) %>%
-              sample_n(input$NRandVar) %>%
-              pull(!!sym(subject()))
+        }else if(input$choice == "Select specific individuals"){
+          IDs <- strsplit(input$SelectIDs, ",")[[1]] %>% # split string by commas
+            str_remove_all(., "\n") %>%  # remove any new lines (if present)
+            str_trim()                   # remove any white space (if present)
+          IDs <- IDs[nchar(IDs) != 0] # Remove any empty values due to spurious commas
+        }else if(input$choice  == "A specific variable"){
+          IDs <- modelDataEdit() %>%
+            filter(!!sym(input$catVars) == input$catLevels) %>%
+            sample_n(input$NRandVar) %>%
+            pull(!!sym(subject()))
+        }
+        return(sort(IDs))
+      })
+
+      # UI output of list of IDs:
+      output$textIDs <- renderText({
+        paste0("The following IDs are plotted: ", paste0(IDs(), collapse = ", "))
+      })
+
+
+      # -----------------------------------------------
+      #################################################
+      # Estimate the individual trajectories:
+      #################################################
+
+      output$trajPlot <-  renderPlot({
+        # loop over all participants to calculate their predictions including the random effects
+        pred_random <- lapply(IDs(), function(x){
+
+          x <- as.character(x)
+
+          # get age at each time point
+          ages <- modelDataEdit() %>%
+            filter(!!sym(subject()) == x) %>%
+            pull(age_original)
+
+          # number of unique time points
+          n <- modelDataEdit() %>%
+            filter(!!sym(subject()) == x) %>%
+            nrow()
+
+          if(is.null(cov()) ){
+          # get the random effects for each participant
+          effects <- sapply(1:ncol(rand()), function(i){
+            filter(rand(), row.names(rand()) %in% x)[,i]
+          })
+
+          agesPoly <- sapply(1:(ncol(rand())-1), function(i){
+            ages^i
+          })
+          } else {
+            # get the random effects for each participant
+            effects <- sapply(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|"))), function(i){
+              filter(rand(), row.names(rand()) %in% x)[,i]
+            })
+
+            agesPoly <- sapply(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|")))[-length(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|"))))], function(i){
+              ages^i
+            })
           }
-          return(sort(IDs))
-        })
 
-       # UI output of list of IDs:
-        output$textIDs <- renderText({
-          paste0("The following IDs are plotted: ", paste0(IDs(), collapse = ", "))
-        })
+          pred_individual <- sapply(1:nrow(agesPoly), function(y){
+            sapply(1:ncol(agesPoly), function(i){
+              effects[i + 1]*agesPoly[y,i]
+            }) %>% sum() + effects[1]
+          }) %>% data.frame("pred_individual" = .)
 
-        output$table <- renderDataTable({
-          modelDataEdit() %>%
-            filter(!!sym(subject()) %in% IDs())
-        })
+          cbind(data.frame(ID = x, age = ages),
+                pred_individual)
 
+        }) %>% do.call(rbind,.)
 
-       # -----------------------------------------------
-       #################################################
-       # Estimate the individual trajectories:
-       #################################################
-
-        output$trajPlot <-  renderPlot({
-          # loop over all participants to calculate their predictions including the random effects
-         pred_random <- lapply(IDs(), function(x){
-
-           x <- as.character(x)
-
-           # get age at each time point
-           ages <- modelDataEdit() %>%
-             filter(!!sym(subject()) == x) %>%
-             pull(!!sym(age()))
-
-           # number of unique time points
-           n <- modelDataEdit() %>%
-                  filter(!!sym(subject()) == x) %>%
-                  nrow()
-
-           # get the random effects for each participant
-           effects <- sapply(1:ncol(rand()), function(i){
-             filter(rand(), row.names(rand()) %in% x)[,i]
-           })
-
-           agesPoly <- sapply(1:(ncol(rand())-1), function(i){
-             ages^i
-           })
-
-           pred_individual <- sapply(1:nrow(agesPoly), function(y){
-             sapply(1:ncol(agesPoly), function(i){
-               effects[i + 1]*agesPoly[y,i]
-             }) %>% sum() + effects[1]
-           }) %>% data.frame("pred_individual" = .)
-
-           cbind(data.frame(ID = x, age = ages),
-                 pred_individual)
-
-         }) %>% do.call(rbind,.)
-
-         # -----------------------------------------------
-         # Plot the individual trajectories:
-         ggplot() +
-           geom_line(data = modelDataEdit(), aes(x= !!sym(age()),  y = pred), na.rm=T) +
-           geom_line(data = pred_random ,
-                     aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")
-       })
+        # -----------------------------------------------
+        # Plot the individual trajectories:
+        ggplot() +
+          geom_line(data = modelDataEdit(), aes(x= age_original,  y = pred), na.rm=T) +
+          geom_line(data = pred_random ,
+                    aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")
+      })
 
     }
   )

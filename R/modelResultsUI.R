@@ -19,8 +19,12 @@ modelResultsUI <- function(id, label = "Model") {
   tagList(
     htmlOutput(ns("formulaText")),
     br(),
+    textOutput(ns("ageMean")),
+    br(),
     htmlOutput(ns("warning")),
     br(),
+    h4("Number of observations and groups"),
+    textOutput(ns("Ndims")),
     h4("Fixed Effects"),
     tableOutput(ns("modelStatsFixed")),
     h4("Random Effects"),

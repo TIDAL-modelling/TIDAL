@@ -11,6 +11,8 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import stringr
+#' @import shinyBS
 #'
 #' @noRd
 #' @keywords internal
@@ -28,41 +30,66 @@ wide2longServer <- function(id) {
       ns <- NS(id)
 
       # -------------------------------
-      # When file has uploaded create extra UIs to interact with the uploaded file
-      # choices are NULL for options we want to update with column names of the file uploaded
-      info <- eventReactive(input$upload, {
-        output$moreControls <- renderUI(
+      # Depending on dataSource either a file is uploaded or synthetic data is used (loaded object in package)
+      # Add an upload button
+      # Render other UIs
+
+      # -------------------------------
+      # Render upload
+      output$uploadControls <- renderUI(
+        if(input$dataSource == "Upload data"){
           tagList(
-            selectInput(ns("ageCols"), "Select columns for age at each time point:", choices = NULL, multiple = TRUE),
-            selectInput(ns("depCols"), "Select columns for the phenotype (eg. depression) at each time point:", choices = NULL, multiple = TRUE),
-            textInput(ns("age"), "Name of new column for age:", value = "age"),
-            textInput(ns("time_point"), "Name of new column for time point:", value = "time_point"),
-            textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
-            textInput(ns("dep_cat"), "Name of new column for phenotype category:", value = "dep_cat"),
-            checkboxInput(ns("ageImpute"), "Do you want to impute missing age?", value = TRUE ),
-            downloadButton(ns("downloadData"), "Download .csv")
+            p("Upload a wide format longitudinal dataset:"),
+            fileInput(ns("upload"), NULL)
           )
-        )
-        # check file is uploaded and read it in
-        inFile <- input$upload
+        }
+      )
 
-        req(inFile)
-
-        f <- fread(inFile$datapath)
-        # make a new variable of the column names (this will be what the user selects from a drop down menu)
-        vars <- colnames(f)
-
-        # Update select input immediately after uploading file.
-        updateSelectInput(session, "ageCols","Select columns for age at each time point:", choices = vars)
-        updateSelectInput(session, "depCols","Select columns for the phenotype (eg. depression) at each time point:", choices = vars)
-
-        # add a message to user on some instructions
-        output$warningMsgEmpty <- renderText({
-          ifelse(is.null(input$ageCols) | is.null(input$depCols), '<b style="color:black">Select columns for age and depression, in chronological order.</b>', '')
-        })
-
+      # -------------------------------
+      # If synthetic then use synthetic
+      # If upload then upload data
+      info <- reactive({
+        if(input$dataSource == "Upload data"){
+          # check file is uploaded and read it in
+          inFile <- input$upload
+          req(inFile)
+          f <- fread(inFile$datapath)
+        }else{
+          f <- TIDAL::emot_reg_emot_simulated
+        }
         f
       })
+
+      # -------------------------------
+      # Create variables options from column names as these will be choices for the user
+      vars <- reactive({
+        colnames(info())
+      })
+
+      # -------------------------------
+      # Render additional UI with options as col names
+      output$moreControls <- renderUI({
+        tagList(
+          selectInput(ns("ageCols"), "Select columns for age at each time point:", choices = vars(), multiple = TRUE),
+          selectInput(ns("depCols"), "Select columns for the phenotype (eg. depression) at each time point:", choices = vars(), multiple = TRUE),
+          textInput(ns("age"), "Name of new column for age:", value = "age"),
+          textInput(ns("time_point"), "Name of new column for time point:", value = "time_point"),
+          textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
+          textInput(ns("dep_cat"), "Name of new column for phenotype category:", value = "dep_cat"),
+          tags$div(title = "Check the box to impute missing\nage with the mean age calculated\nat each time point.",
+          checkboxInput(ns("ageImpute"),
+                        tags$span("Impute missing age",
+                                  tipify(bsButton("pB2", "?", style = "info", size = "extra-small"),
+                                         "")),
+                        value = TRUE ))
+        )
+      })
+
+      # add a message to user on some instructions
+      output$warningMsgEmpty <- renderText({
+        ifelse(is.null(input$ageCols) | is.null(input$depCols) & nrow(info()) > 0, '<b style="color:black">Select columns for age and phenotype, in chronological order.</b>', '')
+      })
+
 
       # -------------------------------
       # We want the user to select the same number of age and depression columns,
@@ -85,11 +112,19 @@ wide2longServer <- function(id) {
           need(length(input$ageCols) == length(input$depCols), "")
         )
 
+        validate(
+          need(length(input$ageCols) > 0, "")
+        )
+
+        validate(
+          need(length(input$depCols) > 0, "")
+        )
+
         # default is to impute age with the mean for each time point if it's missing
         if(isTRUE(input$ageImpute)){
         # Impute mean age where age is missing
         dataWide <- info() %>%
-          mutate_at(vars( !!input$ageCols ), ~replace(., is.na(.), mean(., na.rm = T)))
+          mutate_at(all_of( input$ageCols ), ~replace(., is.na(.), mean(., na.rm = T)))
         }else{
           dataWide <- info()
         }
@@ -122,10 +157,21 @@ wide2longServer <- function(id) {
       })
 
       # -------------------------------
+      # Download button appears only when dataframe has been converted to long format and dataLong() exists
+      output$downloadDataButton <- renderUI({
+      req(dataLong())
+      downloadButton(ns("downloadData"), "Download .csv")
+      })
+
+      # -------------------------------
       # add an option to download the long format dataframe
       output$downloadData <- downloadHandler(
         filename = function(){
-          paste0(Sys.time(), 'LongFormat.csv')
+          if(input$dataSource == "Upload data"){
+            paste0(word(input$upload$name, 1, sep = "\\."), "_LongFormat_", Sys.Date(), ".csv")
+          }else{
+            "emot_reg_emot_simulated_LongFormat.csv"
+          }
         },
         content = function(file){
           write.csv(dataLong(), file, row.names = F, quote = F)

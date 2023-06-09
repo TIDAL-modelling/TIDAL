@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import shinyBS
 #'
 #' @noRd
 #' @export
@@ -20,10 +21,13 @@ wide2longUI <- function(id, label = "wide2long") {
   sidebarLayout(
     sidebarPanel(
       tagList(
-        p("Upload a wide format longitudinal dataset:"),
-        fileInput(ns("upload"), NULL),
-        uiOutput(ns("moreControls"))
-      )
+        radioButtons(ns("dataSource"), "Select data source:",
+                    choices = c("Upload data", "Use demo synthetic data"),
+                    selected = "Upload data"),
+        uiOutput(ns("uploadControls")),
+        uiOutput(ns("moreControls")),
+        uiOutput(ns("downloadDataButton"))
+        )
     ),
     mainPanel(
       tabsetPanel(
@@ -31,10 +35,10 @@ wide2longUI <- function(id, label = "wide2long") {
                  tagList(
                    h2("Convert longitudinal data from wide format to long format"),
                    tags$div(
-                     HTML('<strong style="color:red">Please only upload synthetic datasets available on the
+                     HTML('<strong style="color:red">Please only use synthetic data if using the application online. Details of this data is available on the
                         <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue" target="_blank">
                         TIDAL GitHub repository</a>
-                        if using the application online.</strong>')
+                        .</strong>')
                    ),
                    p('In order to model trajectories R requires the data frame to be in "long" format. It\'s likely that the data is initially inputted as a "wide" format. This page allows you to upload wide formatted data and converts it to long. Similar to the image displayed below.'),
                    img(src = "wide2long.png", height = 350, width = 550),
