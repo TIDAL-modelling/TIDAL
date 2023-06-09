@@ -48,7 +48,11 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                      )
             ),
             tabPanel("Plot",
+                     tagList(
+                     checkboxInput(ns("plotCheckbox"), "Do you want an overlay of the descriptive plot?", TRUE, width = '100%'),
+                     textOutput(ns("test")),
                      plotOutput(ns("modelCondPlot"))
+                     )
             ),
             tabPanel("Scores At Ages",
                        tagList(

@@ -249,25 +249,40 @@ modelCondServer <- function(id,
       ###############################################################
       ###############################################################
       # Plot the split by variable plot
-      plot <- eventReactive(input$button, {
+      plot <- eventReactive(c(input$button, input$plotCheckbox), {
 
-        if(input$varType == "cat"){
-          ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
-            theme_light()+
-            geom_point()+
-            geom_line() +
-            geom_errorbar(aes(ymin = lower, ymax = upper)) +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
-            theme(legend.text = element_text(color = "black", size = 10))
-        }else if(input$varType == "cont"){
-          ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
-            theme_light()+
-            geom_point()+
-            geom_line() +
-            geom_errorbar(aes(ymin = lower, ymax = upper)) +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
-            scale_colour_discrete(na.translate = F) +
-            theme(legend.text = element_text(color = "black", size = 10))
+        if(input$plotCheckbox == TRUE){
+          if(input$varType == "cat"){
+            ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
+              theme_light()+
+              geom_point()+
+              geom_line() +
+              geom_errorbar(aes(ymin = lower, ymax = upper)) +
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+              theme(legend.text = element_text(color = "black", size = 10))
+          }else if(input$varType == "cont"){
+            ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
+              theme_light()+
+              geom_point()+
+              geom_line() +
+              geom_errorbar(aes(ymin = lower, ymax = upper)) +
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
+              scale_colour_discrete(na.translate = F) +
+              theme(legend.text = element_text(color = "black", size = 10))
+          }
+        }else if(input$plotCheckbox == FALSE){
+          if(input$varType == "cat"){
+            ggplot() +
+              theme_light()+
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+              theme(legend.text = element_text(color = "black", size = 10))
+          }else if(input$varType == "cont"){
+            ggplot() +
+              theme_light()+
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
+              scale_colour_discrete(na.translate = F) +
+              theme(legend.text = element_text(color = "black", size = 10))
+          }
         }
 
       })
