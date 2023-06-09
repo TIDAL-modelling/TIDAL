@@ -3,14 +3,17 @@ title: ""
 output:
   pdf_document: default
 params:
-  descTable : NA
-  warningMsg : NA
-  formCodeRender : NA
-  statement : NA
-  fixedTab : NA
-  randomTab : NA
-  N : NA
-  mainPlot : NA
+  condType : NA
+  cond : NA
+  condPlot : NA
+  condModelForm : NA
+  condFixed : NA
+  condRandom : NA
+  modelDataEdit : NA
+  plotScore : NA
+  tableScore : NA
+  AUCplot : NA
+  AUCtable : NA
   phenotype : NA
   modelType : NA
 ---
@@ -29,3 +32,69 @@ For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TI
 
 Date generated: `r Sys.Date()`
 File uploaded:
+
+## Split trajectories by condition
+
+Phenotype: `r params$phenotype`
+Condition: `r params$cond`
+Type: `r params$condType`
+Formula: `r params$condModelForm`
+
+Condition plot
+
+``` {r, echo = F}
+
+params$condPlot
+
+```
+
+### Fixed effects
+
+```{r, echo=F}
+kbl(params$condFixed[,3:ncol(condFixed)], digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+
+### Random effects
+
+```{r, echo=F}
+kbl(params$condRandom[,3:ncol(params$condRandom)], digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+
+### Scores at certain ages
+
+Plot
+``` {r, echo = F}
+
+params$plotScore
+
+```
+
+
+Table
+```{r, echo=F}
+kbl(params$tableScore[,3:ncol(params$tableScore)], digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+
+
+### AUC
+
+Plot
+``` {r, echo = F}
+
+params$AUCplot
+
+```
+
+
+Table
+```{r, echo=F}
+kbl(params$AUCtable[,3:ncol(params$AUCtable)], digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+```
+

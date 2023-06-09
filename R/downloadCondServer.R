@@ -14,13 +14,20 @@
 #' @noRd
 #' @keywords internal
 #' @export
-downloadExploreServer <- function(condType,
+downloadExploreServer <- function(id,
+                                  condType,
                                   cond,
                                   condPlot,
                                   condModelForm,
                                   condFixed,
                                   condRandom,
-                                  modelDataEdit
+                                  modelDataEdit,
+                                  plotScore,
+                                  tableScore,
+                                  AUCplot,
+                                  AUCtable,
+                                  phenotype,
+                                  modelType
 
 ) {
   moduleServer(
@@ -70,7 +77,14 @@ downloadExploreServer <- function(condType,
             condModelForm = condModelForm(),
             condFixed = condFixed(),
             condRandom = condRandom(),
-            modelDataEdit = modelDataEdit()
+            modelDataEdit = modelDataEdit(),
+            plotScore = plotScore(),
+            tableScore = tableScore(),
+            AUCplot = AUCplot(),
+            AUCtable = AUCtable(),
+            phenotype = phenotype(),
+            modelType = modelType()
+
           )
 
           # Knit the document, passing in the `params` list, and eval it in a

@@ -66,13 +66,19 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                        plotOutput(ns("AUCplot")),
                        tableOutput(ns("AUCtable"))
                      )
-            )
+            ),
+            tabPanel("Download Results",
+                     tagList(
+                       p("When you have run the model with your interaction variable of choice, please download a pdf report of the interaction variable analyses."),
+                       p('Note the download button will only appear once you have clicked "Run Model" in the side panel.'),
+                       br(),
+                       uiOutput(ns("buttonHere")))
           )
         )
       )
     )
   )
+)
 
-
-  }
+}
 
