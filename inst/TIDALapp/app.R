@@ -77,7 +77,7 @@ overview_page <-   tabPanel(
                               TIDAL:::modelResultsUI("modelResults")),
                      tabPanel("Plot",
                               TIDAL:::modelPlotUI("modelPlot")),
-                     tabPanel("Alternative Model Results",
+                     tabPanel("Scores At Ages",
                               TIDAL:::datExAltUI("datExAlt")),
                      tabPanel("Download Results",
                               TIDAL::downloadExploreUI("downloadExplore"))
@@ -184,7 +184,8 @@ server <- function(input, output, session) {
   datExAltServer <- TIDAL:::datExAltServer("datExAlt",
                                            modelDataEdit = modelPlotServer$modelDataEdit,
                                            modelFit = modelRunServer$fit,
-                                           modelType = selectedDataServer$modelType
+                                           modelType = selectedDataServer$modelType,
+                                           traj = selectedDataServer$traj
                                            )
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
                                              descTable = modelRunServer$mainTable,
