@@ -494,18 +494,19 @@ modelCondServer <- function(id,
 
           AUCCovs <- lapply(1:(n-1), function(i){
               if(modelType() == "Linear"){
-                ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[rowIndex[i],1]*age1)) %>%
+               AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[rowIndex[i],1]*age1)) %>%
                   round(2)
               } else if(modelType() == "Quadratic"){
-                ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[rowIndex[i],1]*age1)) %>%
+                AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[rowIndex[i],1]*age1)) %>%
                   round(2)
               } else if(modelType() == "Cubic"){
-                ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) + (coef[rowIndex[i],1]*age1))  %>%
+                AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) + (coef[rowIndex[i],1]*age1))  %>%
                   round(2)
               } else if(modelType() == "Quartic"){
-                ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5) + (coef[rowIndex[i],1]*age1)) %>%
+                AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5) + (coef[rowIndex[i],1]*age1)) %>%
                   round(2)
               }
+            AUC <- round(AUC, 2)
           })
           return( list(AUC = AUC, AUCCovs = AUCCovs) )
         }else{
@@ -568,7 +569,7 @@ modelCondServer <- function(id,
           df <- t(
             cbind(
               data.frame(paste0(input$AUCages[1], " - ", input$AUCages[2]),
-                         AUC()$AUC),
+                         round(AUC()$AUC, 2)),
               do.call(cbind, AUC()$AUCCovs)
             )
           )
@@ -582,7 +583,7 @@ modelCondServer <- function(id,
           req(AUC()$AUCCont)
           df <- t(
             data.frame(paste0(input$AUCages[1], " - ", input$AUCages[2]),
-                       AUC()$AUC)
+                       round(AUC()$AUC, 2))
           )
           rowname <- paste0("AUC (", traj(), ") [", input$condition, " ]")
           rownames(df) <- c("Age Range", rowname)
