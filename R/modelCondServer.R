@@ -641,15 +641,15 @@ modelCondServer <- function(id,
           params <- list(
             condType = reactive({ input$varType }),
             cond = reactive({ input$condition }),
-            condPlot = output$modelCondPlot,
-            condModelForm = output$form,
-            condFixed = output$modelStatsFixed,
-            condRandom = output$modelStatsRandom,
+            condPlot = reactive({ output$modelCondPlot }),
+            condModelForm = reactive({ output$form }),
+            condFixed = reactive({ output$modelStatsFixed }),
+            condRandom = reactive({ output$modelStatsRandom }),
             modelDataEdit = modelDataEdit,
-            plotScore = output$plotScore,
-            tableScore = output$tableScore,
-            AUCplot = output$AUCplot,
-            AUCtable = output$AUCtable,
+            plotScore = reactive({ output$plotScore }),
+            tableScore = reactive({ output$tableScore }),
+            AUCplot = reactive({ output$AUCplot }),
+            AUCtable = reactive({ output$AUCtable }),
             phenotype = phenotype(),
             modelType = modelType()
 
@@ -670,11 +670,11 @@ modelCondServer <- function(id,
         list(
           condType = reactive({ input$varType }),
           cond = reactive({ input$condition }),
-          condPlot = output$modelCondPlot,
-          condModelForm = output$form,
-          condFixed = output$modelStatsFixed,
-          condRandom = output$modelStatsRandom,
-          modelDataEdit = modelDataEdit
+          condPlot = reactive({ output$modelCondPlot  }),
+          condModelForm = reactive({ output$form }),
+          condFixed = reactive({ output$modelStatsFixed }),
+          condRandom = reactive({ output$modelStatsRandom }),
+          modelDataEdit = reactive({ modelDataEdit })
         )
       )
 
