@@ -81,8 +81,10 @@ overview_page <-   tabPanel(
                               TIDAL:::modelResultsUI("modelResults")),
                      tabPanel("Plot",
                               TIDAL:::modelPlotUI("modelPlot")),
-                     tabPanel("Alternative Model Results",
+                     tabPanel("Scores At Ages",
                               TIDAL:::datExAltUI("datExAlt")),
+                     tabPanel("Area Under Curve",
+                              TIDAL:::datExAUCUI("datExAUC")),
                      tabPanel("Download Results",
                               TIDAL::downloadExploreUI("downloadExplore"))
                    )
@@ -188,8 +190,17 @@ server <- function(input, output, session) {
   datExAltServer <- TIDAL:::datExAltServer("datExAlt",
                                            modelDataEdit = modelPlotServer$modelDataEdit,
                                            modelFit = modelRunServer$fit,
-                                           modelType = selectedDataServer$modelType
+                                           modelType = selectedDataServer$modelType,
+                                           traj = selectedDataServer$traj
                                            )
+  datExAUCServer <- TIDAL:::datExAUCServer("datExAUC",
+                                           modelDataEdit = modelPlotServer$modelDataEdit,
+                                           modelFit = modelRunServer$fit,
+                                           modelType = selectedDataServer$modelType,
+                                           traj = selectedDataServer$traj,
+                                           button = selectedDataServer$button
+  )
+
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
                                              descTable = modelRunServer$mainTable,
                                              warningMsg = modelRunServer$warning,

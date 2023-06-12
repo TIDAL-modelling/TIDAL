@@ -48,16 +48,40 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                      )
             ),
             tabPanel("Plot",
-                     plotOutput(ns("modelCondPlot"))
-            ),
-            tabPanel("Alternative Model Results",
                      tagList(
+                     checkboxInput(ns("plotCheckbox"), "Do you want an overlay of the descriptive plot?", TRUE, width = '100%'),
+                     plotOutput(ns("modelCondPlot"))
+                     )
+            ),
+            tabPanel("Scores At Ages",
                        tagList(
                          uiOutput(ns("selectAgeScore")),
                          plotOutput(ns("plotScore")),
                          tableOutput(ns("tableScore"))
                        )
-                     ))
+            ),
+            tabPanel("Area Under Curve",
+                     tagList(
+                       textOutput(ns("AUCoverview")),
+                       br(),
+                       fluidRow(
+                         column(width = 6, uiOutput(ns("levelsAUCUI"))),
+                         column(width = 6, uiOutput(ns("AUCagesUI")))
+                       ),
+                       br(),
+                       fluidRow(
+                         column(width = 6, plotOutput(ns("AUCplot"))),
+                         column(width = 6,
+                                tagList(
+                                tableOutput(ns("AUCtable")),
+                                textOutput(ns("test"))
+                                )
+                         )
+                       ),
+                       br(),
+                       br()
+                     )
+            )
           )
         )
       )

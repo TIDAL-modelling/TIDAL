@@ -1,4 +1,4 @@
-#' Run model - data exploration page
+#' Display score at an age for the data exploration page
 #'
 #' @import broom.mixed
 #' @import lme4
@@ -16,7 +16,8 @@
 datExAltServer <- function(id,
                            modelDataEdit,
                            modelFit,
-                           modelType
+                           modelType,
+                           traj
 
 ) {
 
@@ -33,7 +34,7 @@ datExAltServer <- function(id,
         ageOrig <- ageOrig[!is.na(ageOrig)]
         checkboxGroupInput(ns("ageInput"),
                            "What ages do you want to calculate scores for?",
-                           seq(round(min(ageOrig)),round(max(ageOrig))),
+                           seq(round(min(ageOrig, na.rm =T)),round(max(ageOrig, na.rm =T))),
                            inline = TRUE)
       })
 
@@ -74,11 +75,14 @@ datExAltServer <- function(id,
       # ------------------------------------------
       # Plot the score at the given age
       output$plot <- renderPlot({
+        # points of intersection of age and score
+        points <- data.frame(x = as.numeric(input$ageInput),
+                             y = as.numeric(score()))
+
         ggplot() +
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T) +
-          geom_vline(xintercept = as.numeric(input$ageInput), color = "red", linetype = "dashed") +
-          geom_hline(yintercept = score(), color = "red", linetype = "dashed") +
-          ylab("Score") +
+          geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
+          ylab(paste0("Score (", traj(), ")")) +
           xlab("Age")
       })
 
@@ -87,11 +91,11 @@ datExAltServer <- function(id,
       # --- Age | Score -----
       # Change "Score" to the actual column name from the dataframe - which the user previously specified
       output$table <- renderTable({
-        data.frame(Age = input$ageInput,
-                   Score = score())
-      })
-
-
+        df <- t(data.frame( input$ageInput, score() ))
+        rowname <- paste0("Score (", traj(), ")")
+        rownames(df) <- c("Age", rowname)
+        df
+      }, colnames = FALSE, rownames = TRUE)
       # ------------------------------------------
     }
   )
