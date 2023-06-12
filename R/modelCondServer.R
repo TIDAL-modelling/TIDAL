@@ -620,10 +620,18 @@ modelCondServer <- function(id,
       # if input var is categorical
       output$levelsAUCUI <- renderUI({
         if(input$varType == "cat"){
+          if(length(unique(pull(modelDataEdit(), !!sym(input$condition)))) > 2){
           selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference in AUC between:",
                       sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
                       multiple = TRUE,
                       options = list(maxItems = 2))
+          }else if(length(unique(pull(modelDataEdit(), !!sym(input$condition)))) == 2){
+            selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference in AUC between:",
+                           sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
+                           multiple = TRUE,
+                           options = list(maxItems = 2),
+                           selected = sort(unique(pull(modelDataEdit(), !!sym(input$condition)))))
+          }
         }else{
 
         }
@@ -635,8 +643,8 @@ modelCondServer <- function(id,
       })
 
       output$test <- renderText({
-        if(input$varType == "cat"){
-       paste0("The difference between the two factor levels you selected is: ", round( difference() ,2) ,". Please note this section is in development, we will change it to a table output with a statistical test summary.")
+        if(input$varType == "cat" & length(difference() == 2)){
+       paste0("The difference between the two factor levels and the age range you selected is: ", round( difference() ,2) ,". Please note this section is in development, it will change to a table output with a statistical test summary.")
         }else{
 
         }

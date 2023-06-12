@@ -63,14 +63,23 @@ modelCondUI <- function(id, label = "Model Condition Run") {
             tabPanel("Area Under Curve",
                      tagList(
                        textOutput(ns("AUCoverview")),
-                       p(""),
-                       uiOutput(ns("levelsAUCUI")),
-                       p(""),
-                       uiOutput(ns("AUCagesUI")),
-                       plotOutput(ns("AUCplot")),
-                       tableOutput(ns("AUCtable")),
-
-                       textOutput(ns("test"))
+                       br(),
+                       fluidRow(
+                         column(width = 6, uiOutput(ns("levelsAUCUI"))),
+                         column(width = 6, uiOutput(ns("AUCagesUI")))
+                       ),
+                       br(),
+                       fluidRow(
+                         column(width = 6, plotOutput(ns("AUCplot"))),
+                         column(width = 6,
+                                tagList(
+                                tableOutput(ns("AUCtable")),
+                                textOutput(ns("test"))
+                                )
+                         )
+                       ),
+                       br(),
+                       br()
                      )
             )
           )
