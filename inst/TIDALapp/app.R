@@ -207,7 +207,8 @@ server <- function(input, output, session) {
                                              N = modelResultsServer$N,
                                              mainPlot = modelPlotServer$mainPlot,
                                              phenotype = selectedDataServer$traj,
-                                             modelType = selectedDataServer$modelType
+                                             modelType = selectedDataServer$modelType,
+                                             datExAltTable = datExAltServer$datExAltTable
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                              modelData = modelRunServer$data,

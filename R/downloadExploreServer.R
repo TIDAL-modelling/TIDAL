@@ -25,7 +25,8 @@ downloadExploreServer <- function(id,
                             N,
                             mainPlot,
                             phenotype,
-                            modelType
+                            modelType,
+                            datExAltTable
                             ) {
   moduleServer(
     id,
@@ -77,7 +78,8 @@ downloadExploreServer <- function(id,
             N = N(),
             mainPlot = mainPlot(),
             phenotype = phenotype(),
-            modelType = modelType()
+            modelType = modelType(),
+            datExAltTable = datExAltTable()
           )
 
           # Knit the document, passing in the `params` list, and eval it in a

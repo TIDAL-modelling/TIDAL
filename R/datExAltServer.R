@@ -97,6 +97,10 @@ datExAltServer <- function(id,
         df
       }, colnames = FALSE, rownames = TRUE)
       # ------------------------------------------
+
+      return(
+        list(
+          datExAltTable = reactive({output$table})))
     }
   )
 }

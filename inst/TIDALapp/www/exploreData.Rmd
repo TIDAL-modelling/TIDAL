@@ -78,3 +78,10 @@ Random effects can be interpreted as the effects on `r params$phenotype` due to 
 kbl(params$randomTab, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
+
+### Scores at Ages
+
+```{r, echo=F}
+kbl(params$ExAltTable, digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+```
