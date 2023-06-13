@@ -14,6 +14,9 @@ params:
   phenotype : NA
   modelType : NA
   datExAltTable : NA
+  datExAltPlot : NA
+  plotAUC : NA
+  tableAUC : NA
 ---
 
 ```{r, echo=F, warning=F}
@@ -27,7 +30,7 @@ include_graphics("TIDAL.png")
 
 For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
 
-Date generated: `r Sys.Date()` File uploaded:
+Date generated: `r Sys.Date()`
 
 ## Descriptive Statistics
 
@@ -82,7 +85,24 @@ kbl(params$randomTab, digits = 3)  %>%
 
 ### Scores at Ages
 
+```{r, echo = F}
+params$datExAltPlot
+```
+
 ```{r, echo=F}
 kbl(params$datExAltTable, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
+
+
+### Area Under the Curve
+
+``` {r, echo = F}
+params$plotAUC
+```
+
+```{r, echo=F}
+kbl(params$tableAUC, digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+```
+
