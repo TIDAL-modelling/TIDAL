@@ -1,4 +1,4 @@
-#' Display score at an age for the data exploration page
+#' AUC for the data exploration page
 #'
 #' @import broom.mixed
 #' @import lme4
@@ -11,15 +11,19 @@
 #' @noRd
 #' @keywords internal
 #' @export
-datExAltUI <- function(id, label = "Model") {
+datExAUCUI <- function(id, label = "Model") {
   # `NS(id)` returns a namespace function, which was save as `ns` and will
   # invoke later.
   ns <- NS(id)
 
   tagList(
-    uiOutput(ns("selectAge")),
-    plotOutput(ns("plot")),
-    tableOutput(ns("table"))
+    textOutput(ns("AUCoverview")),
+    p(""),
+    p(""),
+    uiOutput(ns("AUCagesUI")),
+    plotOutput(ns("AUCplot")),
+    tableOutput(ns("AUCtable"))
   )
+
 }
 

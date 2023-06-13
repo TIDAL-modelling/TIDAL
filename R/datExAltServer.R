@@ -1,4 +1,4 @@
-#' Run model - data exploration page
+#' Display score at an age for the data exploration page
 #'
 #' @import broom.mixed
 #' @import lme4
@@ -34,7 +34,7 @@ datExAltServer <- function(id,
         ageOrig <- ageOrig[!is.na(ageOrig)]
         checkboxGroupInput(ns("ageInput"),
                            "What ages do you want to calculate scores for?",
-                           seq(round(min(ageOrig)),round(max(ageOrig))),
+                           seq(round(min(ageOrig, na.rm =T)),round(max(ageOrig, na.rm =T))),
                            inline = TRUE)
       })
 
