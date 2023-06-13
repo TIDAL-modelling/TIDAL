@@ -90,17 +90,25 @@ datExAltServer <- function(id,
       # Return a table of the score for all the ages
       # --- Age | Score -----
       # Change "Score" to the actual column name from the dataframe - which the user previously specified
-      output$table <- renderTable({
+
+      datExAltTable <- reactive({
         df <- t(data.frame( input$ageInput, score() ))
         rowname <- paste0("Score (", traj(), ")")
         rownames(df) <- c("Age", rowname)
         df
+      })
+
+      output$table <- renderTable({
+        datExAltTable()
       }, colnames = FALSE, rownames = TRUE)
-      # ------------------------------------------
+
 
       return(
         list(
-          datExAltTable = reactive({output$table})))
+          datExAltTable = datExAltTable
+          )
+        )
+
     }
   )
 }

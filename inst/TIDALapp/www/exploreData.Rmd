@@ -13,6 +13,7 @@ params:
   mainPlot : NA
   phenotype : NA
   modelType : NA
+  datExAltTable : NA
 ---
 
 ```{r, echo=F, warning=F}
@@ -82,6 +83,6 @@ kbl(params$randomTab, digits = 3)  %>%
 ### Scores at Ages
 
 ```{r, echo=F}
-kbl(params$ExAltTable, digits = 3)  %>%
+kbl(params$datExAltTable, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
