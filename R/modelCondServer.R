@@ -216,7 +216,7 @@ modelCondServer <- function(id,
       })
       # ---------------
       # model results
-      output$modelStatsFixed <- renderTable({
+      modelStatsFixed <- reactive({
         if(str_detect(formCodeCovars(), input$condition)){
           data.frame(NULL)
         }else{
@@ -228,7 +228,9 @@ modelCondServer <- function(id,
         }
       })
 
-      output$modelStatsRandom <- renderTable({
+      output$modelStatsFixed <- renderTable({modelStatsFixed()})
+
+      modelStatsRandom <- reactive({
         if(str_detect(formCodeCovars(), input$condition)){
           data.frame(NULL)
         }else{
@@ -236,6 +238,8 @@ modelCondServer <- function(id,
                       order = "lower.tri")
         }
       })
+
+      output$modelStatsRandom <- renderTable({modelStatsRandom()})
 
       # ---------------------------------------
       # Paste the model formula for the user to see (don't want it to appear straight away - could improve this)
@@ -696,15 +700,15 @@ modelCondServer <- function(id,
           params <- list(
             condType = reactive({ input$varType }),
             cond = reactive({ input$condition }),
-            condPlot = reactive({ output$modelCondPlot }),
+            condPlot = plot(),
             condModelForm = reactive({ output$form }),
-            condFixed = reactive({ output$modelStatsFixed }),
-            condRandom = reactive({ output$modelStatsRandom }),
-            modelDataEdit = modelDataEdit,
-            plotScore = reactive({ output$plotScore }),
-            tableScore = reactive({ output$tableScore }),
-            AUCplot = reactive({ output$AUCplot }),
-            AUCtable = reactive({ output$AUCtable }),
+            condFixed = modelStatsFixed(),
+            condRandom = output$modelStatsRandom(),
+            modelDataEdit = modelDataEdit(),
+            plotScore = plotScoreAll(),
+            tableScore = tableScoreAll(),
+            AUCplot = plotAUC(),
+            AUCtable = tableAUC(),
             phenotype = phenotype(),
             modelType = modelType()
 
