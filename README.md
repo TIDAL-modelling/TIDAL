@@ -90,6 +90,7 @@ This page allows the user to view trajectories for specific individuals. The use
 
 <details>
 <summary><h2>Other features in development</h2></summary>
+ 
 * **Points of acceleration**
   * Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory.
 * **Stability**
