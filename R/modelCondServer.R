@@ -85,6 +85,14 @@ modelCondServer <- function(id,
         }
       })
 
+      output$zScore <- renderText({
+        if(input$varType == "cat"){
+          paste0("")
+        }else if(input$varType == "cont"){
+          paste0('Variable: "', input$condition, '" has been z-score standardised.')
+        }
+      })
+
 
 
       # ---------------------------------------
@@ -308,9 +316,16 @@ modelCondServer <- function(id,
               geom_point()+
               geom_line() +
               geom_errorbar(aes(ymin = lower, ymax = upper)) +
-              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
-              scale_colour_discrete(na.translate = F) +
-              theme(legend.text = element_text(color = "black", size = 10))
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = "Population Average" ) , linewidth = 1.5, na.rm=T)+
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = plus, color = "+ 1 SD" ) , na.rm=T)+
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = minus, color = "- 1 SD" ) , na.rm=T)+
+              theme(legend.text = element_text(color = "black", size = 10))+
+              labs(color = "") +
+              scale_color_manual(
+                breaks = c("+ 1 SD", "Population Average", "- 1 SD"),
+                values = c("#d55e00", "black", "#0072b2")) +
+              ylab(paste0("Score (", traj(), ")")) +
+              xlab("Age")
           }
         }else if(input$plotCheckbox == FALSE){
           if(input$varType == "cat"){
@@ -323,10 +338,15 @@ modelCondServer <- function(id,
           }else if(input$varType == "cont"){
             ggplot() +
               theme_light()+
-              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
-              scale_colour_discrete(na.translate = F) +
-              theme(legend.text = element_text(color = "black", size = 10)) +
-              ylab("Phenotype") +
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = "Population Average" ) , linewidth = 1.5, na.rm=T)+
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = plus, color = "+ 1 SD" ) , na.rm=T)+
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = minus, color = "- 1 SD" ) , na.rm=T)+
+              theme(legend.text = element_text(color = "black", size = 10))+
+              labs(color = "") +
+              scale_color_manual(
+                breaks = c("+ 1 SD", "Population Average", "- 1 SD"),
+                values = c("#d55e00", "black", "#0072b2")) +
+              ylab(paste0("Score (", traj(), ")")) +
               xlab("Age")
           }
         }
@@ -439,15 +459,10 @@ modelCondServer <- function(id,
             ggplot() +
             theme_light()+
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
-<<<<<<< HEAD
-            theme(legend.text = element_text(color = "black", size = 10))
-
-=======
             theme(legend.text = element_text(color = "black", size = 10)) +
             geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
->>>>>>> dev
 
         }else if(input$varType == "cont"){
           # points of intersection of age and score
@@ -458,26 +473,12 @@ modelCondServer <- function(id,
           req(score()$scoreCont)
           ggplot() +
             theme_light()+
-<<<<<<< HEAD
-            geom_point()+
-            geom_line() +
-            geom_errorbar(aes(ymin = lower, ymax = upper)) +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = "Population Average" ) , linewidth = 1.5, na.rm=T)+
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = plus, color = "+ 1 SD" ) , na.rm=T)+
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = minus, color = "- 1 SD" ) , na.rm=T)+
-            theme(legend.text = element_text(color = "black", size = 10))+
-            labs(color = "") +
-            scale_color_manual(
-              breaks = c("+ 1 SD", "Population Average", "- 1 SD"),
-              values = c("#d55e00", "black", "#0072b2"))
-=======
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
             scale_colour_discrete(na.translate = F) +
             theme(legend.text = element_text(color = "black", size = 10)) +
             geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
->>>>>>> dev
         }
       })
       output$plotScore <- renderPlot({

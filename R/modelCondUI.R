@@ -41,6 +41,8 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                      tagList(
                        textOutput(ns("warningCov")),
                        htmlOutput(ns("form")),
+                       br(),
+                       textOutput(ns("zScore")),
                        h4("Fixed Effects"),
                        tableOutput(ns("modelStatsFixed")),
                        h4("Random Effects"),
