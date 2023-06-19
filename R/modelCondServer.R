@@ -220,7 +220,7 @@ modelCondServer <- function(id,
         }else if(input$varType == "cont"){
           rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                        pattern = input$condition) &
-                              str_starts(string = row.names(summary(fit())$coefficients),
+                              str_detect(string = row.names(summary(fit())$coefficients),
                                          pattern = age(), negate = T))
 
           if(modelType() == "Linear"){
@@ -248,9 +248,6 @@ modelCondServer <- function(id,
               ageVec^3 * summary(fit())$coefficients[4,1] +
               ageVec^4 * summary(fit())$coefficients[5,1] - summary(fit())$coefficients[rowIndex,1]
           }
-
-
-
 
           modelDataEdit <- modelData() %>%
             mutate(pred = zero) %>%
@@ -324,8 +321,7 @@ modelCondServer <- function(id,
             labs(color = "") +
             scale_color_manual(
               breaks = c("+ 1 SD", "Population Average", "- 1 SD"),
-              values = c("#d55e00", "black", "#0072b2")) +
-            theme(legend.text = element_text(color = "black", size = 10))
+              values = c("#d55e00", "black", "#0072b2"))
         }
 
       })
