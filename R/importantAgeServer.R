@@ -82,8 +82,6 @@ importantAgeServer <- function(id,
             b_age_3*((maxSymptoms-mean(pull(modelDataEdit(), age_original)))^3)
 
           return(list(
-            velPeak = velPeak,
-            velMin = velMin,
             maxSymptoms = maxSymptoms,
             maxSymY = maxSymY
           ))

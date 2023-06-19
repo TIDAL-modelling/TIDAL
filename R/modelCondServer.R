@@ -153,11 +153,6 @@ modelCondServer <- function(id,
 
         ageVec <- modelData() %>% pull(!!age())
 
-        ###############################################################
-        ###############################################################
-        #   edit for non-linear models
-        ###############################################################
-        ###############################################################
         if(modelType() == "Linear"){
           zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
         } else if(modelType() == "Quadratic"){
@@ -296,32 +291,44 @@ modelCondServer <- function(id,
       ###############################################################
       ###############################################################
       # Plot the split by variable plot
-      plot <- eventReactive(input$button, {
+      plot <- eventReactive(c(input$button, input$plotCheckbox), {
 
-        if(input$varType == "cat"){
-          ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
-            theme_light()+
-            geom_point()+
-            geom_line() +
-            geom_errorbar(aes(ymin = lower, ymax = upper)) +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
-            theme(legend.text = element_text(color = "black", size = 10))
-
-
-        }else if(input$varType == "cont"){
-          ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
-            theme_light()+
-            geom_point()+
-            geom_line() +
-            geom_errorbar(aes(ymin = lower, ymax = upper)) +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = "Population Average" ) , linewidth = 1.5, na.rm=T)+
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = plus, color = "+ 1 SD" ) , na.rm=T)+
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = minus, color = "- 1 SD" ) , na.rm=T)+
-            theme(legend.text = element_text(color = "black", size = 10))+
-            labs(color = "") +
-            scale_color_manual(
-              breaks = c("+ 1 SD", "Population Average", "- 1 SD"),
-              values = c("#d55e00", "black", "#0072b2"))
+        if(input$plotCheckbox == TRUE){
+          if(input$varType == "cat"){
+            ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
+              theme_light()+
+              geom_point()+
+              geom_line() +
+              geom_errorbar(aes(ymin = lower, ymax = upper)) +
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+              theme(legend.text = element_text(color = "black", size = 10))
+          }else if(input$varType == "cont"){
+            ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
+              theme_light()+
+              geom_point()+
+              geom_line() +
+              geom_errorbar(aes(ymin = lower, ymax = upper)) +
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
+              scale_colour_discrete(na.translate = F) +
+              theme(legend.text = element_text(color = "black", size = 10))
+          }
+        }else if(input$plotCheckbox == FALSE){
+          if(input$varType == "cat"){
+            ggplot() +
+              theme_light()+
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+              theme(legend.text = element_text(color = "black", size = 10)) +
+              ylab("Phenotype") +
+              xlab("Age")
+          }else if(input$varType == "cont"){
+            ggplot() +
+              theme_light()+
+              geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
+              scale_colour_discrete(na.translate = F) +
+              theme(legend.text = element_text(color = "black", size = 10)) +
+              ylab("Phenotype") +
+              xlab("Age")
+          }
         }
 
       })
@@ -333,6 +340,377 @@ modelCondServer <- function(id,
         plot()
         }
         })
+
+      ###############################################################
+      # --- Score for a given set of ages - Alternative Model Results Tab -----
+      # ------------------------------------------
+      # Allow the user to select the ages they want to calculate scores for
+      output$selectAgeScore <- renderUI({
+        ageOrig <- modelDataEdit() %>%
+          pull(age_original)
+        ageOrig <- ageOrig[!is.na(ageOrig)]
+
+        checkboxGroupInput(ns("ageInputScore"),
+                           "What ages do you want to calculate scores for?",
+                           seq(round(min(ageOrig, na.rm =T)),round(max(ageOrig, na.rm =T))),
+                           inline = TRUE)
+      })
+
+      # ------------------------------------------
+      # Calculate the score at a given age (intercept + slope etc)
+      score <- reactive({
+        ageOrig <- modelDataEdit() %>% pull(age_original)
+        ageOrig <- ageOrig[!is.na(ageOrig)]
+
+        score <- sapply(as.numeric(input$ageInputScore), function(x){
+          if(modelType() == "Linear"){
+            (summary(fit())$coefficients[1,1] +
+               (x - mean(ageOrig)) * summary(fit())$coefficients[2,1]) %>%
+              round(2)
+          } else if(modelType() == "Quadratic"){
+            ( summary(fit())$coefficients[1,1] +
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
+                (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1]) %>%
+              round(2)
+          } else if(modelType() == "Cubic"){
+            (summary(fit())$coefficients[1,1] +
+               (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
+               (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+               (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] )%>%
+              round(2)
+          } else if(modelType() == "Quartic"){
+            ( summary(fit())$coefficients[1,1] +
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
+                (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+                (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
+                (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1]) %>%
+              round(2)
+          }
+        })
+
+        if(input$varType == "cat"){
+          n <- length(unique(pull(modelData(), !!sym(input$condition))))
+          rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                       pattern = input$condition) &
+                              str_starts(string = row.names(summary(fit())$coefficients),
+                                         pattern = age(), negate = T))
+
+          scoreCovs <- lapply(1:(n-1), function(i){
+            sapply(as.numeric(input$ageInputScore), function(x){
+              if(modelType() == "Linear"){
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
+              } else if(modelType() == "Quadratic"){
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
+                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1]
+              } else if(modelType() == "Cubic"){
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
+                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+                  (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1]
+              } else if(modelType() == "Quartic"){
+                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]  +
+                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+                  (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
+                  (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1]
+              }
+            })
+          })
+         return( list(score = score, scoreCovs = scoreCovs) )
+        }else{
+          return(list(scoreCont = score))
+        }
+      })
+
+      # ------------------------------------------
+      # Plot the score at the given age
+
+      plotScoreAll <- eventReactive(input$ageInputScore, {
+
+        # improve the plot
+        #https://stackoverflow.com/questions/72563038/geom-vline-for-values-over-a-threshold-on-y-axis
+
+        if(input$varType == "cat"){
+          req(score()$scoreCovs)
+
+          # points of intersection of age and score
+          points <- data.frame(x = as.numeric(input$ageInputScore),
+                               y = c(score()$score, unlist(score()$scoreCovs))
+          )
+
+            ggplot() +
+            theme_light()+
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+<<<<<<< HEAD
+            theme(legend.text = element_text(color = "black", size = 10))
+
+=======
+            theme(legend.text = element_text(color = "black", size = 10)) +
+            geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
+            ylab(paste0("Score (", traj(), ")")) +
+            xlab("Age")
+>>>>>>> dev
+
+        }else if(input$varType == "cont"){
+          # points of intersection of age and score
+          points <- data.frame(x = as.numeric(input$ageInputScore),
+                               y = score()$scoreCont
+          )
+
+          req(score()$scoreCont)
+          ggplot() +
+            theme_light()+
+<<<<<<< HEAD
+            geom_point()+
+            geom_line() +
+            geom_errorbar(aes(ymin = lower, ymax = upper)) +
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = "Population Average" ) , linewidth = 1.5, na.rm=T)+
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = plus, color = "+ 1 SD" ) , na.rm=T)+
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = minus, color = "- 1 SD" ) , na.rm=T)+
+            theme(legend.text = element_text(color = "black", size = 10))+
+            labs(color = "") +
+            scale_color_manual(
+              breaks = c("+ 1 SD", "Population Average", "- 1 SD"),
+              values = c("#d55e00", "black", "#0072b2"))
+=======
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
+            scale_colour_discrete(na.translate = F) +
+            theme(legend.text = element_text(color = "black", size = 10)) +
+            geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
+            ylab(paste0("Score (", traj(), ")")) +
+            xlab("Age")
+>>>>>>> dev
+        }
+      })
+      output$plotScore <- renderPlot({
+        plotScoreAll()
+      })
+
+      # ------------------------------------------
+      # Return a table of the score for all the ages
+      # --- Age | Score
+      # Change "Score" to the actual column name from the dataframe - which the user previously specified
+      tableScoreAll <- eventReactive(input$ageInputScore, {
+        if(input$varType == "cat"){
+          req(score()$scoreCovs)
+
+          df <- t(
+                  cbind(
+                    data.frame( input$ageInputScore,
+                                score()$score  ),
+                    do.call(cbind, score()$scoreCovs)
+                    )
+                  )
+          rowname <- paste0("Score (", traj(), ")")
+          levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), input$condition))))
+          rownames(df) <- c("Age", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
+          df
+
+        }else if(input$varType == "cont"){
+          req(score()$scoreCont)
+          df <- t(data.frame( input$ageInputScore, score()$scoreCont ))
+          rowname <- paste0("Score (", traj(), ") [", input$condition, "]")
+          rownames(df) <- c("Age", rowname)
+          df
+        }
+      })
+
+      output$tableScore <- renderTable({
+        tableScoreAll()
+      }, colnames = FALSE, rownames = TRUE)
+
+      # ------------------------------------------
+      ###############################################################
+      # --- AUC tab ------
+      ###############################################################
+
+      # ------------------------------------------
+      # Overview of what AUC does text
+      output$AUCoverview <- renderText({
+          paste0("The area under curve (AUC) represents the proportion of time with phenotype (", traj(), ").")
+      })
+
+      # ------------------------------------------
+      # Make age slider for user
+      output$AUCagesUI <- renderUI({
+        ageOrig <- modelDataEdit() %>%
+          pull(age_original)
+        ageOrig <- ageOrig[!is.na(ageOrig)]
+
+        sliderInput(ns("AUCages"),
+                    "Select the age range to calculate AUC for:",
+                    min = round(min(ageOrig, na.rm =T)),
+                    max = round(max(ageOrig, na.rm =T)),
+                    value = c(round(min(ageOrig, na.rm =T)),round(max(ageOrig, na.rm =T)))
+                    )
+      })
+
+      # ------------------------------------------
+      # Calculate the AUC for the ages the user has chosen for the chosen input$condition levels
+      AUC <- reactive({
+        coef <- summary(fit())$coefficients
+        age1 <- input$AUCages[1]
+        age2 <- input$AUCages[2]
+
+        AUC <-
+          if(modelType() == "Linear"){
+            ((age2*coef[1,1]) + (coef[2,1]*age2^2/2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2)) %>%
+              round(2)
+          } else if(modelType() == "Quadratic"){
+            ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3)) %>%
+              round(2)
+          } else if(modelType() == "Cubic"){
+            ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4))  %>%
+              round(2)
+          } else if(modelType() == "Quartic"){
+            ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5)) %>%
+              round(2)
+          }
+
+        if(input$varType == "cat"){
+          n <- length(unique(pull(modelData(), !!sym(input$condition))))
+          rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                       pattern = input$condition) &
+                              str_starts(string = row.names(summary(fit())$coefficients),
+                                         pattern = age(), negate = T))
+
+          AUCCovs <- lapply(1:(n-1), function(i){
+              if(modelType() == "Linear"){
+               AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[rowIndex[i],1]*age1)) %>%
+                  round(2)
+              } else if(modelType() == "Quadratic"){
+                AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[rowIndex[i],1]*age1)) %>%
+                  round(2)
+              } else if(modelType() == "Cubic"){
+                AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) + (coef[rowIndex[i],1]*age1))  %>%
+                  round(2)
+              } else if(modelType() == "Quartic"){
+                AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5) + (coef[rowIndex[i],1]*age1)) %>%
+                  round(2)
+              }
+            AUC <- round(AUC, 2)
+          })
+          return( list(AUC = AUC, AUCCovs = AUCCovs) )
+        }else{
+          return(list(AUCCont = AUC))
+        }
+      })
+
+      # ------------------------------------------
+      # Plot AUC
+      plotAUC <- eventReactive(c(input$button, input$AUCages), {
+
+        if(input$varType == "cat"){
+          req(AUC()$AUCCovs)
+
+          ggplot(data = modelDataEdit()) +
+            theme_light() +
+            geom_ribbon(data = modelDataEdit(),
+                        aes(x = age_original, ymax = pred, ymin = 0, fill = !!sym(input$condition)),
+                        alpha = 0.1, show.legend = FALSE) +
+           coord_cartesian(xlim = c(input$AUCages[1], input$AUCages[2])) +
+            geom_line(aes(x = age_original, y = pred, color = !!sym(input$condition)), na.rm = TRUE) +
+            theme(legend.text = element_text(color = "black", size = 10),
+                  text = element_text(size = 14)) +
+            ylab(paste0("Score (", traj(), ")")) +
+            xlab("Age") +
+            scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original, na.rm =T)), round(max(modelDataEdit()$age_original, na.rm =T)), by = 1),
+                               expand = c(0, 0))+
+            scale_y_continuous(expand = c(0, 0))
+
+
+        }else if(input$varType == "cont"){
+
+          req(AUC()$AUCCont)
+          ggplot() +
+            theme_light()+
+            geom_ribbon(data = modelDataEdit(),
+                        aes(x = age_original, ymax = pred, ymin = 0),
+                        alpha = 0.1, show.legend = FALSE, fill = "deepskyblue") +
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
+            coord_cartesian(xlim = c(input$AUCages[1], input$AUCages[2])) +
+            scale_colour_discrete(na.translate = F) +
+            theme(legend.text = element_text(color = "black", size = 10),
+                  text = element_text(size = 14)) +
+            ylab(paste0("Score (", traj(), ")")) +
+            xlab("Age") +
+            scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original, na.rm =T)), round(max(modelDataEdit()$age_original, na.rm =T)), by = 1),
+                               expand = c(0, 0)) +
+            scale_y_continuous(expand = c(0, 0))
+          }
+      })
+
+      output$AUCplot <- renderPlot({
+        plotAUC()
+      })
+
+
+      tableAUC <- eventReactive(c(input$button, input$AUCages), {
+        if(input$varType == "cat"){
+          req(AUC()$AUCCovs)
+          df <- t(
+            cbind(
+              data.frame(paste0(input$AUCages[1], " - ", input$AUCages[2]),
+                         round(AUC()$AUC, 2)),
+              do.call(cbind, AUC()$AUCCovs)
+            )
+          )
+
+          rowname <- paste0("AUC (", traj(), ")")
+          levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), input$condition))))
+          rownames(df) <- c("Age Range", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
+          df
+
+        }else if(input$varType == "cont"){
+          req(AUC()$AUCCont)
+          df <- t(
+            data.frame(paste0(input$AUCages[1], " - ", input$AUCages[2]),
+                       round(AUC()$AUC, 2))
+          )
+          rowname <- paste0("AUC (", traj(), ") [", input$condition, " ]")
+          rownames(df) <- c("Age Range", rowname)
+          df
+        }
+      })
+
+
+      output$AUCtable <- renderTable({
+        tableAUC()
+      }, colnames = FALSE, rownames = TRUE)
+
+      # ------
+      # User select which 2 levels of their factor they want to see a difference between
+      # if input var is categorical
+      output$levelsAUCUI <- renderUI({
+        if(input$varType == "cat"){
+          if(length(unique(pull(modelDataEdit(), !!sym(input$condition)))) > 2){
+          selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference in AUC between:",
+                      sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
+                      multiple = TRUE,
+                      options = list(maxItems = 2))
+          }else if(length(unique(pull(modelDataEdit(), !!sym(input$condition)))) == 2){
+            selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference in AUC between:",
+                           sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
+                           multiple = TRUE,
+                           options = list(maxItems = 2),
+                           selected = sort(unique(pull(modelDataEdit(), !!sym(input$condition)))))
+          }
+        }else{
+
+        }
+      })
+
+      difference <- reactive({
+        levelChoice <- as.character(input$levelsAUC)
+       as.numeric( tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[1])),1] ) - as.numeric(tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[2])),1])
+      })
+
+      output$test <- renderText({
+        if(input$varType == "cat" & length(difference() == 2)){
+       paste0("The difference between the two factor levels and the age range you selected is: ", round( difference() ,2) ,". Please note this section is in development, it will change to a table output with a statistical test summary.")
+        }else{
+
+        }
+      })
+
 
       return(list(
         modelDataEdit = modelDataEdit
