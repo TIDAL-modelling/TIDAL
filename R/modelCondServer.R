@@ -72,20 +72,29 @@ modelCondServer <- function(id,
       ###############################################################
 
 
-      # ---------------------------------------
-      # paste the formula
 
+      # ---------------------------------------
+      # z-scale continuous variable
+      modelDataScaled <- eventReactive(input$button,{
+        if(input$varType == "cat"){
+          modelData()
+        }else if(input$varType == "cont"){
+          colSplit <- which(colnames(modelData()) %in% input$condition)
+          modelData() %>%
+            mutate(!!input$condition := scale(.[[colSplit]]) )
+        }
+      })
+
+
+
+      # ---------------------------------------
       fit <- eventReactive(input$button,{
 
-        ###############################################################
-        ###############################################################
-        #   EDIT TO USE THE SAME OPTIMISER AS PREVIOUSLY, IE. If warning message previously contains optimiser then use that below...
-        ###############################################################
-        ###############################################################
 
         # either factorise or make numeric the input$condition depending on the input$varType option
         if(input$varType == "cat"){
           cond <- paste0("as.factor(", input$condition, ")")
+
         }else if(input$varType == "cont"){
           cond <- paste0("as.numeric(", input$condition, ")")
         }
@@ -209,8 +218,44 @@ modelCondServer <- function(id,
                                              paste0(rep(")", length(num)), collapse = ""), collapse = "")
           )))
         }else if(input$varType == "cont"){
+          rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                       pattern = input$condition) &
+                              str_starts(string = row.names(summary(fit())$coefficients),
+                                         pattern = age(), negate = T))
+
+          if(modelType() == "Linear"){
+            plus <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex,1]
+            minus <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] - summary(fit())$coefficients[rowIndex,1]
+          } else if(modelType() == "Quadratic"){
+            plus  <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] +
+              ageVec^2 * summary(fit())$coefficients[3,1] + summary(fit())$coefficients[rowIndex,1]
+            minus <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] +
+              ageVec^2 * summary(fit())$coefficients[3,1] - summary(fit())$coefficients[rowIndex,1]
+          } else if(modelType() == "Cubic"){
+            plus  <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+              ageVec^2 * summary(fit())$coefficients[3,1] +
+              ageVec^3 * summary(fit())$coefficients[4,1] + summary(fit())$coefficients[rowIndex,1]
+            minus <-  ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+              ageVec^2 * summary(fit())$coefficients[3,1] +
+              ageVec^3 * summary(fit())$coefficients[4,1] - summary(fit())$coefficients[rowIndex,1]
+          } else if(modelType() == "Quartic"){
+            plus  <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+              ageVec^2 * summary(fit())$coefficients[3,1] +
+              ageVec^3 * summary(fit())$coefficients[4,1] +
+              ageVec^4 * summary(fit())$coefficients[5,1] + summary(fit())$coefficients[rowIndex,1]
+            minus <-  ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+              ageVec^2 * summary(fit())$coefficients[3,1] +
+              ageVec^3 * summary(fit())$coefficients[4,1] +
+              ageVec^4 * summary(fit())$coefficients[5,1] - summary(fit())$coefficients[rowIndex,1]
+          }
+
+
+
+
           modelDataEdit <- modelData() %>%
-            mutate(pred = zero)
+            mutate(pred = zero) %>%
+            mutate(plus = plus) %>%
+            mutate(minus = minus)
         }
         return(modelDataEdit)
       })
@@ -264,14 +309,22 @@ modelCondServer <- function(id,
             geom_errorbar(aes(ymin = lower, ymax = upper)) +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
             theme(legend.text = element_text(color = "black", size = 10))
+
+
         }else if(input$varType == "cont"){
           ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
             theme_light()+
             geom_point()+
             geom_line() +
             geom_errorbar(aes(ymin = lower, ymax = upper)) +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
-            scale_colour_discrete(na.translate = F) +
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = "Population Average" ) , linewidth = 1.5, na.rm=T)+
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = plus, color = "+ 1 SD" ) , na.rm=T)+
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = minus, color = "- 1 SD" ) , na.rm=T)+
+            theme(legend.text = element_text(color = "black", size = 10))+
+            labs(color = "") +
+            scale_color_manual(
+              breaks = c("+ 1 SD", "Population Average", "- 1 SD"),
+              values = c("#d55e00", "black", "#0072b2")) +
             theme(legend.text = element_text(color = "black", size = 10))
         }
 
