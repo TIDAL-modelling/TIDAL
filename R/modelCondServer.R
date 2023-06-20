@@ -77,7 +77,8 @@ modelCondServer <- function(id,
       # z-scale continuous variable
       modelDataScaled <- eventReactive(input$button,{
         if(input$varType == "cat"){
-          modelData()
+          modelData() %>%
+            filter(!is.na(!!sym(input$condition)))
         }else if(input$varType == "cont"){
           colSplit <- which(colnames(modelData()) %in% input$condition)
           modelData() %>%
@@ -113,7 +114,7 @@ modelCondServer <- function(id,
                                        "+ ", cond,
                                        " + ", age(), "*", cond
           ),
-          REML=F , data = modelData(),
+          REML=F , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Quadratic"){
@@ -122,7 +123,7 @@ modelCondServer <- function(id,
                                        " + ", age(), "*", cond,
                                        " + I(", age(), "^2)*", cond
           ),
-          REML=F , data = modelData(),
+          REML=F , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Cubic"){
@@ -132,7 +133,7 @@ modelCondServer <- function(id,
                                        " + I(", age(), "^2)*", cond,
                                        " + I(", age(), "^3)*", cond
           ),
-          REML=F , data = modelData(),
+          REML=F , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Quartic"){
@@ -143,7 +144,7 @@ modelCondServer <- function(id,
                                        " + I(", age(), "^3)*", cond,
                                        " + I(", age(), "^4)*", cond
           ),
-          REML=F , data = modelData(),
+          REML=F , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         }
@@ -154,12 +155,12 @@ modelCondServer <- function(id,
       modelDataEdit <- eventReactive(input$button,{
 
         # select the index for the column that the user wants to split the analysis on
-        colSplit <- which(colnames(modelData()) %in% input$condition)
+        colSplit <- which(colnames(modelDataScaled()) %in% input$condition)
 
         # add the "predicted" column to this dataset (it's not really a prediction because its the same dataset, it just shows the model)
         # add a column for coloring the plot by the split by variable
 
-        ageVec <- modelData() %>% pull(!!age())
+        ageVec <- modelDataScaled() %>% pull(!!age())
 
         if(modelType() == "Linear"){
           zero <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]
@@ -178,7 +179,7 @@ modelCondServer <- function(id,
         }
 
         if(input$varType == "cat"){
-        n <- length(unique(pull(modelData(), !!sym(input$condition))))
+        n <- length(unique(pull(modelDataScaled(), !!sym(input$condition))))
         rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                      pattern = input$condition) &
                             str_starts(string = row.names(summary(fit())$coefficients),
@@ -213,7 +214,7 @@ modelCondServer <- function(id,
 
         names(predCovs) <- paste0(input$condition, "_", num)
 
-        modelDataEdit <- cbind(modelData(), do.call(cbind, predCovs)) %>%
+        modelDataEdit <- cbind(modelDataScaled(), do.call(cbind, predCovs)) %>%
           mutate(zero = zero) %>%
           mutate(!!input$condition := as.factor(.[[colSplit]]) ) %>%
           mutate(pred =  eval(parse(text =
@@ -252,7 +253,7 @@ modelCondServer <- function(id,
               ageVec^4 * summary(fit())$coefficients[5,1] - summary(fit())$coefficients[rowIndex,1]
           }
 
-          modelDataEdit <- modelData() %>%
+          modelDataEdit <- modelDataScaled() %>%
             mutate(pred = zero) %>%
             mutate(plus = plus) %>%
             mutate(minus = minus)
@@ -409,11 +410,11 @@ modelCondServer <- function(id,
         })
 
         if(input$varType == "cat"){
-          n <- length(unique(pull(modelData(), !!sym(input$condition))))
+          n <- length(unique(pull(modelDataScaled(), !!sym(input$condition))))
           rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                        pattern = input$condition) &
                               str_starts(string = row.names(summary(fit())$coefficients),
-                                         pattern = age(), negate = T))
+                                         pattern = ":", negate = T))
 
           scoreCovs <- lapply(1:(n-1), function(i){
             sapply(as.numeric(input$ageInputScore), function(x){
@@ -567,11 +568,11 @@ modelCondServer <- function(id,
           }
 
         if(input$varType == "cat"){
-          n <- length(unique(pull(modelData(), !!sym(input$condition))))
+          n <- length(unique(pull(modelDataScaled(), !!sym(input$condition))))
           rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                        pattern = input$condition) &
                               str_starts(string = row.names(summary(fit())$coefficients),
-                                         pattern = age(), negate = T))
+                                         pattern = ":", negate = T))
 
           AUCCovs <- lapply(1:(n-1), function(i){
               if(modelType() == "Linear"){
