@@ -10,7 +10,10 @@ options(shiny.maxRequestSize = 100*1024^2)
 my_theme <- function(base_size = 16, base_family = ""){
   theme_gray(base_size = base_size, base_family = base_family) %+replace%
     theme(
-      panel.background = element_rect(fill="white")
+      panel.background = element_rect(fill = NA),
+      panel.grid.major = element_line(colour = "grey88"),
+      panel.grid.minor = element_line(colour = "grey99"),
+      panel.ontop = FALSE
     )
 }
 

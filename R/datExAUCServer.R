@@ -82,7 +82,7 @@ plotAUC <- eventReactive(c(input$AUCages, button()), {
     ggplot() +
       geom_ribbon(data = modelDataEdit(),
                   aes(x = age_original, ymax = pred, ymin = 0),
-                  alpha = 0.1, show.legend = FALSE, fill = "deepskyblue") +
+                  alpha = 0.1, show.legend = FALSE, fill = "#1D86C7") +
       geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
       coord_cartesian(xlim = c(input$AUCages[1], input$AUCages[2])) +
       scale_colour_discrete(na.translate = F) +
