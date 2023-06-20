@@ -1,7 +1,7 @@
 # Tool to Implement Developmental Analyses of Longitudinal Data
 
 <p align="center">
-<img width="600" alt="Screenshot 2023-02-03 at 13 00 15" src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png">
+<img width="600" alt="Two-tone blue wave TIDAL logo. Below the wave the text reads Tool to Implement Developmental Analyses of Longitudinal data" src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png">
 </p>
 
 <!-- badges: start -->
@@ -9,9 +9,7 @@
 <!-- badges: end -->
 
 
-
-
-## Installation and useage
+## Installation and usage
 
 ### Locally
 
@@ -41,56 +39,75 @@ To use this tool online please do not upload any sensitive data. Only use the [s
 
 ## Main Features
 
+![](tabs.png)
+
 ### Overview
 
-The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people.
+The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people. A more detailed description of each page is provided below with links to the full [walkthrough video](https://www.youtube.com/watch?v=aWteXAWPBik).
 
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/24313187/216603041-f4bf851c-72d6-4cb3-b9f7-415047e8abca.png" width="700">
-</p>
+<details>
+<summary><h2>Data Preparation</h2></summary>
 
-### Data Preparation
-This allows the user to upload a wide format of their longitudinal dataset. Select which columns measure time and the phenotype they want to model trajectories on. Converts the dataframe to long format. Allows the user to download the long format dataset.
+Many longitudinal datasets will be written in "wide" format, with each time point's data stored in a separate column. To analyse this data, it must first be convered into "long" format, with one column containing the time point names and one column containing the measurements.
 
-<p align="center">
-  <video src="https://user-images.githubusercontent.com/24313187/216603909-9868a4e4-35ed-4b09-86ef-38a126a3d6b1.mov" controls="controls" muted="muted" class="d-block rounded-bottom-2 width-fit" style="max-height:640px;">
-</video>
-</p>
+This page allows the user to upload a wide format dataset and convert it into long format. The user selects which columns measure time and the phenotype they want to model trajectories on. There is also an option to impute mean age for missing age data in this step. Once converted into long format, there is the option to download the long version dataset as a .csv file.
 
-### Data Exploration
-This is the first stage of the trajectory modelling. Here the user either uploads a long format dataset or uses the dataset formatted on the previous page (Data Preparation). They specify the columns relatated to the variables to include in the model. There is a choice of model type and the user can see which model type looks like it best fits their data to explore further on the following pages.
+[![TIDAL Data Preparation walkthrough](/_includes/data-prep.png)](https://youtu.be/aWteXAWPBik?t=133)
+</details>
 
-<p align="center">
-  <video src="https://user-images.githubusercontent.com/24313187/216604313-bc7f3643-35c3-408a-b85a-d302ec0b3e1e.mov" controls="controls" muted="muted" class="d-block rounded-bottom-2 width-fit" style="max-height:640px;">
-</video>
-</p>
+<details>
+<summary><h2>Data Exploration</h2></summary>
 
-### Group Interactions
-Split the trajectories by categorical varaibles to examine the differences in trajectories.
+This is the first stage of trajectory modelling. Here the user can either upload a long format dataset or use the dataset formatted on the previous page (Data Preparation). They then select the desired outcome variable to model the trajectory on and a time variable, usually age. Note that the variable which the trajectory is modelled on must be measured on a continuous scale.
 
-<p align="center">
-  <video src="https://user-images.githubusercontent.com/24313187/216604194-9a4f520d-1f62-4822-b463-5e2c04efef65.mov" controls="controls" muted="muted" class="d-block rounded-bottom-2 width-fit" style="max-height:640px;">
-</video>
-</p>
+There is an option at this stage to add extra covariates or confounders to the model. These can be categorical or continuous and multiple variables can be selected from the drop-down menu. The user can run a linear or non-linear (quadratic, cubic, quartic) model according to which best fits their data.
 
-### Individual Trajectories
-View trajectories for specific individuals. Choose from a random sample, specific individuals of interest, individuals within a specific variable, eg. a random sample of females only.
+Once a model has been fitted, TIDAL will output the fixed and random effects in the "Model Results" tab. The user can also examine predicted scores for specific ages in the "Scores At Ages" tab and extract Area Under the Curve metrics in the "Area Under Curve" tab. Finally, the user can download a PDF report from the "Download Results" tab.
 
-<p align="center">
-  <video src="https://user-images.githubusercontent.com/24313187/216604268-332cd5ff-e0fa-4a05-a3b5-f4a993ea13d0.mov" controls="controls" muted="muted" class="d-block rounded-bottom-2 width-fit" style="max-height:640px;">
-</video>
-</p>
+[![TIDAL Data Exploration walkthrough](/_includes/data-explore.png)](https://youtu.be/aWteXAWPBik?t=239)
 
+</details>
 
-## Other features in development
+<details>
+<summary><h2>Interaction Variable</h2></summary>
+
+On this page, the user can examine group differences or the effect of an interacting variable. The user can select a categorical or continuous variable from within the data and fit an updated model with the included interaction variable. The model type is inherited from the "Data Exploration" page alongside any covariates or confounders. Note that the interaction variable should not be included in the initial model if you wish to investigate it on this page. 
+
+The output is similar to that from the "Data Exploration" page. In future we will be implementing features allowing the user to change factor level names and select the reference level to be used for categorical variables.
+
+[![TIDAL Interaction Variable walkthrough](/_includes/interaction-variable.png)](https://youtu.be/aWteXAWPBik?t=475)
+
+</details>
+
+<details>
+<summary><h2>Individual trajectories</h2></summary>
+
+This page allows the user to view trajectories for specific individuals. The user can input specific IDs of interest, select a random sample of individuals to plot, or select a random sample from a specific category - e.g. female only. This allows comparison between individual trajectories and the group trajectories and may be useful for identifying whether a particular individual could be "on track" or not.
+
+[![TIDAL Individual Trajectories walkthrough](/_includes/individual-trajectories.png)](https://youtu.be/aWteXAWPBik?t=580)
+
+</details>
+
+<details>
+<summary><h2>Other features in development</h2></summary>
 * **Points of acceleration**
   * Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory.
 * **Stability**
-  * Captures within-individual variability in depressive symptoms over time and compare how this varies by different forms of interventions or combinations of interventions. 
+  * Captures within-individual variability in depressive symptoms over time and compares how this varies by different forms of interventions or combinations of interventions. 
 * Allow users to input an x-axis value (eg. age) and recieve y-axis value (eg. depression score), for mean values from a user specified model.
 * Allow users to download tables and plots (also to edit colours in the plots)
 * Return an R script at the end of analysis with the code ran to generate tables and plots downloaded.
 
+</details>
+
+## Links
+
+[FAQs and troubleshooting](FAQs.md)
+
+[Statistics guide](StatsGuide.md)
+
+## Bugs and Feature Requests
+Please raise an issue if you find a bug or have a feature request using the templates provided.
 
 ## Authors, contributors and funders
 * Amelia J. Edmondson-Stait<sup>1</sup>, Ellen J. Thompson<sup>2</sup>, Eileen Y. Xu<sup>1</sup>, Richard M. A. Parker <sup>3</sup>, Ahmed Elhakeem<sup>3</sup>,  Liana Romaniuk<sup>1</sup>, Iona Beange<sup>1</sup>, Rebecca M. Pearson<sup>3,4</sup>, Andrew M. McIntosh<sup>1</sup>, Thalia C. Eley<sup>2</sup>, Kate Tilling<sup>3</sup>, Heather C. Whalley<sup>1,5</sup>, Alex S. F. Kwong<sup>1</sup>
