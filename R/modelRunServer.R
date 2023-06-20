@@ -138,8 +138,6 @@ modelRunServer <- function(id,
       output$plot <- renderPlot({
         req(df.plot())
         ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
-          theme_light()+
-          theme_light()+
           geom_point()+
           geom_line() +
           geom_errorbar(aes(ymin = lower, ymax = upper))

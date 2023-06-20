@@ -1,9 +1,20 @@
 # R Shiny app code, calls module functions exported in R/
 
 library(shinythemes)
+library(ggplot2)
 
 # Increase maximum file size that can be uploaded
 options(shiny.maxRequestSize = 100*1024^2)
+
+# Set global theme for ggplot
+my_theme <- function(base_size = 16, base_family = ""){
+  theme_gray(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      panel.background = element_rect(fill="white")
+    )
+}
+
+theme_set(my_theme())
 
 # User interface
 welcome_page <- tabPanel(
