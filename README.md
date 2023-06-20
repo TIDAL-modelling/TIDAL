@@ -106,6 +106,9 @@ This page allows the user to view trajectories for specific individuals. The use
 
 [Statistics guide](StatsGuide.md)
 
+## Bugs and Feature Requests
+Please raise an issue if you find a bug or have a feature request using the templates provided.
+
 ## Authors, contributors and funders
 * Amelia J. Edmondson-Stait<sup>1</sup>, Ellen J. Thompson<sup>2</sup>, Eileen Y. Xu<sup>1</sup>, Richard M. A. Parker <sup>3</sup>, Ahmed Elhakeem<sup>3</sup>,  Liana Romaniuk<sup>1</sup>, Iona Beange<sup>1</sup>, Rebecca M. Pearson<sup>3,4</sup>, Andrew M. McIntosh<sup>1</sup>, Thalia C. Eley<sup>2</sup>, Kate Tilling<sup>3</sup>, Heather C. Whalley<sup>1,5</sup>, Alex S. F. Kwong<sup>1</sup>
 * Affiliations:
