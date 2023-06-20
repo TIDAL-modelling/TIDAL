@@ -218,7 +218,8 @@ singleTrajServer <- function(id,
           geom_line(data = pred_random ,
                     aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")+
           ylab(paste0("Score (", traj(), ")")) +
-          xlab("Age")
+          xlab("Age") +
+          guides(color=guide_legend(title=" "))
       })
 
     }
