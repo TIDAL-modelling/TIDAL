@@ -182,7 +182,7 @@ modelCondServer <- function(id,
         rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                      pattern = input$condition) &
                             str_starts(string = row.names(summary(fit())$coefficients),
-                                       pattern = age(), negate = T))
+                                       pattern = ":", negate = T))
 
         predCovs <- lapply(1:(n-1), function(i){
 
@@ -224,7 +224,7 @@ modelCondServer <- function(id,
           rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                        pattern = input$condition) &
                               str_detect(string = row.names(summary(fit())$coefficients),
-                                         pattern = age(), negate = T))
+                                         pattern = ":", negate = T))
 
           if(modelType() == "Linear"){
             plus <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex,1]
