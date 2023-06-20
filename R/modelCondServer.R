@@ -270,7 +270,7 @@ modelCondServer <- function(id,
           tidy(fit(), "fixed"),
           confint(fit(), "beta_", method = "Wald")) %>%
           mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
-          mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", p.z))
+          mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", round(p.z, 3) ))
         }
       })
 
@@ -417,19 +417,23 @@ modelCondServer <- function(id,
           scoreCovs <- lapply(1:(n-1), function(i){
             sapply(as.numeric(input$ageInputScore), function(x){
               if(modelType() == "Linear"){
-                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
+              scoreCov <-   (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
+              round(scoreCov, 2)
               } else if(modelType() == "Quadratic"){
-                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
+                scoreCov <-  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
                   (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1]
+                round(scoreCov, 2)
               } else if(modelType() == "Cubic"){
-                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
+                scoreCov <-  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
                   (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
                   (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1]
+                round(scoreCov, 2)
               } else if(modelType() == "Quartic"){
-                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]  +
+                scoreCov <-  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]  +
                   (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
                   (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
                   (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1]
+                round(scoreCov, 2)
               }
             })
           })
