@@ -479,7 +479,7 @@ modelCondServer <- function(id,
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
             scale_colour_discrete(na.translate = F) +
             theme(legend.text = element_text(color = "black")) +
-            geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
+            geom_point(data = points, aes(x = x, y = y), col = "#1D86C7", size = 5) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
         }
