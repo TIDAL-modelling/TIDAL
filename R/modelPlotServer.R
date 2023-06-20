@@ -73,7 +73,9 @@ modelPlotServer <- function(id,
           geom_point()+
           geom_line() +
           geom_errorbar(aes(ymin = lower, ymax = upper)) +
-          geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T)
+          geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T) +
+          ylab(paste0("Score (", traj(), ")")) +
+          xlab("Age")
       })
 
       # plot the mean trajectory against the model

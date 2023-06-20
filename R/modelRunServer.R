@@ -140,7 +140,9 @@ modelRunServer <- function(id,
         ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
           geom_point()+
           geom_line() +
-          geom_errorbar(aes(ymin = lower, ymax = upper))
+          geom_errorbar(aes(ymin = lower, ymax = upper))+
+          ylab(paste0("Score (", traj(), ")")) +
+          xlab("Age")
       })
 
       return(

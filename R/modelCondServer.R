@@ -310,7 +310,9 @@ modelCondServer <- function(id,
               geom_line() +
               geom_errorbar(aes(ymin = lower, ymax = upper)) +
               geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
-              theme(legend.text = element_text(color = "black"))
+              theme(legend.text = element_text(color = "black"))+
+              ylab(paste0("Score (", traj(), ")")) +
+              xlab("Age")
           }else if(input$varType == "cont"){
             ggplot(data = dfPlot(),aes(x=Age, y=Phenotype)) +
 
