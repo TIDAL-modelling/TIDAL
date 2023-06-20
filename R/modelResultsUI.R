@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import shinycssloaders
 #'
 #' @noRd
 #' @keywords internal
@@ -17,7 +18,7 @@ modelResultsUI <- function(id, label = "Model") {
   ns <- NS(id)
 
   tagList(
-    htmlOutput(ns("formulaText")),
+    withSpinner(htmlOutput(ns("formulaText")), proxy.height = "100px"),
     br(),
     textOutput(ns("ageMean")),
     br(),
@@ -26,9 +27,9 @@ modelResultsUI <- function(id, label = "Model") {
     h4("Number of observations and groups"),
     textOutput(ns("Ndims")),
     h4("Fixed Effects"),
-    tableOutput(ns("modelStatsFixed")),
+    withSpinner(tableOutput(ns("modelStatsFixed")), proxy.height = "100px"),
     h4("Random Effects"),
-    tableOutput(ns("modelStatsRandom"))
+    withSpinner(tableOutput(ns("modelStatsRandom")), proxy.height = "100px")
     )
 }
 

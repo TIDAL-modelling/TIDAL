@@ -450,9 +450,6 @@ modelCondServer <- function(id,
 
       plotScoreAll <- eventReactive(input$ageInputScore, {
 
-        # improve the plot
-        #https://stackoverflow.com/questions/72563038/geom-vline-for-values-over-a-threshold-on-y-axis
-
         if(input$varType == "cat"){
           req(score()$scoreCovs)
 

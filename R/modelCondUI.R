@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import shinycssloaders
 #'
 #' @noRd
 #' @keywords internal
@@ -44,22 +45,22 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                        br(),
                        textOutput(ns("zScore")),
                        h4("Fixed Effects"),
-                       tableOutput(ns("modelStatsFixed")),
+                       withSpinner(tableOutput(ns("modelStatsFixed")), proxy.height = "100px"),
                        h4("Random Effects"),
-                       tableOutput(ns("modelStatsRandom"))
+                       withSpinner(tableOutput(ns("modelStatsRandom")), proxy.height = "100px")
                      )
             ),
             tabPanel("Plot",
                      tagList(
                      checkboxInput(ns("plotCheckbox"), "Do you want an overlay of the descriptive plot?", TRUE, width = '100%'),
-                     plotOutput(ns("modelCondPlot"))
+                     withSpinner(plotOutput(ns("modelCondPlot")), proxy.height = "100px")
                      )
             ),
             tabPanel("Scores At Ages",
                        tagList(
                          uiOutput(ns("selectAgeScore")),
-                         plotOutput(ns("plotScore")),
-                         tableOutput(ns("tableScore"))
+                         withSpinner(plotOutput(ns("plotScore")), proxy.height = "100px"),
+                         withSpinner(tableOutput(ns("tableScore")), proxy.height = "100px")
                        )
             ),
             tabPanel("Area Under Curve",
@@ -72,10 +73,10 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                        ),
                        br(),
                        fluidRow(
-                         column(width = 6, plotOutput(ns("AUCplot"))),
+                         column(width = 6, withSpinner(plotOutput(ns("AUCplot")), proxy.height = "100px")),
                          column(width = 6,
                                 tagList(
-                                tableOutput(ns("AUCtable")),
+                                  withSpinner(tableOutput(ns("AUCtable")), proxy.height = "100px"),
                                 textOutput(ns("test"))
                                 )
                          )

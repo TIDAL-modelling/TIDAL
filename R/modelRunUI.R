@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import shinycssloaders
 #'
 #' @noRd
 #' @keywords internal
@@ -22,7 +23,7 @@ modelRunUI <- function(id, label = "Model") {
     tableOutput(ns("desc")),
     p('Plot the mean scores of your variable of interest by the time/age variable.
        Have a look to see what type of model you think best fits your data. Use the "Plot" tab to overlay the model on top.'),
-    plotOutput(ns("plot"))
+    withSpinner(plotOutput(ns("plot")), proxy.height = "100px")
     )
 }
 
