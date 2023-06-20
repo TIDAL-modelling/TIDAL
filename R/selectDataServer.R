@@ -19,13 +19,22 @@ selectDataServer <- function(id, dataFormatted) {
         }
       })
       # if the user wants to use data formatted on previous page, from wide to long format then save this as "data()"
+
       data <- reactive ({
         if (input$select == "Upload a long format dataset"){
           req(input$uploadFile)
           data <- fread(input$uploadFile$datapath)
+          # check for spaces in column names and change them to underscores
+          colnames(data) <- gsub(" ", "_", colnames(data))
+          # Replace special characters with an empty string in column names of the data frame
+          colnames(data) <- gsub("[\\(\\)\\*]", "", colnames(data))
         }
         else {
           data <- dataFormatted()
+          # check for spaces in column names and change them to underscores
+          colnames(data) <- gsub(" ", "_", colnames(data))
+          # Replace special characters with an empty string in column names of the data frame
+          colnames(data) <- gsub("[\\(\\)\\*]", "", colnames(data))
         }
         return(data)
       })
