@@ -16,6 +16,7 @@
 singleTrajServer <- function(id,
                              subject,
                              age,
+                             traj,
                              modelData,
                              modelFit,
                              modelType,
@@ -215,7 +216,9 @@ singleTrajServer <- function(id,
         ggplot() +
           geom_line(data = modelDataEdit(), aes(x= age_original,  y = pred), na.rm=T) +
           geom_line(data = pred_random ,
-                    aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")
+                    aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")+
+          ylab(paste0("Score (", traj(), ")")) +
+          xlab("Age")
       })
 
     }
