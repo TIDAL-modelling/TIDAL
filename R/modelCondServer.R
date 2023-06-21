@@ -676,7 +676,7 @@ modelCondServer <- function(id,
       # ------------------------------------------
       # Add UI to download results
       output$buttonHere <- renderUI({
-        req(mainPlot())
+        req(plot())
         tagList(
           textInput(ns("suffix"),
                     "File name suffix:"
@@ -693,17 +693,19 @@ modelCondServer <- function(id,
           # Copy the report file to a temporary directory before processing it, in
           # case we don't have write permissions to the current working dir (which
           # can happen when deployed).
-          tempReport <- file.path("www/exploreData.Rmd")
+          tempReport <- file.path("www/interactionVar.Rmd")
           file.copy("interactionVar.Rmd", tempReport, overwrite = TRUE)
 
-          # Set up parameters to pass to Rmd document
+
+
+          # -------Set up parameters to pass to Rmd document--------
           params <- list(
             condType = reactive({ input$varType }),
             cond = reactive({ input$condition }),
             condPlot = plot(),
             condModelForm = reactive({ output$form }),
             condFixed = modelStatsFixed(),
-            condRandom = output$modelStatsRandom(),
+            condRandom = modelStatsRandom(),
             modelDataEdit = modelDataEdit(),
             plotScore = plotScoreAll(),
             tableScore = tableScoreAll(),

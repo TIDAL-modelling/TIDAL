@@ -31,7 +31,6 @@ include_graphics("TIDAL.png")
 For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
 
 Date generated: `r Sys.Date()`
-File uploaded:
 
 ## Split trajectories by condition
 
