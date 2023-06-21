@@ -6,13 +6,21 @@ library(ggplot2)
 # Increase maximum file size that can be uploaded
 options(shiny.maxRequestSize = 100*1024^2)
 
+# Set default ggplot colour palette to colourblind-friendly Okabe Ito (2008)
+options(ggplot2.discrete.colour= c("#E69F00","#56B4E9","#009E73","#F5C710",
+                                   "#0072B2","#D55E00","#CC79A7",
+                                   "#999999","#000000"))
+
 # Set global theme for ggplot
 my_theme <- function(base_size = 16, base_family = ""){
-  theme_gray(base_size = base_size, base_family = base_family) %+replace%
+  theme_bw(base_size = base_size, base_family = base_family) %+replace%
     theme(
-      panel.background = element_rect(fill = NA),
+      panel.background = element_rect(fill = "transparent"),
+      plot.background = element_rect(fill = "transparent", color = NA),
       panel.grid.major = element_line(colour = "grey88"),
       panel.grid.minor = element_line(colour = "grey99"),
+      legend.background = element_rect(fill = "transparent"),
+      legend.box.background = element_rect(fill = "transparent"),
       panel.ontop = FALSE
     )
 }
