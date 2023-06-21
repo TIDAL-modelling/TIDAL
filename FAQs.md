@@ -47,3 +47,9 @@ If you are *only* running a linear model, ensure that there are at least 3 time 
 
 Check that your R version is up-to-date. TIDAL requires you to have R version 2.10 or newer. If you are a Mac user or installing TIDAL within the terminal/command line, you may need to install the compiler [CMake](https://cmake.org/) which should solve any issues with compiling R packages from source. 
 </details>
+
+<details>
+    <summary> My column names have changed </summary>
+
+    To avoid errors when running, spaces in column names are replaced with underscores "_". If column names contain "(", ")" or "*" these are replaced with empty strings "".
+</details>
