@@ -52,6 +52,8 @@ Many longitudinal datasets will be written in "wide" format, with each time poin
 
 This page allows the user to upload a wide format dataset and convert it into long format. The user selects which columns measure time and the phenotype they want to model trajectories on. There is also an option to impute mean age for missing age data in this step. Once converted into long format, there is the option to download the long version dataset as a .csv file.
 
+To avoid errors when running, spaces in column names are replaced with underscores "_". If column names contain "(", ")" or "*" these are replaced with empty strings "". If you wish to change this, it is advised to edit your column names prior to uploading your data.
+
 [![TIDAL Data Preparation walkthrough](/_includes/data-prep.png)](https://youtu.be/aWteXAWPBik?t=133)
 </details>
 
@@ -90,13 +92,12 @@ This page allows the user to view trajectories for specific individuals. The use
 
 <details>
 <summary><h2>Other features in development</h2></summary>
+ 
 * **Points of acceleration**
   * Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory.
+ 
 * **Stability**
   * Captures within-individual variability in depressive symptoms over time and compares how this varies by different forms of interventions or combinations of interventions. 
-* Allow users to input an x-axis value (eg. age) and recieve y-axis value (eg. depression score), for mean values from a user specified model.
-* Allow users to download tables and plots (also to edit colours in the plots)
-* Return an R script at the end of analysis with the code ran to generate tables and plots downloaded.
 
 </details>
 
