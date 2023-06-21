@@ -113,7 +113,7 @@ datExAltServer <- function(id,
       return(
         list(
           datExAltTable = datExAltTable,
-          datExAltPlot = datExAltPlot
+          datExAltPlot = plotScoreAll
           )
         )
 
