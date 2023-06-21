@@ -16,6 +16,7 @@
 singleTrajServer <- function(id,
                              subject,
                              age,
+                             traj,
                              modelData,
                              modelFit,
                              modelType,
@@ -213,10 +214,12 @@ singleTrajServer <- function(id,
         # -----------------------------------------------
         # Plot the individual trajectories:
         ggplot() +
-          theme_light()+
           geom_line(data = modelDataEdit(), aes(x= age_original,  y = pred), na.rm=T) +
           geom_line(data = pred_random ,
-                    aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")
+                    aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")+
+          ylab(paste0("Score (", traj(), ")")) +
+          xlab("Age") +
+          guides(color=guide_legend(title=" "))
       })
 
     }

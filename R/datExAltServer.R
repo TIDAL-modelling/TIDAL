@@ -81,7 +81,7 @@ datExAltServer <- function(id,
 
         ggplot() +
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T) +
-          geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
+          geom_point(data = points, aes(x = x, y = y), col = "#1D86C7", size = 5) +
           ylab(paste0("Score (", traj(), ")")) +
           xlab("Age")
       })

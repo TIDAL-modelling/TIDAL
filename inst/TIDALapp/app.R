@@ -1,9 +1,31 @@
 # R Shiny app code, calls module functions exported in R/
 
 library(shinythemes)
+library(ggplot2)
 
 # Increase maximum file size that can be uploaded
 options(shiny.maxRequestSize = 100*1024^2)
+
+# Set default ggplot colour palette to colourblind-friendly Okabe Ito (2008)
+options(ggplot2.discrete.colour= c("#E69F00","#56B4E9","#009E73","#F5C710",
+                                   "#0072B2","#D55E00","#CC79A7",
+                                   "#999999","#000000"))
+
+# Set global theme for ggplot
+my_theme <- function(base_size = 16, base_family = ""){
+  theme_bw(base_size = base_size, base_family = base_family) %+replace%
+    theme(
+      panel.background = element_rect(fill = "transparent"),
+      plot.background = element_rect(fill = "transparent", color = NA),
+      panel.grid.major = element_line(colour = "grey88"),
+      panel.grid.minor = element_line(colour = "grey99"),
+      legend.background = element_rect(fill = "transparent"),
+      legend.box.background = element_rect(fill = "transparent"),
+      panel.ontop = FALSE
+    )
+}
+
+theme_set(my_theme())
 
 # User interface
 welcome_page <- tabPanel(
@@ -159,42 +181,42 @@ ui <- navbarPage(
 # Main server
 server <- function(input, output, session) {
   wide2longServer <- TIDAL:::wide2longServer("wide2long")
-  selectedDataServer <- TIDAL:::selectDataServer("select", dataFormatted=wide2longServer)
+  selectDataServer <- TIDAL:::selectDataServer("select", dataFormatted=wide2longServer)
   modelRunServer <- TIDAL:::modelRunServer("modelRun",
-                                           covariateChoice = selectedDataServer$covariateChoice,
-                                           button = selectedDataServer$button,
-                                           modelData = selectedDataServer$data,
-                                           formCode = selectedDataServer$modelForm,
-                                           formCodeCovars = selectedDataServer$modelFormCovars,
-                                           traj = selectedDataServer$traj,
-                                           age = selectedDataServer$age,
-                                           timePoint = selectedDataServer$timePoint)
+                                           covariateChoice = selectDataServer$covariateChoice,
+                                           button = selectDataServer$button,
+                                           modelData = selectDataServer$data,
+                                           formCode = selectDataServer$modelForm,
+                                           formCodeCovars = selectDataServer$modelFormCovars,
+                                           traj = selectDataServer$traj,
+                                           age = selectDataServer$age,
+                                           timePoint = selectDataServer$timePoint)
   modelResultsServer <- TIDAL:::modelResultsServer("modelResults",
                                                    modelFit = modelRunServer$fit,
                                                    warningMsg = modelRunServer$warning,
-                                                   modelData = selectedDataServer$data,
-                                                   age = selectedDataServer$age)
+                                                   modelData = selectDataServer$data,
+                                                   age = selectDataServer$age)
   modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
                                              modelData = modelRunServer$data,
                                              modelFit = modelRunServer$fit,
-                                             age = selectedDataServer$age,
-                                             traj = selectedDataServer$traj,
-                                             timePoint = selectedDataServer$timePoint,
-                                             modelType = selectedDataServer$modelType,
-                                             button = selectedDataServer$button
+                                             age = selectDataServer$age,
+                                             traj = selectDataServer$traj,
+                                             timePoint = selectDataServer$timePoint,
+                                             modelType = selectDataServer$modelType,
+                                             button = selectDataServer$button
   )
   datExAltServer <- TIDAL:::datExAltServer("datExAlt",
                                            modelDataEdit = modelPlotServer$modelDataEdit,
                                            modelFit = modelRunServer$fit,
-                                           modelType = selectedDataServer$modelType,
-                                           traj = selectedDataServer$traj
+                                           modelType = selectDataServer$modelType,
+                                           traj = selectDataServer$traj
                                            )
   datExAUCServer <- TIDAL:::datExAUCServer("datExAUC",
                                            modelDataEdit = modelPlotServer$modelDataEdit,
                                            modelFit = modelRunServer$fit,
-                                           modelType = selectedDataServer$modelType,
-                                           traj = selectedDataServer$traj,
-                                           button = selectedDataServer$button
+                                           modelType = selectDataServer$modelType,
+                                           traj = selectDataServer$traj,
+                                           button = selectDataServer$button
   )
 
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
@@ -206,29 +228,30 @@ server <- function(input, output, session) {
                                              randomTab = modelResultsServer$randomTab,
                                              N = modelResultsServer$N,
                                              mainPlot = modelPlotServer$mainPlot,
-                                             phenotype = selectedDataServer$traj,
-                                             modelType = selectedDataServer$modelType
+                                             phenotype = selectDataServer$traj,
+                                             modelType = selectDataServer$modelType
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                              modelData = modelRunServer$data,
-                                             formCodeCovars = selectedDataServer$modelFormCovars,
+                                             formCodeCovars = selectDataServer$modelFormCovars,
                                              dfPlot = modelPlotServer$df.plot,
-                                             traj = selectedDataServer$traj,
-                                             age = selectedDataServer$age,
-                                             timePoint = selectedDataServer$timePoint,
-                                             modelType = selectedDataServer$modelType)
+                                             traj = selectDataServer$traj,
+                                             age = selectDataServer$age,
+                                             timePoint = selectDataServer$timePoint,
+                                             modelType = selectDataServer$modelType)
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
-                                               subject = selectedDataServer$ID,
-                                               age = selectedDataServer$age,
+                                               subject = selectDataServer$ID,
+                                               age = selectDataServer$age,
+                                               traj = selectDataServer$traj,
                                                modelData = modelRunServer$data,
                                                modelFit = modelRunServer$fit,
-                                               modelType = selectedDataServer$modelType,
-                                               cov = selectedDataServer$covars)
+                                               modelType = selectDataServer$modelType,
+                                               cov = selectDataServer$covars)
   importantAgeServer <- TIDAL:::importantAgeServer("importantAge",
                                                    modelDataEdit = modelPlotServer$modelDataEdit,
-                                                   modelType = selectedDataServer$modelType,
+                                                   modelType = selectDataServer$modelType,
                                                    modelFit = modelRunServer$fit,
-                                                   age = selectedDataServer$age)
+                                                   age = selectDataServer$age)
 }
 
 # Run the application
