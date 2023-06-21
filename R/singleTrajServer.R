@@ -16,6 +16,7 @@
 singleTrajServer <- function(id,
                              subject,
                              age,
+                             traj,
                              modelData,
                              modelFit,
                              modelType,
@@ -162,8 +163,9 @@ singleTrajServer <- function(id,
       #################################################
       # Estimate the individual trajectories:
       #################################################
+      plot <- reactive({
+        req(IDs())
 
-      output$trajPlot <-  renderPlot({
         # loop over all participants to calculate their predictions including the random effects
         pred_random <- lapply(IDs(), function(x){
 
@@ -180,14 +182,14 @@ singleTrajServer <- function(id,
             nrow()
 
           if(is.null(cov()) ){
-          # get the random effects for each participant
-          effects <- sapply(1:ncol(rand()), function(i){
-            filter(rand(), row.names(rand()) %in% x)[,i]
-          })
+            # get the random effects for each participant
+            effects <- sapply(1:ncol(rand()), function(i){
+              filter(rand(), row.names(rand()) %in% x)[,i]
+            })
 
-          agesPoly <- sapply(1:(ncol(rand())-1), function(i){
-            ages^i
-          })
+            agesPoly <- sapply(1:(ncol(rand())-1), function(i){
+              ages^i
+            })
           } else {
             # get the random effects for each participant
             effects <- sapply(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|"))), function(i){
@@ -213,10 +215,16 @@ singleTrajServer <- function(id,
         # -----------------------------------------------
         # Plot the individual trajectories:
         ggplot() +
-          theme_light()+
           geom_line(data = modelDataEdit(), aes(x= age_original,  y = pred), na.rm=T) +
           geom_line(data = pred_random ,
-                    aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")
+                    aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")+
+          ylab(paste0("Score (", traj(), ")")) +
+          xlab("Age") +
+          guides(color=guide_legend(title=" "))
+      })
+
+      output$trajPlot <-  renderPlot({
+          plot()
       })
 
     }

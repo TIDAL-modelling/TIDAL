@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import shinycssloaders
 #'
 #' @noRd
 #' @keywords internal
@@ -30,7 +31,7 @@ singleTrajUI <- function(id, label = "Model") {
     mainPanel(
       tagList(
         textOutput(ns("textIDs")),
-        plotOutput(ns("trajPlot"))
+        withSpinner(plotOutput(ns("trajPlot")), proxy.height = "100px")
       )
     )
   )

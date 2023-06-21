@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import shinycssloaders
 #'
 #' @noRd
 #' @keywords internal
@@ -21,8 +22,8 @@ datExAUCUI <- function(id, label = "Model") {
     p(""),
     p(""),
     uiOutput(ns("AUCagesUI")),
-    plotOutput(ns("AUCplot")),
-    tableOutput(ns("AUCtable"))
+    withSpinner(plotOutput(ns("AUCplot")), proxy.height = "100px"),
+    withSpinner(tableOutput(ns("AUCtable")), proxy.height = "100px")
   )
 
 }

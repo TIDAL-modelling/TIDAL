@@ -80,15 +80,13 @@ plotAUC <- eventReactive(c(input$AUCages, button()), {
     req(AUC())
 
     ggplot() +
-      theme_light()+
       geom_ribbon(data = modelDataEdit(),
                   aes(x = age_original, ymax = pred, ymin = 0),
-                  alpha = 0.1, show.legend = FALSE, fill = "deepskyblue") +
+                  alpha = 0.1, show.legend = FALSE, fill = "#1D86C7") +
       geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
       coord_cartesian(xlim = c(input$AUCages[1], input$AUCages[2])) +
       scale_colour_discrete(na.translate = F) +
-      theme(legend.text = element_text(color = "black", size = 10),
-            text = element_text(size = 14)) +
+      theme(legend.text = element_text(color = "black")) +
       ylab(paste0("Score (", traj(), ")")) +
       xlab("Age") +
       scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original, na.rm =T)), round(max(modelDataEdit()$age_original, na.rm =T)), by = 1),

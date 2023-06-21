@@ -74,21 +74,23 @@ datExAltServer <- function(id,
 
       # ------------------------------------------
       # Plot the score at the given age
-      datExAltPlot <- reactive({
-        # points of intersection of age and score
+
+      # points of intersection of age and score
+      plotScoreAll <- eventReactive(input$ageInput, {
+
         points <- data.frame(x = as.numeric(input$ageInput),
                              y = as.numeric(score()))
 
         ggplot() +
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T) +
-          geom_point(data = points, aes(x = x, y = y), col = "blue", size = 5) +
+          geom_point(data = points, aes(x = x, y = y), col = "#1D86C7", size = 5) +
           ylab(paste0("Score (", traj(), ")")) +
           xlab("Age") +
           theme_light()
       })
 
       output$plot <- renderPlot({
-        datExAltPlot()
+        plotScoreAll()
       })
 
       # ------------------------------------------
