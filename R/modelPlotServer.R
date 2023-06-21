@@ -68,7 +68,8 @@ modelPlotServer <- function(id,
       })
 
       # ------------------------------------------
-      mainPlot <- reactive({
+      mainPlot <- eventReactive(c(input$plotCheckbox), {
+        if(input$plotCheckbox == TRUE){
         ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
           geom_point()+
           geom_line() +
@@ -76,6 +77,13 @@ modelPlotServer <- function(id,
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T) +
           ylab(paste0("Score (", traj(), ")")) +
           xlab("Age")
+        }else if(input$plotCheckbox == FALSE){
+          ggplot() +
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T) +
+            ylab(paste0("Score (", traj(), ")")) +
+            xlab("Age")
+        }
+
       })
 
       # plot the mean trajectory against the model
