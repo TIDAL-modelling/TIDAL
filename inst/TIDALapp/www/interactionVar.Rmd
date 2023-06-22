@@ -14,7 +14,7 @@ params:
   tableScore : NA
   AUCplot : NA
   AUCtable : NA
-  phenotype : NA
+  traj : NA
   modelType : NA
 ---
 
@@ -34,7 +34,7 @@ Date generated: `r Sys.Date()`
 
 ## Split trajectories by condition
 
-Phenotype: `r params$phenotype`
+Phenotype: `r params$traj`
 Condition: `r params$cond`
 Type: `r params$condType`
 Formula: `r params$condModelForm`
@@ -50,7 +50,7 @@ params$condPlot
 ### Fixed effects
 
 ```{r, echo=F}
-kbl(params$condFixed[,3:ncol(condFixed)], digits = 3)  %>%
+kbl(params$condFixed[,3:ncol(params$condFixed)], digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
 
@@ -63,7 +63,7 @@ kbl(params$condRandom[,3:ncol(params$condRandom)], digits = 3)  %>%
 ```
 
 
-### Scores at certain ages
+### Scores at ages
 
 Plot
 ``` {r, echo = F}
@@ -75,7 +75,7 @@ params$plotScore
 
 Table
 ```{r, echo=F}
-kbl(params$tableScore[,3:ncol(params$tableScore)], digits = 3)  %>%
+kbl(params$tableScore, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
 
@@ -93,7 +93,7 @@ params$AUCplot
 
 Table
 ```{r, echo=F}
-kbl(params$AUCtable[,3:ncol(params$AUCtable)], digits = 3)  %>%
+kbl(params$AUCtable, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
 

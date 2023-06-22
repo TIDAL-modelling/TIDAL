@@ -22,8 +22,7 @@ modelCondServer <- function(id,
                             traj,
                             age,
                             timePoint,
-                            modelType,
-                            phenotype) {
+                            modelType) {
 
   moduleServer(
     id,
@@ -769,9 +768,8 @@ modelCondServer <- function(id,
             tableScore = tableScoreAll(),
             AUCplot = plotAUC(),
             AUCtable = tableAUC(),
-            phenotype = phenotype(),
+            traj = traj(),
             modelType = modelType()
-
           )
 
           # Knit the document, passing in the `params` list, and eval it in a
