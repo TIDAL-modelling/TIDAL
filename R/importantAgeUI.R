@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import shinycssloaders
 #'
 #' @noRd
 #' @keywords internal
@@ -19,7 +20,7 @@ importantAgeUI <- function(id, label = "Model") {
   tabPanel("Output",
   fluidRow(column(12, h4("Age at Maximum Symptoms"))),
   fluidRow(column(12, textOutput(ns("maxSymText")))),
-  fluidRow(column(12, align="center", plotOutput(ns("maxSymPlot"), width = "50%", height = 300)))
+  fluidRow(column(12, align="center", withSpinner(plotOutput(ns("maxSymPlot") , width = "50%", height = 300), proxy.height = "100px")))
   )
 
 }

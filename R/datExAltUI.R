@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import shinycssloaders
 #'
 #' @noRd
 #' @keywords internal
@@ -18,7 +19,7 @@ datExAltUI <- function(id, label = "Model") {
 
   tagList(
     uiOutput(ns("selectAge")),
-    plotOutput(ns("plot")),
+    withSpinner(plotOutput(ns("plot")), proxy.height = "100px"),
     tableOutput(ns("table"))
   )
 }

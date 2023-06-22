@@ -335,7 +335,7 @@ modelCondServer <- function(id,
             ggplot() +
               geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
               theme(legend.text = element_text(color = "black")) +
-              ylab("Phenotype") +
+              ylab(paste0("Score (", traj(), ")")) +
               xlab("Age")
           }else if(input$varType == "cont"){
             ggplot() +
@@ -449,9 +449,6 @@ modelCondServer <- function(id,
       # Plot the score at the given age
 
       plotScoreAll <- eventReactive(input$ageInputScore, {
-
-        # improve the plot
-        #https://stackoverflow.com/questions/72563038/geom-vline-for-values-over-a-threshold-on-y-axis
 
         if(input$varType == "cat"){
           req(score()$scoreCovs)

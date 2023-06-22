@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import shinycssloaders
 #'
 #' @noRd
 #' @keywords internal
@@ -16,7 +17,8 @@ modelPlotUI <- function(id, label = "Model Plot") {
 
   tagList(
     p("Plot of model (note covariates are set to 0)"),
-    plotOutput(ns("mainPlot"))
+    checkboxInput(ns("plotCheckbox"), "Do you want an overlay of the descriptive plot?", TRUE, width = '100%'),
+    withSpinner(plotOutput(ns("mainPlot")), proxy.height = "100px")
   )
 }
 
