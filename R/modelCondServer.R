@@ -379,11 +379,6 @@ modelCondServer <- function(id,
       })
 
       # ---------------------------------------
-      ###############################################################
-      ###############################################################
-      ######### DIFFERENT FOR CONTINUOUS AND CATEGORICAL SPLIT - change continuous plot to percentiles or ± 1 SDs
-      ###############################################################
-      ###############################################################
       # Plot the split by variable plot
       plot <- eventReactive(c(input$button, input$plotCheckbox), {
 
@@ -501,25 +496,71 @@ modelCondServer <- function(id,
                               str_detect(string = row.names(summary(fit())$coefficients),
                                          pattern = ":", negate = T))
 
+          rowIndexInteract1 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = input$condition) &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^", negate = T))
+
+          rowIndexInteract2 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = input$condition) &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^2"))
+
+          rowIndexInteract3 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = input$condition) &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^3"))
+
+          rowIndexInteract4 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = input$condition) &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^4"))
+
           scoreCovs <- lapply(1:(n-1), function(i){
             sapply(as.numeric(input$ageInputScore), function(x){
               if(modelType() == "Linear"){
-                scoreCov <-   (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
+                scoreCov <-   summary(fit())$coefficients[1,1] +
+                              summary(fit())$coefficients[rowIndex[i],1] +
+                              (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
+                              ((x - mean(ageOrig)) * summary(fit())$coefficients[rowIndexInteract1[i],1])
                 round(scoreCov, 2)
               } else if(modelType() == "Quadratic"){
-                scoreCov <-  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
-                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1]
+                scoreCov <-  summary(fit())$coefficients[1,1] +
+                  summary(fit())$coefficients[rowIndex[i],1] +
+                  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
+                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+                  ((x - mean(ageOrig)) * summary(fit())$coefficients[rowIndexInteract1[i],1]) +
+                  ((x - mean(ageOrig))^2 * summary(fit())$coefficients[rowIndexInteract2[i],1])
                 round(scoreCov, 2)
               } else if(modelType() == "Cubic"){
-                scoreCov <-  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
-                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
-                  (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1]
-                round(scoreCov, 2)
-              } else if(modelType() == "Quartic"){
-                scoreCov <-  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]  +
+                scoreCov <-  summary(fit())$coefficients[1,1] +
+                  summary(fit())$coefficients[rowIndex[i],1] +
+                  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
                   (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
                   (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
-                  (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1]
+                  ((x - mean(ageOrig)) * summary(fit())$coefficients[rowIndexInteract1[i],1]) +
+                  ((x - mean(ageOrig))^2 * summary(fit())$coefficients[rowIndexInteract2[i],1]) +
+                  ((x - mean(ageOrig))^3 * summary(fit())$coefficients[rowIndexInteract3[i],1])
+                round(scoreCov, 2)
+              } else if(modelType() == "Quartic"){
+                scoreCov <-  summary(fit())$coefficients[1,1] +
+                             summary(fit())$coefficients[rowIndex[i],1]  +
+                             (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
+                             (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
+                             (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
+                             (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1] +
+                             ((x - mean(ageOrig)) * summary(fit())$coefficients[rowIndexInteract1[i],1]) +
+                             ((x - mean(ageOrig))^2 * summary(fit())$coefficients[rowIndexInteract2[i],1]) +
+                             ((x - mean(ageOrig))^3 * summary(fit())$coefficients[rowIndexInteract3[i],1]) +
+                             ((x - mean(ageOrig))^4 * summary(fit())$coefficients[rowIndexInteract4[i],1])
                 round(scoreCov, 2)
               }
             })
