@@ -63,9 +63,10 @@ selectDataServer <- function(id, dataFormatted) {
 
       # edit dataframe so that categorical covariates are factorised and polynomial age columns are added
       dataEdit <- reactive({
-        data() %>%
+        dataEdit <- data() %>%
           mutate_at(vars(all_of(input$covarsCat)), factor) %>%
-          mutate_at(vars(all_of(input$covarsCont)), numeric)
+          mutate_at(vars(all_of(input$covarsCont)), numeric) %>%
+          mutate( !!paste0(input$age, 2) := as.numeric(!!sym(input$age))^2 )
       })
 
       covars <- reactive({
@@ -83,7 +84,7 @@ selectDataServer <- function(id, dataFormatted) {
         if(input$modelType == "Linear"){
           form <- paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
         } else if(input$modelType == "Quadratic"){
-          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")" )
+          form <- paste0(input$traj," ~ ", input$age, " + ", paste0(input$age, "2")   ," + (1 + ", input$age, " + ",paste0(input$age, "2"), " |" , input$ID, ")" )
         } else if(input$modelType == "Cubic"){
           form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
         } else if(input$modelType == "Quartic"){
@@ -97,18 +98,18 @@ selectDataServer <- function(id, dataFormatted) {
         if( (!is.null(input$covarsCat)) & (!is.null(input$covarsCont)) ){
           form <- paste0(modelForm(),
                          " + ",
-                         paste0(input$covarsCat, collapse = " + "),
+                         paste0(input$covarsCat, collapse = " + "), " + ",
                          paste0(input$covarsCont, collapse = " + ")
           )
         }else if((is.null(input$covarsCat)) & (!is.null(input$covarsCont))){
           form <- paste0(modelForm(),
                          " + ",
-                         paste0(input$covarsCat, collapse = " + ")
+                         paste0(input$covarsCont, collapse = " + ")
           )
         }else if((!is.null(input$covarsCat)) & (is.null(input$covarsCont))){
           form <- paste0(modelForm(),
                          " + ",
-                         paste0(input$covarsCont, collapse = " + ")
+                         paste0(input$covarsCat, collapse = " + ")
           )
         }else {
           form <- modelForm()
@@ -120,7 +121,7 @@ selectDataServer <- function(id, dataFormatted) {
       return(
         list(
           button = reactive({ input$button }),
-          data = data,
+          data = dataEdit,
           modelForm = modelForm,
           modelFormCovars = modelFormCovars,
           ID = reactive({ input$ID }),

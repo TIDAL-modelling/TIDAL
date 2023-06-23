@@ -75,8 +75,10 @@ modelRunServer <- function(id,
       warning <- reactive({
         if(class(fit()) != "try-error"){
             'The lme4 &quot;bobyqa&quot; optimiser was used by default. Please see more info <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.'
+            paste0(formCodeCovars())
         }else{
           "The model doesn't run. This could be because there is too much missing data or too few time points."
+          paste0(formCodeCovars())
         }
       })
 
