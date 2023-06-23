@@ -54,7 +54,7 @@ modelRunServer <- function(id,
 
         # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
         # Run the mixed model
-        fit <- try(lmer(formula = formCode(),
+        fit <- try(lmer(formula = formCodeCovars(),
                         REML=F ,
                         data = newModelData(),
                         control=lmerControl(optimizer="bobyqa",

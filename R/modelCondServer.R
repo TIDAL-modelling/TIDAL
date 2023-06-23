@@ -75,6 +75,7 @@ modelCondServer <- function(id,
 
       # ---------------------------------------
       # z-scale continuous variable
+      # also factorise or make numeric the interaction variable
       modelDataScaled <- eventReactive(input$button,{
         if(input$varType == "cat"){
           modelData() %>%

@@ -61,6 +61,13 @@ selectDataServer <- function(id, dataFormatted) {
         )
       })
 
+      # edit dataframe so that categorical covariates are factorised and polynomial age columns are added
+      dataEdit <- reactive({
+        data() %>%
+          mutate_at(vars(all_of(input$covarsCat)), factor) %>%
+          mutate_at(vars(all_of(input$covarsCont)), numeric)
+      })
+
       covars <- reactive({
         c(input$covarsCat, input$covarsCont)
       })
@@ -89,18 +96,20 @@ selectDataServer <- function(id, dataFormatted) {
         req(modelForm())
         if( (!is.null(input$covarsCat)) & (!is.null(input$covarsCont)) ){
           form <- paste0(modelForm(),
-                         " + as.factor(",
-                         paste0(input$covarsCat, collapse = ") + as.factor("), ")",
-                         " + as.numeric(",
-                         paste0(input$covarsCont, collapse = ") + as.numeric("), ")")
+                         " + ",
+                         paste0(input$covarsCat, collapse = " + "),
+                         paste0(input$covarsCont, collapse = " + ")
+          )
         }else if((is.null(input$covarsCat)) & (!is.null(input$covarsCont))){
           form <- paste0(modelForm(),
-                         " + as.numeric(",
-                         paste0(input$covarsCont, collapse = ") + as.numeric("), ")")
+                         " + ",
+                         paste0(input$covarsCat, collapse = " + ")
+          )
         }else if((!is.null(input$covarsCat)) & (is.null(input$covarsCont))){
           form <- paste0(modelForm(),
-                         " + as.factor(",
-                         paste0(input$covarsCat, collapse = ") + as.factor("), ")")
+                         " + ",
+                         paste0(input$covarsCont, collapse = " + ")
+          )
         }else {
           form <- modelForm()
         }
