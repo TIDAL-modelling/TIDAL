@@ -35,7 +35,7 @@ modelCondServer <- function(id,
         }else{
           colnames(modelData())
         }
-    })
+      })
 
       observeEvent(vars(),{
         req(modelData())
@@ -179,48 +179,94 @@ modelCondServer <- function(id,
         }
 
         if(input$varType == "cat"){
-        n <- length(unique(pull(modelDataScaled(), !!sym(input$condition))))
-        rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                     pattern = input$condition) &
-                            str_starts(string = row.names(summary(fit())$coefficients),
-                                       pattern = ":", negate = T))
+          n <- length(unique(pull(modelDataScaled(), !!sym(input$condition))))
+          rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                       pattern = input$condition) &
+                              str_detect(string = row.names(summary(fit())$coefficients),
+                                         pattern = ":", negate = T))
 
-        predCovs <- lapply(1:(n-1), function(i){
+          rowIndexInteract1 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                               pattern = input$condition) &
+                                      str_detect(string = row.names(summary(fit())$coefficients),
+                                                 pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^", negate = T))
 
-          if(modelType() == "Linear"){
-            ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
-          } else if(modelType() == "Quadratic"){
-            ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
-              ageVec^2 * summary(fit())$coefficients[3,1]
-          } else if(modelType() == "Cubic"){
-            ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
+          rowIndexInteract2 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                               pattern = input$condition) &
+                                      str_detect(string = row.names(summary(fit())$coefficients),
+                                                 pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^2"))
+
+          rowIndexInteract3 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                               pattern = input$condition) &
+                                      str_detect(string = row.names(summary(fit())$coefficients),
+                                                 pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^3"))
+
+          rowIndexInteract4 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                               pattern = input$condition) &
+                                      str_detect(string = row.names(summary(fit())$coefficients),
+                                                 pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^4"))
+
+          predCovs <- lapply(1:(n-1), function(i){
+
+            if(modelType() == "Linear"){
+              summary(fit())$coefficients[1,1] +
+              (ageVec * summary(fit())$coefficients[2,1]) +
+              summary(fit())$coefficients[rowIndex[i],1] +
+              (ageVec * summary(fit())$coefficients[rowIndexInteract[i],1])
+            } else if(modelType() == "Quadratic"){
+              summary(fit())$coefficients[1,1] +
+              ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[rowIndex[i],1] +
               ageVec^2 * summary(fit())$coefficients[3,1] +
-              ageVec^3 * summary(fit())$coefficients[4,1]
-          } else if(modelType() == "Quartic"){
-            ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]  +
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1[i],1]) +
+              (ageVec^2 * summary(fit())$coefficients[(rowIndexInteract2)[i],1])
+            } else if(modelType() == "Cubic"){
+              summary(fit())$coefficients[1,1] +
+              ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[rowIndex[i],1] +
               ageVec^2 * summary(fit())$coefficients[3,1] +
               ageVec^3 * summary(fit())$coefficients[4,1] +
-              ageVec^4 * summary(fit())$coefficients[5,1]
-          }
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1[i],1]) +
+              (ageVec^2 * summary(fit())$coefficients[(rowIndexInteract2)[i],1]) +
+              (ageVec^3 * summary(fit())$coefficients[(rowIndexInteract3)[i],1])
+            } else if(modelType() == "Quartic"){
+              summary(fit())$coefficients[1,1] +
+              ageVec * summary(fit())$coefficients[2,1] +
+                summary(fit())$coefficients[rowIndex[i],1]  +
+                ageVec^2 * summary(fit())$coefficients[3,1] +
+                ageVec^3 * summary(fit())$coefficients[4,1] +
+                ageVec^4 * summary(fit())$coefficients[5,1] +
+                (ageVec * summary(fit())$coefficients[rowIndexInteract1[i],1]) +
+                (ageVec^2 * summary(fit())$coefficients[(rowIndexInteract2)[i],1]) +
+                (ageVec^3 * summary(fit())$coefficients[(rowIndexInteract3)[i],1]) +
+                (ageVec^4 * summary(fit())$coefficients[(rowIndexInteract4)[i],1])
+            }
 
-        })
+          })
 
-        num <- str_subset(row.names(summary(fit())$coefficients), input$condition) %>%
-                  str_split(., "\\)", simplify = T)  %>%
-                  as.data.frame() %>%
-                  filter(!str_detect(V1, "\\^")) %>%
-                  pull(V2) %>%
-                  unique()
+          num <- str_subset(row.names(summary(fit())$coefficients), input$condition) %>%
+            str_split(., "\\)", simplify = T)  %>%
+            as.data.frame() %>%
+            filter(!str_detect(V1, "\\^")) %>%
+            pull(V2) %>%
+            unique()
 
-        names(predCovs) <- paste0(input$condition, "_", num)
+          names(predCovs) <- paste0(input$condition, "_", num)
 
-        modelDataEdit <- cbind(modelDataScaled(), do.call(cbind, predCovs)) %>%
-          mutate(zero = zero) %>%
-          mutate(!!input$condition := as.factor(.[[colSplit]]) ) %>%
-          mutate(pred =  eval(parse(text =
-                                      paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero",
-                                             paste0(rep(")", length(num)), collapse = ""), collapse = "")
-          )))
+          modelDataEdit <- cbind(modelDataScaled(), do.call(cbind, predCovs)) %>%
+            mutate(zero = zero) %>%
+            mutate(!!input$condition := as.factor(.[[colSplit]]) ) %>%
+            mutate(pred =  eval(parse(text =
+                                        paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero",
+                                               paste0(rep(")", length(num)), collapse = ""), collapse = "")
+            )))
         }else if(input$varType == "cont"){
           rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                        pattern = input$condition) &
@@ -266,11 +312,11 @@ modelCondServer <- function(id,
         if(str_detect(formCodeCovars(), input$condition)){
           data.frame(NULL)
         }else{
-        cbind(
-          tidy(fit(), "fixed"),
-          confint(fit(), "beta_", method = "Wald")) %>%
-          mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
-          mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", round(p.z, 3) ))
+          cbind(
+            tidy(fit(), "fixed"),
+            confint(fit(), "beta_", method = "Wald")) %>%
+            mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
+            mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", round(p.z, 3) ))
         }
       })
 
@@ -278,8 +324,8 @@ modelCondServer <- function(id,
         if(str_detect(formCodeCovars(), input$condition)){
           data.frame(NULL)
         }else{
-        as.data.frame(VarCorr(fit()),
-                      order = "lower.tri")
+          as.data.frame(VarCorr(fit()),
+                        order = "lower.tri")
         }
       })
 
@@ -289,7 +335,7 @@ modelCondServer <- function(id,
         if(str_detect(formCodeCovars(), input$condition)){
           ""
         }else{
-        paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(fit())$call)[2])
+          paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(fit())$call)[2])
         }
       })
 
@@ -358,9 +404,9 @@ modelCondServer <- function(id,
         if(str_detect(formCodeCovars(), input$condition)){
 
         }else{
-        plot()
+          plot()
         }
-        })
+      })
 
       ###############################################################
       # --- Score for a given set of ages - Alternative Model Results Tab -----
@@ -413,14 +459,14 @@ modelCondServer <- function(id,
           n <- length(unique(pull(modelDataScaled(), !!sym(input$condition))))
           rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                        pattern = input$condition) &
-                              str_starts(string = row.names(summary(fit())$coefficients),
+                              str_detect(string = row.names(summary(fit())$coefficients),
                                          pattern = ":", negate = T))
 
           scoreCovs <- lapply(1:(n-1), function(i){
             sapply(as.numeric(input$ageInputScore), function(x){
               if(modelType() == "Linear"){
-              scoreCov <-   (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
-              round(scoreCov, 2)
+                scoreCov <-   (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1]
+                round(scoreCov, 2)
               } else if(modelType() == "Quadratic"){
                 scoreCov <-  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex[i],1] +
                   (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1]
@@ -439,7 +485,7 @@ modelCondServer <- function(id,
               }
             })
           })
-         return( list(score = score, scoreCovs = scoreCovs) )
+          return( list(score = score, scoreCovs = scoreCovs) )
         }else{
           return(list(scoreCont = score))
         }
@@ -458,7 +504,7 @@ modelCondServer <- function(id,
                                y = c(score()$score, unlist(score()$scoreCovs))
           )
 
-            ggplot() +
+          ggplot() +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
             theme(legend.text = element_text(color = "black")) +
             geom_point(data = points, aes(x = x, y = y), col = "#1D86C7", size = 5) +
@@ -494,12 +540,12 @@ modelCondServer <- function(id,
           req(score()$scoreCovs)
 
           df <- t(
-                  cbind(
-                    data.frame( input$ageInputScore,
-                                score()$score  ),
-                    do.call(cbind, score()$scoreCovs)
-                    )
-                  )
+            cbind(
+              data.frame( input$ageInputScore,
+                          score()$score  ),
+              do.call(cbind, score()$scoreCovs)
+            )
+          )
           rowname <- paste0("Score (", traj(), ")")
           levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), input$condition))))
           rownames(df) <- c("Age", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
@@ -526,7 +572,7 @@ modelCondServer <- function(id,
       # ------------------------------------------
       # Overview of what AUC does text
       output$AUCoverview <- renderText({
-          paste0("The area under curve (AUC) represents the proportion of time with phenotype (", traj(), ").")
+        paste0("The area under curve (AUC) represents the proportion of time with phenotype (", traj(), ").")
       })
 
       # ------------------------------------------
@@ -541,7 +587,7 @@ modelCondServer <- function(id,
                     min = round(min(ageOrig, na.rm =T)),
                     max = round(max(ageOrig, na.rm =T)),
                     value = c(round(min(ageOrig, na.rm =T)),round(max(ageOrig, na.rm =T)))
-                    )
+        )
       })
 
       # ------------------------------------------
@@ -570,23 +616,23 @@ modelCondServer <- function(id,
           n <- length(unique(pull(modelDataScaled(), !!sym(input$condition))))
           rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                        pattern = input$condition) &
-                              str_starts(string = row.names(summary(fit())$coefficients),
+                              str_detect(string = row.names(summary(fit())$coefficients),
                                          pattern = ":", negate = T))
 
           AUCCovs <- lapply(1:(n-1), function(i){
-              if(modelType() == "Linear"){
-               AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[rowIndex[i],1]*age1)) %>%
-                  round(2)
-              } else if(modelType() == "Quadratic"){
-                AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[rowIndex[i],1]*age1)) %>%
-                  round(2)
-              } else if(modelType() == "Cubic"){
-                AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) + (coef[rowIndex[i],1]*age1))  %>%
-                  round(2)
-              } else if(modelType() == "Quartic"){
-                AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5) + (coef[rowIndex[i],1]*age1)) %>%
-                  round(2)
-              }
+            if(modelType() == "Linear"){
+              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[rowIndex[i],1]*age1)) %>%
+                round(2)
+            } else if(modelType() == "Quadratic"){
+              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[rowIndex[i],1]*age1)) %>%
+                round(2)
+            } else if(modelType() == "Cubic"){
+              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) + (coef[rowIndex[i],1]*age1))  %>%
+                round(2)
+            } else if(modelType() == "Quartic"){
+              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5) + (coef[rowIndex[i],1]*age1)) %>%
+                round(2)
+            }
             AUC <- round(AUC, 2)
           })
           return( list(AUC = AUC, AUCCovs = AUCCovs) )
@@ -606,7 +652,7 @@ modelCondServer <- function(id,
             geom_ribbon(data = modelDataEdit(),
                         aes(x = age_original, ymax = pred, ymin = 0, fill = !!sym(input$condition)),
                         alpha = 0.1, show.legend = FALSE) +
-           coord_cartesian(xlim = c(input$AUCages[1], input$AUCages[2])) +
+            coord_cartesian(xlim = c(input$AUCages[1], input$AUCages[2])) +
             geom_line(aes(x = age_original, y = pred, color = !!sym(input$condition)), na.rm = TRUE) +
             theme(legend.text = element_text(color = "black")) +
             ylab(paste0("Score (", traj(), ")")) +
@@ -632,7 +678,7 @@ modelCondServer <- function(id,
             scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original, na.rm =T)), round(max(modelDataEdit()$age_original, na.rm =T)), by = 1),
                                expand = c(0, 0)) +
             scale_y_continuous(expand = c(0, 0))
-          }
+        }
       })
 
       output$AUCplot <- renderPlot({
@@ -679,10 +725,10 @@ modelCondServer <- function(id,
       output$levelsAUCUI <- renderUI({
         if(input$varType == "cat"){
           if(length(unique(pull(modelDataEdit(), !!sym(input$condition)))) > 2){
-          selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference in AUC between:",
-                      sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
-                      multiple = TRUE,
-                      options = list(maxItems = 2))
+            selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference in AUC between:",
+                           sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
+                           multiple = TRUE,
+                           options = list(maxItems = 2))
           }else if(length(unique(pull(modelDataEdit(), !!sym(input$condition)))) == 2){
             selectizeInput(ns("levelsAUC"), "Select two levels from your factor to calculate the difference in AUC between:",
                            sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
@@ -697,12 +743,12 @@ modelCondServer <- function(id,
 
       difference <- reactive({
         levelChoice <- as.character(input$levelsAUC)
-       as.numeric( tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[1])),1] ) - as.numeric(tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[2])),1])
+        as.numeric( tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[1])),1] ) - as.numeric(tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[2])),1])
       })
 
       output$test <- renderText({
         if(input$varType == "cat" & length(difference() == 2)){
-       paste0("The difference between the two factor levels and the age range you selected is: ", round( difference() ,2) ,". Please note this section is in development, it will change to a table output with a statistical test summary.")
+          paste0("The difference between the two factor levels and the age range you selected is: ", round( difference() ,2) ,". Please note this section is in development, it will change to a table output with a statistical test summary.")
         }else{
 
         }
@@ -711,7 +757,7 @@ modelCondServer <- function(id,
 
       return(list(
         modelDataEdit = modelDataEdit
-        ))
+      ))
 
     }
   )
