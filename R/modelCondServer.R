@@ -859,7 +859,7 @@ modelCondServer <- function(id,
 
       difference <- reactive({
         levelChoice <- as.character(input$levelsAUC)
-        as.numeric( tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[1])),1] ) - as.numeric(tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[2])),1])
+        abs(as.numeric( tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[1])),1] ) - as.numeric(tableAUC()[str_detect(row.names(tableAUC()), paste0("level = ", levelChoice[2])),1]))
       })
 
       output$test <- renderText({
