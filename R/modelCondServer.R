@@ -703,18 +703,50 @@ modelCondServer <- function(id,
                               str_detect(string = row.names(summary(fit())$coefficients),
                                          pattern = ":", negate = T))
 
+          rowIndexInteract1 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = input$condition) &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^", negate = T))
+
+          rowIndexInteract2 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = input$condition) &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^2"))
+
+          rowIndexInteract3 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = input$condition) &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^3"))
+
+          rowIndexInteract4 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = input$condition) &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = ":") &
+                                       str_detect(string = row.names(summary(fit())$coefficients),
+                                                  pattern = "\\^4"))
+
           AUCCovs <- lapply(1:(n-1), function(i){
             if(modelType() == "Linear"){
-              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[rowIndex[i],1]*age1)) %>%
+              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[rowIndex[i],1]*age2) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age2^2/2) ) -
+                ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[rowIndex[i],1]*age1) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age1^2/2) ) %>%
                 round(2)
             } else if(modelType() == "Quadratic"){
-              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[rowIndex[i],1]*age1)) %>%
+              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[rowIndex[i],1]*age2) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age2^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age2^3/3) ) -
+                ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[rowIndex[i],1]*age1) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age1^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age1^3/3)) %>%
                 round(2)
             } else if(modelType() == "Cubic"){
-              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) + (coef[rowIndex[i],1]*age1))  %>%
+              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[rowIndex[i],1]*age2) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age2^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age2^3/3) + (summary(fit())$coefficients[rowIndexInteract3[i],1]*age2^4/4) ) -
+                ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) + (coef[rowIndex[i],1]*age1) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age1^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age1^3/3) + (summary(fit())$coefficients[rowIndexInteract3[i],1]*age1^4/4))  %>%
                 round(2)
             } else if(modelType() == "Quartic"){
-              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5) + (coef[rowIndex[i],1]*age2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5) + (coef[rowIndex[i],1]*age1)) %>%
+              AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5) + (coef[rowIndex[i],1]*age2)  + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age2^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age2^3/3) + (summary(fit())$coefficients[rowIndexInteract3[i],1]*age2^4/4) + (summary(fit())$coefficients[rowIndexInteract4[i],1]*age2^5/5)) -
+                ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5) + (coef[rowIndex[i],1]*age1) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age1^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age1^3/3) + (summary(fit())$coefficients[rowIndexInteract3[i],1]*age1^4/4) + (summary(fit())$coefficients[rowIndexInteract4[i],1]*age1^5/5)) %>%
                 round(2)
             }
             AUC <- round(AUC, 2)
