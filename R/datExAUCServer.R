@@ -53,22 +53,22 @@ output$AUCagesUI <- renderUI({
 # Calculate the AUC for the ages the user has chosen for the chosen input$condition levels
 AUC <- reactive({
   coef <- summary(modelFit())$coefficients
-  age1 <- input$AUCages[1]
-  age2 <- input$AUCages[2]
+
+  ageOrig <- modelDataEdit() %>%
+    pull(age_original)
+  ageOrig <- ageOrig[!is.na(ageOrig)]
+  age1 <- input$AUCages[1] - mean(ageOrig)
+  age2 <- input$AUCages[2] - mean(ageOrig)
 
   AUC <-
     if(modelType() == "Linear"){
-      ((age2*coef[1,1]) + (coef[2,1]*age2^2/2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2)) %>%
-        round(2)
+      ((age2*coef[1,1]) + (coef[2,1]*age2^2/2)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2))
     } else if(modelType() == "Quadratic"){
-      ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3)) %>%
-        round(2)
+      ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3))
     } else if(modelType() == "Cubic"){
-      ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4))  %>%
-        round(2)
+      ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4))
     } else if(modelType() == "Quartic"){
-      ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5)) %>%
-        round(2)
+      ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5))
     }
     return(AUC)
 })
@@ -107,6 +107,7 @@ tableAUC <- eventReactive(c(input$AUCages, button()), {
       data.frame(paste0(input$AUCages[1], " - ", input$AUCages[2]),
                  round(AUC(), 2))
     )
+
     rowname <- paste0("AUC (", traj(), ")")
     rownames(df) <- c("Age Range", rowname)
     df

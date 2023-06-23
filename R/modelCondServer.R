@@ -219,7 +219,7 @@ modelCondServer <- function(id,
               summary(fit())$coefficients[1,1] +
               (ageVec * summary(fit())$coefficients[2,1]) +
               summary(fit())$coefficients[rowIndex[i],1] +
-              (ageVec * summary(fit())$coefficients[rowIndexInteract[i],1])
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1[i],1])
             } else if(modelType() == "Quadratic"){
               summary(fit())$coefficients[1,1] +
               ageVec * summary(fit())$coefficients[2,1] +
@@ -674,8 +674,12 @@ modelCondServer <- function(id,
       # Calculate the AUC for the ages the user has chosen for the chosen input$condition levels
       AUC <- reactive({
         coef <- summary(fit())$coefficients
-        age1 <- input$AUCages[1]
-        age2 <- input$AUCages[2]
+
+        ageOrig <- modelDataEdit() %>%
+          pull(age_original)
+        ageOrig <- ageOrig[!is.na(ageOrig)]
+        age1 <- input$AUCages[1] - mean(ageOrig)
+        age2 <- input$AUCages[2] - mean(ageOrig)
 
         AUC <-
           if(modelType() == "Linear"){
