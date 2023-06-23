@@ -178,43 +178,43 @@ modelCondServer <- function(id,
             ageVec^4 * summary(fit())$coefficients[5,1]
         }
 
+        rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                     pattern = input$condition) &
+                            str_detect(string = row.names(summary(fit())$coefficients),
+                                       pattern = ":", negate = T))
+
+        rowIndexInteract1 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                              pattern = input$condition) &
+                                     str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = ":") &
+                                     str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = "\\^", negate = T))
+
+        rowIndexInteract2 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                              pattern = input$condition) &
+                                     str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = ":") &
+                                     str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = "\\^2"))
+
+        rowIndexInteract3 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                              pattern = input$condition) &
+                                     str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = ":") &
+                                     str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = "\\^3"))
+
+        rowIndexInteract4 <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                              pattern = input$condition) &
+                                     str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = ":") &
+                                     str_detect(string = row.names(summary(fit())$coefficients),
+                                                pattern = "\\^4"))
+
         if(input$varType == "cat"){
           n <- length(unique(pull(modelDataScaled(), !!sym(input$condition))))
-          rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                       pattern = input$condition) &
-                              str_detect(string = row.names(summary(fit())$coefficients),
-                                         pattern = ":", negate = T))
-
-          rowIndexInteract1 <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                               pattern = input$condition) &
-                                      str_detect(string = row.names(summary(fit())$coefficients),
-                                                 pattern = ":") &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = "\\^", negate = T))
-
-          rowIndexInteract2 <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                               pattern = input$condition) &
-                                      str_detect(string = row.names(summary(fit())$coefficients),
-                                                 pattern = ":") &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = "\\^2"))
-
-          rowIndexInteract3 <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                               pattern = input$condition) &
-                                      str_detect(string = row.names(summary(fit())$coefficients),
-                                                 pattern = ":") &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = "\\^3"))
-
-          rowIndexInteract4 <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                               pattern = input$condition) &
-                                      str_detect(string = row.names(summary(fit())$coefficients),
-                                                 pattern = ":") &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = "\\^4"))
 
           predCovs <- lapply(1:(n-1), function(i){
-
             if(modelType() == "Linear"){
               summary(fit())$coefficients[1,1] +
               (ageVec * summary(fit())$coefficients[2,1]) +
@@ -268,35 +268,74 @@ modelCondServer <- function(id,
                                                paste0(rep(")", length(num)), collapse = ""), collapse = "")
             )))
         }else if(input$varType == "cont"){
-          rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                       pattern = input$condition) &
-                              str_detect(string = row.names(summary(fit())$coefficients),
-                                         pattern = ":", negate = T))
 
           if(modelType() == "Linear"){
-            plus <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] + summary(fit())$coefficients[rowIndex,1]
-            minus <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] - summary(fit())$coefficients[rowIndex,1]
+            plus <- ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[1,1] +
+              summary(fit())$coefficients[rowIndex,1]  +
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1,1])
+
+            minus <- ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[1,1] -
+              summary(fit())$coefficients[rowIndex,1] -
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1,1])
+
           } else if(modelType() == "Quadratic"){
-            plus  <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] +
-              ageVec^2 * summary(fit())$coefficients[3,1] + summary(fit())$coefficients[rowIndex,1]
-            minus <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1] +
-              ageVec^2 * summary(fit())$coefficients[3,1] - summary(fit())$coefficients[rowIndex,1]
+            plus  <- ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[1,1] +
+              ageVec^2 * summary(fit())$coefficients[3,1] +
+              summary(fit())$coefficients[rowIndex,1] +
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1,1]) +
+              (ageVec^2 * summary(fit())$coefficients[(rowIndexInteract2),1])
+
+            minus <- ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[1,1] +
+              ageVec^2 * summary(fit())$coefficients[3,1] -
+              summary(fit())$coefficients[rowIndex,1] -
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1,1]) -
+              (ageVec^2 * summary(fit())$coefficients[(rowIndexInteract2),1])
+
           } else if(modelType() == "Cubic"){
-            plus  <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+            plus  <- ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[1,1]  +
               ageVec^2 * summary(fit())$coefficients[3,1] +
-              ageVec^3 * summary(fit())$coefficients[4,1] + summary(fit())$coefficients[rowIndex,1]
-            minus <-  ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+              ageVec^3 * summary(fit())$coefficients[4,1] +
+              summary(fit())$coefficients[rowIndex,1] +
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1,1]) +
+              (ageVec^2 * summary(fit())$coefficients[(rowIndexInteract2),1]) +
+              (ageVec^3 * summary(fit())$coefficients[(rowIndexInteract3),1])
+
+            minus <-  ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[1,1]  +
               ageVec^2 * summary(fit())$coefficients[3,1] +
-              ageVec^3 * summary(fit())$coefficients[4,1] - summary(fit())$coefficients[rowIndex,1]
+              ageVec^3 * summary(fit())$coefficients[4,1] -
+              summary(fit())$coefficients[rowIndex,1] -
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1,1]) -
+              (ageVec^2 * summary(fit())$coefficients[(rowIndexInteract2),1]) -
+              (ageVec^3 * summary(fit())$coefficients[(rowIndexInteract3),1])
+
           } else if(modelType() == "Quartic"){
-            plus  <- ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+            plus  <- ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[1,1]  +
               ageVec^2 * summary(fit())$coefficients[3,1] +
               ageVec^3 * summary(fit())$coefficients[4,1] +
-              ageVec^4 * summary(fit())$coefficients[5,1] + summary(fit())$coefficients[rowIndex,1]
-            minus <-  ageVec * summary(fit())$coefficients[2,1] + summary(fit())$coefficients[1,1]  +
+              ageVec^4 * summary(fit())$coefficients[5,1] +
+              summary(fit())$coefficients[rowIndex,1] +
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1,1]) +
+              (ageVec^2 * summary(fit())$coefficients[(rowIndexInteract2),1]) +
+              (ageVec^3 * summary(fit())$coefficients[(rowIndexInteract3),1]) +
+              (ageVec^4 * summary(fit())$coefficients[(rowIndexInteract4),1])
+
+            minus <-  ageVec * summary(fit())$coefficients[2,1] +
+              summary(fit())$coefficients[1,1]  +
               ageVec^2 * summary(fit())$coefficients[3,1] +
               ageVec^3 * summary(fit())$coefficients[4,1] +
-              ageVec^4 * summary(fit())$coefficients[5,1] - summary(fit())$coefficients[rowIndex,1]
+              ageVec^4 * summary(fit())$coefficients[5,1] -
+              summary(fit())$coefficients[rowIndex,1] -
+              (ageVec * summary(fit())$coefficients[rowIndexInteract1,1]) -
+              (ageVec^2 * summary(fit())$coefficients[(rowIndexInteract2),1]) -
+              (ageVec^3 * summary(fit())$coefficients[(rowIndexInteract3),1]) -
+              (ageVec^4 * summary(fit())$coefficients[(rowIndexInteract4),1])
           }
 
           modelDataEdit <- modelDataScaled() %>%
