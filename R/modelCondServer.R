@@ -8,6 +8,7 @@
 #' @import shinyjs
 #' @import tidyr
 #' @import multcomp
+#' @import tibble
 #'
 #' @noRd
 #' @keywords internal
@@ -588,12 +589,19 @@ modelCondServer <- function(id,
             paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[rowIndex[i]] , " + ", rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " == 0")
           })
 
-          res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " == 0"), equations) )
 
-          scores <- round(unname(summary(res)$test$coefficients),2)
+          res <- tidy(confint(res))
 
-          return( scores  )
-        }) %>% do.call(rbind,.)
+          rowname <- paste0("Score (", traj(), ")")
+          levelNames <- as.character(levels(pull(modelDataEdit(), input$condition)))
+
+          res <-  res %>%
+            mutate(contrast = paste0(rowname, " [", input$condition, ", level = ", levelNames, " ] (95% CIs)")) %>%
+            column_to_rownames(var = "contrast") %>%
+            mutate(across(where(is.numeric), round, 2))
+
+          return( res )
+        })
       })
 
 
@@ -603,18 +611,36 @@ modelCondServer <- function(id,
       plotScoreAll <- eventReactive(input$ageInputScore, {
 
         if(input$varType == "cat"){
-          req(score()$scoreCovs)
+          req(score_glht())
 
-          # points of intersection of age and score
-          points <- cbind(data.frame(x = as.numeric(input$ageInputScore)),
-                          score_glht())
+          estimate <- lapply(score_glht(), function(df) {
+            df %>%
+              dplyr::select(estimate)
+          })  %>% do.call(cbind, .)
+          colnames(estimate) <- input$ageInputScore
+          estimate <- estimate %>%
+            gather(age, score, 1:ncol(estimate)) %>%
+            mutate(age = as.numeric(age))
 
-          colnames(points)[2] <- "y"
+          conf.low <- lapply(score_glht(), function(df) {df %>% dplyr::select(conf.low)}) %>% do.call(cbind, .)
+          colnames(conf.low) <- input$ageInputScore
+          conf.low  <- conf.low %>%
+            gather(age, conf.low, 1:ncol(conf.low)) %>%
+            mutate(age = as.numeric(age))
+
+          conf.high <- lapply(score_glht(), function(df) {df %>% dplyr::select(conf.high)}) %>% do.call(cbind, .)
+          colnames(conf.high) <- input$ageInputScore
+          conf.high  <- conf.high %>%
+            gather(age, conf.high, 1:ncol(conf.high)) %>%
+            mutate(age = as.numeric(age))
+
+          conf <- merge(conf.low, conf.high, "age")
 
           ggplot() +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
             theme(legend.text = element_text(color = "black")) +
-            geom_point(data = points, aes(x = x, y = y), col = "#1D86C7", size = 5) +
+            geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high), color = "grey70") +
+            geom_point(data = estimate, aes(x = age, y = score), col = "#1D86C7", size = 5) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
 
@@ -644,22 +670,14 @@ modelCondServer <- function(id,
       # Change "Score" to the actual column name from the dataframe - which the user previously specified
       tableScoreAll <- eventReactive(input$ageInputScore, {
         if(input$varType == "cat"){
-          req(score()$scoreCovs)
-
-          # df <- t(
-          #   cbind(
-          #     data.frame( input$ageInputScore,
-          #                 score()$score  ),
-          #     do.call(cbind, score()$scoreCovs)
-          #
-          #   )
-          # )
-          df <- t(score_glht())
-
-          # rowname <- paste0("Score (", traj(), ")")
-          # levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), input$condition))))
-          # rownames(df) <- c("Age", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
-          df
+          req(score_glht())
+          estimateCI <- lapply(score_glht(), function(df) {
+            df %>%
+              mutate(estimateCI = paste0(estimate, " (", conf.low, " - ", conf.high, ")")) %>%
+              dplyr::select(estimateCI)
+          })  %>% do.call(cbind, .)
+          colnames(estimateCI) <- input$ageInputScore
+          estimateCI
 
         }else if(input$varType == "cont"){
           req(score()$scoreCont)
