@@ -584,14 +584,80 @@ modelCondServer <- function(id,
           rowNames <- rownames(summary(fit())$coefficients)
 
           ageInput <- round(x - mean(ageOrig), 3)
-
-          # The following is for linear models (categorical) only:
+          ageInput2 <- ageInput^2
+          ageInput3 <- ageInput^3
+          ageInput4 <- ageInput^4
+          # --------------------
+          # Change for model type
+          if(modelType() == "Linear"){
           equations <- sapply(1:(n-1), function(i){
             paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[rowIndex[i]] , " + ", rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " == 0")
           })
 
           res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " == 0"), equations) )
+          }else if(modelType() == "Quadratic"){
 
+            equations <- sapply(1:(n-1), function(i){
+              paste0(rowNames[1], " + ",
+                     rowNames[rowIndex[i]] , " + ",
+                     rowNames[2], "*", ageInput, " + \`",
+                     rowNames[3], "\`*", ageInput2, " + ",
+                     rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " + \`",
+                     rowNames[3], ":", rowNames[rowIndex[i]],"\`*",ageInput2 , "",
+                     " == 0")
+            })
+
+            res <- glht(fit(), linfct = c( paste0(rowNames[1], " + ",
+                                                rowNames[2], "*", ageInput," + \`",
+                                                rowNames[3], "\`*", ageInput2,
+                                                " == 0"),
+                                         equations) )
+           } else if(modelType() == "Cubic"){
+
+             equations <- sapply(1:(n-1), function(i){
+               paste0(rowNames[1], " + ",
+                      rowNames[rowIndex[i]] , " + ",
+                      rowNames[2], "*", ageInput, " + \`",
+                      rowNames[3], "\`*", ageInput2, " + \`",
+                      rowNames[4], "\`*", ageInput3,  " + ",
+                      rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " + \`",
+                      rowNames[3], ":", rowNames[rowIndex[i]],"\`*",ageInput2 , " + \`",
+                      rowNames[4], ":", rowNames[rowIndex[i]],"\`*",ageInput3 ,
+                      " == 0")
+             })
+
+             res <- glht(fit(), linfct = c( paste0(rowNames[1], " + ",
+                                                 rowNames[2], "*", ageInput," + \`",
+                                                 rowNames[3], "\`*", ageInput2,  " + \`",
+                                                 rowNames[4], "\`*", ageInput3,
+                                                 " == 0"),
+                                          equations) )
+
+           } else if(modelType() == "Quartic"){
+             equations <- sapply(1:(n-1), function(i){
+               paste0(rowNames[1], " + ",
+                      rowNames[rowIndex[i]] , " + ",
+                      rowNames[2], "*", ageInput, " + \`",
+                      rowNames[3], "\`*", ageInput2, " + \`",
+                      rowNames[4], "\`*", ageInput3,  " + \`",
+                      rowNames[5], "\`*", ageInput4,  " + ",
+                      rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " + \`",
+                      rowNames[3], ":", rowNames[rowIndex[i]],"\`*",ageInput2 , " + \`",
+                      rowNames[4], ":", rowNames[rowIndex[i]],"\`*",ageInput3 , " + \`",
+                      rowNames[5], ":", rowNames[rowIndex[i]],"\`*",ageInput4 ,
+                      " == 0")
+             })
+
+             res <- glht(fit(), linfct = c( paste0(rowNames[1], " + ",
+                                                   rowNames[2], "*", ageInput," + \`",
+                                                   rowNames[3], "\`*", ageInput2,  " + \`",
+                                                   rowNames[4], "\`*", ageInput3,  " + \`",
+                                                   rowNames[5], "\`*", ageInput4,
+                                                   " == 0"),
+                                            equations) )
+          }
+
+          # --------------------
           res <- tidy(confint(res))
 
           rowname <- paste0("Score (", traj(), ")")
