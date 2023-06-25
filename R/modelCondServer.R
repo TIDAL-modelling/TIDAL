@@ -7,6 +7,7 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import multcomp
 #'
 #' @noRd
 #' @keywords internal
@@ -248,10 +249,7 @@ modelCondServer <- function(id,
           })
 
           num <- str_subset(row.names(summary(fit())$coefficients), input$condition) %>%
-            str_split(., "\\)", simplify = T)  %>%
-            as.data.frame() %>%
-            filter(!str_detect(V1, "\\^")) %>%
-            pull(V2) %>%
+            str_sub(-1)%>%
             unique()
 
           names(predCovs) <- paste0(input$condition, "_", num)
@@ -568,6 +566,38 @@ modelCondServer <- function(id,
       })
 
       # ------------------------------------------
+      # use glht to calculate scores at ages
+      score_glht <- reactive({
+        ageOrig <- modelDataEdit() %>% pull(age_original)
+        ageOrig <- ageOrig[!is.na(ageOrig)]
+
+        score <- lapply(as.numeric(input$ageInputScore), function(x){
+
+          n <- length(unique(pull(modelDataEdit(), !!sym(input$condition))))
+
+          rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
+                                       pattern = input$condition) &
+                              str_detect(string = row.names(summary(fit())$coefficients),
+                                         pattern = ":", negate = T))
+
+          rowNames <- rownames(summary(fit())$coefficients)
+
+          ageInput <- round(x - mean(ageOrig), 3)
+
+          equations <- sapply(1:(n-1), function(i){
+            paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[rowIndex[i]] , " + ", rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " == 0")
+          })
+
+          res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " == 0"), equations) )
+
+          scores <- round(unname(summary(res)$test$coefficients),2)
+
+          return( scores  )
+        }) %>% do.call(rbind,.)
+      })
+
+
+      # ------------------------------------------
       # Plot the score at the given age
 
       plotScoreAll <- eventReactive(input$ageInputScore, {
@@ -576,9 +606,10 @@ modelCondServer <- function(id,
           req(score()$scoreCovs)
 
           # points of intersection of age and score
-          points <- data.frame(x = as.numeric(input$ageInputScore),
-                               y = c(score()$score, unlist(score()$scoreCovs))
-          )
+          points <- cbind(data.frame(x = as.numeric(input$ageInputScore)),
+                          score_glht())
+
+          colnames(points)[2] <- "y"
 
           ggplot() +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
@@ -615,16 +646,19 @@ modelCondServer <- function(id,
         if(input$varType == "cat"){
           req(score()$scoreCovs)
 
-          df <- t(
-            cbind(
-              data.frame( input$ageInputScore,
-                          score()$score  ),
-              do.call(cbind, score()$scoreCovs)
-            )
-          )
-          rowname <- paste0("Score (", traj(), ")")
-          levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), input$condition))))
-          rownames(df) <- c("Age", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
+          # df <- t(
+          #   cbind(
+          #     data.frame( input$ageInputScore,
+          #                 score()$score  ),
+          #     do.call(cbind, score()$scoreCovs)
+          #
+          #   )
+          # )
+          df <- t(score_glht())
+
+          # rowname <- paste0("Score (", traj(), ")")
+          # levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), input$condition))))
+          # rownames(df) <- c("Age", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
           df
 
         }else if(input$varType == "cont"){
@@ -639,6 +673,7 @@ modelCondServer <- function(id,
       output$tableScore <- renderTable({
         tableScoreAll()
       }, colnames = FALSE, rownames = TRUE)
+
 
       # ------------------------------------------
       ###############################################################
