@@ -585,15 +585,17 @@ modelCondServer <- function(id,
 
           ageInput <- round(x - mean(ageOrig), 3)
 
+          # The following is for linear models (categorical) only:
           equations <- sapply(1:(n-1), function(i){
             paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[rowIndex[i]] , " + ", rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " == 0")
           })
 
+          res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " == 0"), equations) )
 
           res <- tidy(confint(res))
 
           rowname <- paste0("Score (", traj(), ")")
-          levelNames <- as.character(levels(pull(modelDataEdit(), input$condition)))
+          levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
 
           res <-  res %>%
             mutate(contrast = paste0(rowname, " [", input$condition, ", level = ", levelNames, " ] (95% CIs)")) %>%
@@ -602,6 +604,7 @@ modelCondServer <- function(id,
 
           return( res )
         })
+        return(score)
       })
 
 
@@ -632,14 +635,15 @@ modelCondServer <- function(id,
           colnames(conf.high) <- input$ageInputScore
           conf.high  <- conf.high %>%
             gather(age, conf.high, 1:ncol(conf.high)) %>%
-            mutate(age = as.numeric(age))
+            mutate(age = as.numeric(age))%>%
+            dplyr::select(-age)
 
-          conf <- merge(conf.low, conf.high, "age")
+          conf <- cbind(conf.low, conf.high, "age")
 
           ggplot() +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
             theme(legend.text = element_text(color = "black")) +
-            geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high), color = "grey70") +
+            geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high)) +
             geom_point(data = estimate, aes(x = age, y = score), col = "#1D86C7", size = 5) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
@@ -671,6 +675,7 @@ modelCondServer <- function(id,
       tableScoreAll <- eventReactive(input$ageInputScore, {
         if(input$varType == "cat"){
           req(score_glht())
+
           estimateCI <- lapply(score_glht(), function(df) {
             df %>%
               mutate(estimateCI = paste0(estimate, " (", conf.low, " - ", conf.high, ")")) %>%
@@ -681,16 +686,17 @@ modelCondServer <- function(id,
 
         }else if(input$varType == "cont"){
           req(score()$scoreCont)
-          df <- t(data.frame( input$ageInputScore, score()$scoreCont ))
+          df <- t(data.frame( score()$scoreCont ))
           rowname <- paste0("Score (", traj(), ") [", input$condition, "]")
-          rownames(df) <- c("Age", rowname)
+          rownames(df) <- c(rowname)
+          colnames(df) <- input$ageInputScore
           df
         }
       })
 
       output$tableScore <- renderTable({
         tableScoreAll()
-      }, colnames = FALSE, rownames = TRUE)
+      }, colnames =TRUE, rownames = TRUE)
 
 
       # ------------------------------------------
