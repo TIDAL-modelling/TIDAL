@@ -77,11 +77,14 @@ modelCondServer <- function(id,
       # z-scale continuous variable
       # also factorise or make numeric the interaction variable
       modelDataScaled <- eventReactive(input$button,{
+        colSplit <- which(colnames(modelData()) %in% input$condition)
+
         if(input$varType == "cat"){
           modelData() %>%
-            filter(!is.na(!!sym(input$condition)))
+            filter(!is.na(!!sym(input$condition))) %>%
+            mutate(!!input$condition := factor(.[[colSplit]]) )
+
         }else if(input$varType == "cont"){
-          colSplit <- which(colnames(modelData()) %in% input$condition)
           modelData() %>%
             mutate(!!input$condition := scale(.[[colSplit]]) )
         }
@@ -102,48 +105,40 @@ modelCondServer <- function(id,
 
 
         # either factorise or make numeric the input$condition depending on the input$varType option
-        if(input$varType == "cat"){
-          cond <- paste0("as.factor(", input$condition, ")")
-
-        }else if(input$varType == "cont"){
-          cond <- paste0("as.numeric(", input$condition, ")")
-        }
-
-
         if(modelType() == "Linear"){
           fit <- lmer(formula = paste0(formCodeCovars(),
-                                       "+ ", cond,
-                                       " + ", age(), "*", cond
+                                       "+ ", input$condition,
+                                       " + ", age(), "*", input$condition
           ),
           REML=F , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Quadratic"){
           fit <- lmer(formula = paste0(formCodeCovars(),
-                                       "+ ", cond,
-                                       " + ", age(), "*", cond,
-                                       " + I(", age(), "^2)*", cond
+                                       "+ ", input$condition,
+                                       " + ", age(), "*", input$condition,
+                                       " + I(", age(), "^2)*", input$condition
           ),
           REML=F , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Cubic"){
           fit <- lmer(formula = paste0(formCodeCovars(),
-                                       "+ ", cond,
-                                       " + ", age(), "*", cond,
-                                       " + I(", age(), "^2)*", cond,
-                                       " + I(", age(), "^3)*", cond
+                                       "+ ", input$condition,
+                                       " + ", age(), "*", input$condition,
+                                       " + I(", age(), "^2)*", input$condition,
+                                       " + I(", age(), "^3)*", input$condition
           ),
           REML=F , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Quartic"){
           fit <- lmer(formula = paste0(formCodeCovars(),
-                                       "+ ", cond,
-                                       " + ", age(), "*", cond,
-                                       " + I(", age(), "^2)*", cond,
-                                       " + I(", age(), "^3)*", cond,
-                                       " + I(", age(), "^4)*", cond
+                                       "+ ", input$condition,
+                                       " + ", age(), "*", input$condition,
+                                       " + I(", age(), "^2)*", input$condition,
+                                       " + I(", age(), "^3)*", input$condition,
+                                       " + I(", age(), "^4)*", input$condition
           ),
           REML=F , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
