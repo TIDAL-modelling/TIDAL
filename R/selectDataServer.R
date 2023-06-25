@@ -65,8 +65,7 @@ selectDataServer <- function(id, dataFormatted) {
       dataEdit <- reactive({
         dataEdit <- data() %>%
           mutate_at(vars(all_of(input$covarsCat)), factor) %>%
-          mutate_at(vars(all_of(input$covarsCont)), numeric) %>%
-          mutate( !!paste0(input$age, 2) := as.numeric(!!sym(input$age))^2 )
+          mutate_at(vars(all_of(input$covarsCont)), numeric)
       })
 
       covars <- reactive({
@@ -84,7 +83,7 @@ selectDataServer <- function(id, dataFormatted) {
         if(input$modelType == "Linear"){
           form <- paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
         } else if(input$modelType == "Quadratic"){
-          form <- paste0(input$traj," ~ ", input$age, " + ", paste0(input$age, "2")   ," + (1 + ", input$age, " + ",paste0(input$age, "2"), " |" , input$ID, ")" )
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")" )
         } else if(input$modelType == "Cubic"){
           form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
         } else if(input$modelType == "Quartic"){
