@@ -429,24 +429,23 @@ modelCondServer <- function(id,
 
       })
 
-      # ------------------------------------------------
-      # Open modal dialog so user can edit ggplot
+
       observeEvent(input$openModal, {
         showModal(modalDialog(
           textAreaInput(ns("textInput"), "Enter Text:", ""),
           footer = tagList(
-            modalButton(ns("Close")),
+            modalButton("Close"),
             actionButton(ns("saveText"), "Save")
           )
         ))
+      })
 
-        observeEvent(input$saveText, {
-          closeModal()
-          # Access the input value and store it in a reactive value
-          text <- isolate(input$textInput)
-          output$inputText <- renderText({ text })
-        })
-
+      observeEvent(input$saveText, {
+        removeModal()
+        # Access the input value and store it in a reactive value
+        text <- isolate(input$textInput)
+        output$inputText <- renderText({ text })
+      })
 
       output$modelCondPlot <- renderPlot({
         if(str_detect(formCodeCovars(), input$condition)){
