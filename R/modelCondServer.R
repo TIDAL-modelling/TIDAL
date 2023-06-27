@@ -434,15 +434,22 @@ modelCondServer <- function(id,
       observeEvent(input$openModal, {
         showModal(modalDialog(
           tagList(
-          textInput(ns("yAxisLab"), "Y-Axis Label", value = ""),
-          textInput(ns("xAxisLab"), "X-Axis Label", value = ""),
-          colourpicker::colourInput(ns("colour"), "Select a colour", "#555599")
+            textInput(ns("yAxisLab"), "Y-Axis Label", value = ""),
+            textInput(ns("xAxisLab"), "X-Axis Label", value = ""),
+            uiOutput(ns("colourUI"))
           ),
           footer = tagList(
             modalButton("Close"),
             actionButton(ns("saveText"), "Save")
           )
         ))
+      })
+
+      output$colourUI <- renderUI({
+        levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
+        lapply(levelNames, function(x){
+          do.call(colourpicker::colourInput, list(inputId = ns(x), label = paste0("Select a colour for variable level '", x, "' :")))
+        })
       })
 
       observeEvent(input$saveText, {
@@ -462,18 +469,21 @@ modelCondServer <- function(id,
         } else {
           xlab <- "Age"
         }
-        # Colours
 
+        levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
+        colours <- sapply(levelNames, function(x){
+         eval(parse(text = paste0("input$`", x, "`")))
+        })
 
         return(list(
           ylab = ylab,
           xlab = xlab,
-          colour = input$colour
+          colours = colours
         ))
       })
 
       output$modalText <- renderText({
-        paste0(ggEdit()$colour)
+        paste0(ggEdit()$colours)
       })
 
       plot_edit <- reactive({
@@ -482,7 +492,8 @@ modelCondServer <- function(id,
         }else{
         plot() +
           ylab(ggEdit()$ylab) +
-          xlab(ggEdit()$xlab)
+          xlab(ggEdit()$xlab) +
+          scale_color_manual(values = ggEdit()$colours)
         }
       })
 
