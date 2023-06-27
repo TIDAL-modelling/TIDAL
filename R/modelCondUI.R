@@ -54,7 +54,6 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                      tagList(
                      checkboxInput(ns("plotCheckbox"), "Do you want an overlay of the descriptive plot?", TRUE, width = '100%'),
                      actionButton(ns("openModal"), "Customise Plot"),
-                     verbatimTextOutput(ns("inputText")),
                      withSpinner(plotOutput(ns("modelCondPlot")), proxy.height = "100px")
                      )
             ),

@@ -432,7 +432,7 @@ modelCondServer <- function(id,
 
       observeEvent(input$openModal, {
         showModal(modalDialog(
-          textAreaInput(ns("textInput"), "Enter Text:", ""),
+          textInput(ns("yAxisLab"), "Y-Axis Label", value = ""),
           footer = tagList(
             modalButton("Close"),
             actionButton(ns("saveText"), "Save")
@@ -442,18 +442,38 @@ modelCondServer <- function(id,
 
       observeEvent(input$saveText, {
         removeModal()
-        # Access the input value and store it in a reactive value
-        text <- isolate(input$textInput)
-        output$inputText <- renderText({ text })
+      })
+
+      ggEdit <- eventReactive(input$saveText, {
+        if (input$yAxisLab != "") {
+          ylab <- isolate(input$yAxisLab)
+        } else {
+          ylab <- paste0("Score (", traj(), ")")
+        }
+
+        return(list(
+          ylab = ylab
+        ))
+      })
+
+      plot_edit <- reactive({
+        if( is.null(input$saveText) ){
+          plot()
+        }else{
+        plot() +
+          ylab(ggEdit()$ylab)
+      }
+
       })
 
       output$modelCondPlot <- renderPlot({
         if(str_detect(formCodeCovars(), input$condition)){
 
         }else{
-          plot()
+         plot_edit()
         }
       })
+
 
       ###############################################################
       # --- Score for a given set of ages - Alternative Model Results Tab -----
