@@ -9,6 +9,7 @@
 #' @import tidyr
 #' @import multcomp
 #' @import tibble
+#' @import colourpicker
 #'
 #' @noRd
 #' @keywords internal
@@ -432,7 +433,11 @@ modelCondServer <- function(id,
 
       observeEvent(input$openModal, {
         showModal(modalDialog(
+          tagList(
           textInput(ns("yAxisLab"), "Y-Axis Label", value = ""),
+          textInput(ns("xAxisLab"), "X-Axis Label", value = ""),
+          colourpicker::colourInput(ns("colour"), "Select a colour", "#555599")
+          ),
           footer = tagList(
             modalButton("Close"),
             actionButton(ns("saveText"), "Save")
@@ -445,15 +450,30 @@ modelCondServer <- function(id,
       })
 
       ggEdit <- eventReactive(input$saveText, {
+        # Y-axis lab
         if (input$yAxisLab != "") {
           ylab <- isolate(input$yAxisLab)
         } else {
           ylab <- paste0("Score (", traj(), ")")
         }
+        # X-axis lab
+        if (input$xAxisLab != "") {
+          xlab <- isolate(input$xAxisLab)
+        } else {
+          xlab <- "Age"
+        }
+        # Colours
+
 
         return(list(
-          ylab = ylab
+          ylab = ylab,
+          xlab = xlab,
+          colour = input$colour
         ))
+      })
+
+      output$modalText <- renderText({
+        paste0(ggEdit()$colour)
       })
 
       plot_edit <- reactive({
@@ -461,9 +481,9 @@ modelCondServer <- function(id,
           plot()
         }else{
         plot() +
-          ylab(ggEdit()$ylab)
-      }
-
+          ylab(ggEdit()$ylab) +
+          xlab(ggEdit()$xlab)
+        }
       })
 
       output$modelCondPlot <- renderPlot({
