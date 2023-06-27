@@ -495,10 +495,6 @@ modelCondServer <- function(id,
         }
       })
 
-      output$modalText <- renderText({
-        paste0(ggEdit()$colours)
-      })
-
       plot_edit <- reactive({
         if( is.null(input$saveText) ){
           plot()
