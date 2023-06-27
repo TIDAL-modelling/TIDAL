@@ -66,6 +66,10 @@ modelCondServer <- function(id,
         }
       })
 
+# pass condition selection to an object for report?
+      condition <- reactive({ input$condition })
+# pass vartype to an object for report?
+      vartype <- reactive({ input$varType })
 
       # ---------------------------------------
       # allow the user to change the reference value for the categorical variable, by default i think it's the first item of the factor levels
@@ -300,6 +304,13 @@ modelCondServer <- function(id,
         paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(fit())$call)[2])
         }
       })
+
+      # paste formula into object so it can be passed to the report
+      modelform <- reactive({ if(str_detect(formCodeCovars(), input$condition)){
+        ""
+      }else{
+        paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(fit())$call)[2])
+      } })
 
       # ---------------------------------------
       ###############################################################
@@ -757,10 +768,10 @@ modelCondServer <- function(id,
 
           # -------Set up parameters to pass to Rmd document--------
           params <- list(
-            condType = reactive({ input$varType }),
-            cond = reactive({ input$condition }),
+            cond = condition(),
+            condtype = vartype(),
             condPlot = plot(),
-            condModelForm = reactive({ output$form }),
+            condModelForm = modelform(),
             condFixed = modelStatsFixed(),
             condRandom = modelStatsRandom(),
             modelDataEdit = modelDataEdit(),
