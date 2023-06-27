@@ -446,10 +446,15 @@ modelCondServer <- function(id,
       })
 
       output$colourUI <- renderUI({
+        if(input$varType == "cat"){
         levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
-        lapply(levelNames, function(x){
-          do.call(colourpicker::colourInput, list(inputId = ns(x), label = paste0("Select a colour for variable level '", x, "' :")))
+        colourDefault <- c("#E69F00","#56B4E9","#009E73","#F5C710",
+                           "#0072B2","#D55E00","#CC79A7",
+                           "#999999","#000000")
+        lapply(1:length(levelNames), function(i){
+          do.call(colourpicker::colourInput, list(inputId = ns(levelNames[i]), label = paste0("Select a colour for variable level '", levelNames[i], "' :"), value = colourDefault[i]) )
         })
+        }
       })
 
       observeEvent(input$saveText, {
@@ -470,6 +475,7 @@ modelCondServer <- function(id,
           xlab <- "Age"
         }
 
+        if(input$varType == "cat"){
         levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
         colours <- sapply(levelNames, function(x){
          eval(parse(text = paste0("input$`", x, "`")))
@@ -480,6 +486,13 @@ modelCondServer <- function(id,
           xlab = xlab,
           colours = colours
         ))
+        }
+        else{
+          return(list(
+            ylab = ylab,
+            xlab = xlab
+          ))
+        }
       })
 
       output$modalText <- renderText({
@@ -490,10 +503,16 @@ modelCondServer <- function(id,
         if( is.null(input$saveText) ){
           plot()
         }else{
+          if(input$varType == "cat"){
         plot() +
           ylab(ggEdit()$ylab) +
           xlab(ggEdit()$xlab) +
           scale_color_manual(values = ggEdit()$colours)
+          }else{
+          plot() +
+              ylab(ggEdit()$ylab) +
+              xlab(ggEdit()$xlab)
+          }
         }
       })
 
