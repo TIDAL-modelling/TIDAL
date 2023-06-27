@@ -709,7 +709,7 @@ modelCondServer <- function(id,
           ggplot() +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
             theme(legend.text = element_text(color = "black")) +
-            geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high)) +
+            geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high), width = 0.5) +
             geom_point(data = estimate, aes(x = age, y = score), col = "#1D86C7", size = 5) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
