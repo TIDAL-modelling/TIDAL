@@ -9,6 +9,7 @@
 #' @import tidyr
 #' @import multcomp
 #' @import tibble
+#' @import colourpicker
 #'
 #' @noRd
 #' @keywords internal
@@ -429,13 +430,96 @@ modelCondServer <- function(id,
 
       })
 
+
+      observeEvent(input$openModal, {
+        showModal(modalDialog(
+          tagList(
+            textInput(ns("yAxisLab"), "Y-Axis Label", value = ""),
+            textInput(ns("xAxisLab"), "X-Axis Label", value = ""),
+            uiOutput(ns("colourUI"))
+          ),
+          footer = tagList(
+            modalButton("Close"),
+            actionButton(ns("saveText"), "Save")
+          )
+        ))
+      })
+
+      output$colourUI <- renderUI({
+        if(input$varType == "cat"){
+        levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
+        colourDefault <- c("#E69F00","#56B4E9","#009E73","#F5C710",
+                           "#0072B2","#D55E00","#CC79A7",
+                           "#999999","#000000")
+        lapply(1:length(levelNames), function(i){
+          do.call(colourpicker::colourInput, list(inputId = ns(levelNames[i]), label = paste0("Select a colour for variable level '", levelNames[i], "' :"), value = colourDefault[i]) )
+        })
+        }
+      })
+
+      observeEvent(input$saveText, {
+        removeModal()
+      })
+
+      ggEdit <- eventReactive(input$saveText, {
+        # Y-axis lab
+        if (input$yAxisLab != "") {
+          ylab <- isolate(input$yAxisLab)
+        } else {
+          ylab <- paste0("Score (", traj(), ")")
+        }
+        # X-axis lab
+        if (input$xAxisLab != "") {
+          xlab <- isolate(input$xAxisLab)
+        } else {
+          xlab <- "Age"
+        }
+
+        if(input$varType == "cat"){
+        levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
+        colours <- sapply(levelNames, function(x){
+         eval(parse(text = paste0("input$`", x, "`")))
+        })
+
+        return(list(
+          ylab = ylab,
+          xlab = xlab,
+          colours = colours
+        ))
+        }
+        else{
+          return(list(
+            ylab = ylab,
+            xlab = xlab
+          ))
+        }
+      })
+
+      plot_edit <- reactive({
+        if( is.null(input$saveText) ){
+          plot()
+        }else{
+          if(input$varType == "cat"){
+        plot() +
+          ylab(ggEdit()$ylab) +
+          xlab(ggEdit()$xlab) +
+          scale_color_manual(values = ggEdit()$colours)
+          }else{
+          plot() +
+              ylab(ggEdit()$ylab) +
+              xlab(ggEdit()$xlab)
+          }
+        }
+      })
+
       output$modelCondPlot <- renderPlot({
         if(str_detect(formCodeCovars(), input$condition)){
 
         }else{
-          plot()
+         plot_edit()
         }
       })
+
 
       ###############################################################
       # --- Score for a given set of ages - Alternative Model Results Tab -----
