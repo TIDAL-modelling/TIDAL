@@ -195,7 +195,9 @@ server <- function(input, output, session) {
                                                    modelFit = modelRunServer$fit,
                                                    warningMsg = modelRunServer$warning,
                                                    modelData = selectDataServer$data,
-                                                   age = selectDataServer$age)
+                                                   age = selectDataServer$age,
+                                                   traj = selectDataServer$traj,
+                                                   covars = selectDataServer$covars)
   modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
                                              modelData = modelRunServer$data,
                                              modelFit = modelRunServer$fit,
