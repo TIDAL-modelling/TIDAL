@@ -64,7 +64,12 @@ selectDataServer <- function(id, dataFormatted) {
       # edit dataframe so that categorical covariates are factorised and polynomial age columns are added
       dataEdit <- reactive({
         dataEdit <- data() %>%
+<<<<<<< HEAD
           mutate_at(vars(all_of(input$covarsCat)), factor)
+=======
+          mutate_at(vars(all_of(input$covarsCat)), factor) #%>%
+          # mutate_at(vars(all_of(input$covarsCont)), numeric)
+>>>>>>> dev
       })
 
       covars <- reactive({
