@@ -28,6 +28,7 @@ modelResultsUI <- function(id, label = "Model") {
     textOutput(ns("Ndims")),
     h4("Fixed Effects"),
     withSpinner(tableOutput(ns("modelStatsFixed")), proxy.height = "100px"),
+    withSpinner(textOutput(ns("interFixed")), proxy.height = "100px"),
     h4("Random Effects"),
     withSpinner(tableOutput(ns("modelStatsRandom")), proxy.height = "100px")
     )
