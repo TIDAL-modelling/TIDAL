@@ -41,9 +41,11 @@ Phenotype: `r params$traj`
 
 Condition: `r params$cond`
 
-Type: `r vartype`
+Condition type: `r vartype`
 
-Formula: `r params$condModelForm`
+`r params$condModelForm`
+
+Model type: `r params$modelType`
 
 
 ``` {r, echo = F}
