@@ -106,6 +106,7 @@ datExAltServer <- function(id,
 
       # ------------------------------------------
       # Plot the score at the given age
+
       # points of intersection of age and score
       plotScoreAll <- eventReactive(input$ageInput, {
 

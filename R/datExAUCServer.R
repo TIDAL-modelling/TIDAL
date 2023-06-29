@@ -121,7 +121,9 @@ output$AUCtable <- renderTable({
 
 
 return(list(
-  modelDataEdit = modelDataEdit
+  modelDataEdit = modelDataEdit,
+  plotAUC = plotAUC,
+  tableAUC = tableAUC
 ))
 
 }

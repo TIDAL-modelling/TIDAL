@@ -231,7 +231,12 @@ server <- function(input, output, session) {
                                              N = modelResultsServer$N,
                                              mainPlot = modelPlotServer$mainPlot,
                                              phenotype = selectDataServer$traj,
-                                             modelType = selectDataServer$modelType
+                                             modelType = selectDataServer$modelType,
+                                             datExAltTable = datExAltServer$datExAltTable,
+                                             datExAltPlot = datExAltServer$datExAltPlot,
+                                             plotAUC = datExAUCServer$plotAUC,
+                                             tableAUC = datExAUCServer$tableAUC
+
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                              modelData = modelRunServer$data,
@@ -241,6 +246,7 @@ server <- function(input, output, session) {
                                              age = selectDataServer$age,
                                              timePoint = selectDataServer$timePoint,
                                              modelType = selectDataServer$modelType)
+
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
                                                subject = selectDataServer$ID,
                                                age = selectDataServer$age,

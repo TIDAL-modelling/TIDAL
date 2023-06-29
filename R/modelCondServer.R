@@ -9,6 +9,10 @@
 #' @import tidyr
 #' @import multcomp
 #' @import tibble
+#' @import purrr
+#' @import tinytex
+#' @import rmarkdown
+#' @import kableExtra
 #'
 #' @noRd
 #' @keywords internal
@@ -64,6 +68,10 @@ modelCondServer <- function(id,
         }
       })
 
+# pass condition selection to an object for report?
+      condition <- reactive({ input$condition })
+# pass vartype to an object for report?
+      vartype <- reactive({ input$varType })
 
       # ---------------------------------------
       # allow the user to change the reference value for the categorical variable, by default i think it's the first item of the factor levels
@@ -342,7 +350,7 @@ modelCondServer <- function(id,
       })
       # ---------------
       # model results
-      output$modelStatsFixed <- renderTable({
+      modelStatsFixed <- reactive({
         if(str_detect(formCodeCovars(), input$condition)){
           data.frame(NULL)
         }else{
@@ -354,7 +362,9 @@ modelCondServer <- function(id,
         }
       })
 
-      output$modelStatsRandom <- renderTable({
+      output$modelStatsFixed <- renderTable({modelStatsFixed()})
+
+      modelStatsRandom <- reactive({
         if(str_detect(formCodeCovars(), input$condition)){
           data.frame(NULL)
         }else{
@@ -362,6 +372,8 @@ modelCondServer <- function(id,
                         order = "lower.tri")
         }
       })
+
+      output$modelStatsRandom <- renderTable({modelStatsRandom()})
 
       # ---------------------------------------
       # Paste the model formula for the user to see (don't want it to appear straight away - could improve this)
@@ -372,6 +384,13 @@ modelCondServer <- function(id,
           paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(fit())$call)[2])
         }
       })
+
+      # paste formula into object so it can be passed to the report
+      modelform <- reactive({ if(str_detect(formCodeCovars(), input$condition)){
+        ""
+      }else{
+        paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(fit())$call)[2])
+      } })
 
       # ---------------------------------------
       # Plot the split by variable plot
@@ -992,9 +1011,83 @@ modelCondServer <- function(id,
       })
 
 
-      return(list(
-        modelDataEdit = modelDataEdit
-      ))
+      #################################################################################
+      # ----- DOWNLOADING RESULTS TAB -------
+      ###############################################################
+      # ------------------------------------------
+      # Suffix for name:
+      name <- reactive({
+        if(input$suffix != ""){
+          paste0("_", input$suffix, "_")
+        }else{
+          "_"
+        }
+      })
+
+      # ------------------------------------------
+      # Add UI to download results
+      output$buttonHere <- renderUI({
+        req(plot())
+        tagList(
+          textInput(ns("suffix"),
+                    "File name suffix:"
+          ),
+          downloadButton(ns("downloadReport"), "Download report")
+        )
+      })
+
+      output$downloadReport <- downloadHandler(
+        filename = function(){
+          paste0("Interaction_Variable", name(), Sys.Date(), ".pdf")
+        },
+        content = function(file) {
+          # Copy the report file to a temporary directory before processing it, in
+          # case we don't have write permissions to the current working dir (which
+          # can happen when deployed).
+          tempReport <- file.path("www/interactionVar.Rmd")
+          file.copy("interactionVar.Rmd", tempReport, overwrite = TRUE)
+
+
+
+          # -------Set up parameters to pass to Rmd document--------
+          params <- list(
+            cond = condition(),
+            condtype = vartype(),
+            condPlot = plot(),
+            condModelForm = modelform(),
+            condFixed = modelStatsFixed(),
+            condRandom = modelStatsRandom(),
+            modelDataEdit = modelDataEdit(),
+            plotScore = plotScoreAll(),
+            tableScore = tableScoreAll(),
+            AUCplot = plotAUC(),
+            AUCtable = tableAUC(),
+            traj = traj(),
+            modelType = modelType()
+          )
+
+          # Knit the document, passing in the `params` list, and eval it in a
+          # child of the global environment (this isolates the code in the document
+          # from the code in this app).
+          rmarkdown::render(tempReport, output_file = file,
+                            params = params,
+                            envir = new.env(parent = globalenv())
+          )
+        }
+)
+
+      ###
+      return(
+        list(
+          condType = reactive({ input$varType }),
+          cond = reactive({ input$condition }),
+          condPlot = reactive({ output$modelCondPlot  }),
+          condModelForm = reactive({ output$form }),
+          condFixed = reactive({ output$modelStatsFixed }),
+          condRandom = reactive({ output$modelStatsRandom }),
+          modelDataEdit = reactive({ modelDataEdit })
+        )
+      )
 
     }
   )
