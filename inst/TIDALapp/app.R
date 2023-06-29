@@ -2,6 +2,7 @@
 
 library(shinythemes)
 library(ggplot2)
+library(bslib)
 
 # Increase maximum file size that can be uploaded
 options(shiny.maxRequestSize = 100*1024^2)
@@ -27,9 +28,42 @@ my_theme <- function(base_size = 16, base_family = ""){
 
 theme_set(my_theme())
 
+
+## Accessibility features - dark mode, high contrast, large font
+light <- bs_theme(version = version_default(), bootswatch = "cerulean")
+dark <- bs_theme(version = version_default(), bootswatch = "darkly")
+contrast <- bs_theme(version = version_default(),
+                     bg = "#000000",
+                     fg = "#FFFFFF",
+                     primary = "#FFFF00",
+                     secondary = "#EA80FC",
+                     success = "#00FF00",
+                     info = "#00ffff",
+                     warning = "#FFCF00",
+                     danger = "#FFFF00")
+large <- bs_theme(version = version_default(), bootswatch = "cerulean", font_scale = 3)
+largecontrast <- bs_theme(version = version_default(),
+                          bg = "#000000",
+                          fg = "#FFFFFF",
+                          primary = "#FFFF00",
+                          secondary = "#EA80FC",
+                          success = "#00FF00",
+                          info = "#00ffff",
+                          warning = "#FFCF00",
+                          danger = "#FFFF00",
+                          font_scale = 3)
+
+
+
+
 # User interface
 welcome_page <- tabPanel(
   title = "Overview",
+
+  #### this bit should allow the user to select from a dropdown list of themes #### HELP PLS
+  selectInput("Theme", label = "Display Theme",
+              choices = c("Default", "Dark mode", "High contrast",
+                          "Large font", "High contrast large font")),
   fluidPage(
     HTML('<center><img src="TIDAL.png" width="550"></center>'),
     h1("Tool to Implement Developmental Analyses of Longitudinal Data"),
@@ -169,7 +203,8 @@ ui <- navbarPage(
   tags$style(type="text/css",
              ".shiny-output-error { visibility: hidden; }",
              ".shiny-output-error:before { visibility: hidden; }"
-  ),
+  ), #### i thought this might be a problem but removing it doesn't help #### HELP PLS
+  ### setting it to bs_theme(version = 5, bootswatch = "cerulean") doesn't fix it though
   welcome_page,
   format_page,
   overview_page,
@@ -252,6 +287,14 @@ server <- function(input, output, session) {
                                                    modelType = selectDataServer$modelType,
                                                    modelFit = modelRunServer$fit,
                                                    age = selectDataServer$age)
+  ### this should change the font to whatever is selected but I get this error #### HELP PLS
+  ## Error in : session$setCurrentTheme() cannot be used to change the Bootstrap version from  to 5. Try using `bs_theme(version = 5)` for initial theme.
+  observe(session$setCurrentTheme(
+    if (input$Theme == "Dark mode") {dark} else
+      if (input$Theme == "High contrast"){contrast} else
+        if (input$Theme == "Large font"){large} else
+          if (input$Theme == "High contrast large font"){largecontrast} else
+          {light}))
 }
 
 # Run the application
