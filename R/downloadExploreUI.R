@@ -17,6 +17,7 @@ downloadExploreUI <- function(id, label = "data") {
     p("When you have run the model, please download a pdf report with the descriptive statistics, model results and plot."),
     p('Note the download button will only appear once you have clicked "Run Model" in the side panel.'),
     br(),
-    uiOutput(ns("buttonHere"))
+    uiOutput(ns("buttonHere")),
+    textOutput(ns("test"))
   )
 }

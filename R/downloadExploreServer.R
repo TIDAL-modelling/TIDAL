@@ -71,6 +71,28 @@ downloadExploreServer <- function(id,
           file.copy("exploreData.Rmd", tempReport, overwrite = TRUE)
 
           # Set up parameters to pass to Rmd document
+
+
+          # if datExAltTable/Plot plotAUC/tableAUC don't exist then save those variables as NA values
+
+          if( is.null(datExAltTable()) ){
+            params <- list(
+              descTable = descTable(),
+              warningMsg = warningMsg(),
+              formCodeRender = formCodeRender(),
+              statement = statement(),
+              fixedTab = fixedTab(),
+              randomTab = randomTab(),
+              N = N(),
+              mainPlot = mainPlot(),
+              phenotype = phenotype(),
+              modelType = modelType(),
+              datExAltTable = NA,
+              datExAltPlot = NA,
+              plotAUC = NA,
+              tableAUC = NA
+            )
+          }else{
           params <- list(
             descTable = descTable(),
             warningMsg = warningMsg(),
@@ -87,6 +109,7 @@ downloadExploreServer <- function(id,
             plotAUC = plotAUC(),
             tableAUC = tableAUC()
           )
+          }
 
           # Knit the document, passing in the `params` list, and eval it in a
           # child of the global environment (this isolates the code in the document
@@ -97,6 +120,15 @@ downloadExploreServer <- function(id,
           )
         }
       )
+
+      output$test <- renderText({
+          paste0( is.null(datExAltTable())
+                  # , is.null(datExAltPlot())
+                  # , is.null(plotAUC())
+                  # , is.null(tableAUC())
+                  )
+      })
+
     }
   )
 }
