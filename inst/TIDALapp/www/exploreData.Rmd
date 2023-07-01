@@ -83,42 +83,46 @@ kbl(params$randomTab, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
 
-### Scores at Ages
 
-```{r, echo = F}
+
+```{r, echo = F, results='asis', warning=F}
 if(!is.na(params$datExAltPlot)){
-params$datExAltPlot
-}else{
-  paste0("Scores at Ages and Area Under the Curve tabs have been missed")
+cat("### Scores at Ages")
 }
 ```
 
-```{r, echo=F}
+```{r, echo=F, warning=F}
+if(!is.na(params$datExAltPlot)){
+params$datExAltPlot
+}
+```
+
+
+```{r, echo=F, warning=F}
 if(!is.na(params$datExAltTable)){
 kbl(params$datExAltTable, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
-}else{
-  paste0("Scores at Ages and Area Under the Curve tabs have been missed")
 }
 ```
 
 
-### Area Under the Curve
+``` {r, echo = F, results='asis', warning=F}
+if(!is.na(params$plotAUC)){
+cat("### Area Under the Curve")
+}
+```
 
-``` {r, echo = F}
+```{r, echo=F, warning=F}
 if(!is.na(params$plotAUC)){
 params$plotAUC
-}else{
-  paste0("Scores at Ages and Area Under the Curve tabs have been missed")
 }
 ```
 
-```{r, echo=F}
+
+```{r, echo=F, warning=F}
 if(!is.na(params$tableAUC)){
 kbl(params$tableAUC, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
-}else{
-  paste0("Scores at Ages and Area Under the Curve tabs have been missed")
 }
 ```
 
