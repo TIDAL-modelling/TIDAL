@@ -28,6 +28,7 @@ downloadExploreServer <- function(id,
                             modelType,
                             datExAltTable,
                             datExAltPlot,
+                            AUC,
                             plotAUC,
                             tableAUC
                             ) {
@@ -75,7 +76,7 @@ downloadExploreServer <- function(id,
 
           # if datExAltTable/Plot plotAUC/tableAUC don't exist then save those variables as NA values
 
-          if( is.null(datExAltTable()) ){
+          if( is.null(datExAltTable()) & length(AUC()) == 0 ){
             params <- list(
               descTable = descTable(),
               warningMsg = warningMsg(),
@@ -89,6 +90,40 @@ downloadExploreServer <- function(id,
               modelType = modelType(),
               datExAltTable = NA,
               datExAltPlot = NA,
+              plotAUC = NA,
+              tableAUC = NA
+            )
+          }else if( is.null(datExAltTable()) & length(AUC()) > 0 ){
+            params <- list(
+              descTable = descTable(),
+              warningMsg = warningMsg(),
+              formCodeRender = formCodeRender(),
+              statement = statement(),
+              fixedTab = fixedTab(),
+              randomTab = randomTab(),
+              N = N(),
+              mainPlot = mainPlot(),
+              phenotype = phenotype(),
+              modelType = modelType(),
+              datExAltTable = NA,
+              datExAltPlot = NA,
+              plotAUC = plotAUC(),
+              tableAUC = tableAUC()
+            )
+          }else if( !is.null(datExAltTable()) & length(AUC()) == 0 ){
+            params <- list(
+              descTable = descTable(),
+              warningMsg = warningMsg(),
+              formCodeRender = formCodeRender(),
+              statement = statement(),
+              fixedTab = fixedTab(),
+              randomTab = randomTab(),
+              N = N(),
+              mainPlot = mainPlot(),
+              phenotype = phenotype(),
+              modelType = modelType(),
+              datExAltTable = datExAltTable(),
+              datExAltPlot = datExAltPlot(),
               plotAUC = NA,
               tableAUC = NA
             )
@@ -120,14 +155,6 @@ downloadExploreServer <- function(id,
           )
         }
       )
-
-      output$test <- renderText({
-          paste0( is.null(datExAltTable())
-                  # , is.null(datExAltPlot())
-                  # , is.null(plotAUC())
-                  # , is.null(tableAUC())
-                  )
-      })
 
     }
   )

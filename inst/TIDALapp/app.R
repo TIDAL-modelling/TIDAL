@@ -234,6 +234,7 @@ server <- function(input, output, session) {
                                              modelType = selectDataServer$modelType,
                                              datExAltTable = datExAltServer$datExAltTable,
                                              datExAltPlot = datExAltServer$datExAltPlot,
+                                             AUC = datExAUCServer$AUC,
                                              plotAUC = datExAUCServer$plotAUC,
                                              tableAUC = datExAUCServer$tableAUC
 
