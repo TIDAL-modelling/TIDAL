@@ -17,6 +17,7 @@ modelResultsServer <- function(id,
                            modelFit,
                            warningMsg,
                            modelData ,
+                           modelType,
                            age,
                            traj,
                            covars
@@ -95,6 +96,19 @@ modelResultsServer <- function(id,
         # Slope:
         slope <- round(fixedTab()$estimate[2], 2)
 
+        if(modelType() %in% c("Quadratic", "Cubic", "Quartic") ){
+          slope2 <- round(fixedTab()$estimate[3], 2)
+          direction2 <- ifelse(slope2 >= 0 , "an increase", "a decrease")
+        }
+        if(modelType() %in% c("Cubic", "Quartic")){
+          slope3 <- round(fixedTab()$estimate[4], 2)
+          direction3 <- ifelse(slope3 >= 0 , "an increase", "a decrease")
+        }
+        if(modelType() == "Quartic"){
+          slope4 <- round(fixedTab()$estimate[5], 2)
+          direction4 <- ifelse(slope4 >= 0 , "an increase", "a decrease")
+        }
+
         # Direction
         direction <- ifelse(slope >= 0 , "an increase", "a decrease")
 
@@ -114,8 +128,21 @@ modelResultsServer <- function(id,
         <br/>
         <br/>
 
-        Every unit increase in ',ageVar,' is associated with ', direction ,' of ', trajVar ,' by ', slope,'.
-        <br/>
+        Every unit increase in ',ageVar,' is associated with ', direction ,' of ', trajVar ,' by ', slope,'.',
+
+        ifelse(modelType() ==  "Quadratic",
+               paste0('As you have specified a quadratic model, every unit increase in ', ageVar ,'^2 is also associated with ', direction2 ,' of ', trajVar,' by ',slope2,'. However, it can be difficult to interpret these two estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),
+               paste0('')),
+
+        ifelse(modelType() == "Cubic",
+               paste0('As you have specified a cubic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,'. However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),
+               paste0('')),
+
+        ifelse(modelType() == "Quartic",
+               paste0('As you have specified a quartic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,' and every unit increase in ',ageVar,'^4 is associated with ', direction4 ,' in ',trajVar,' by ',slope4, ' However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),
+               paste0('')),
+
+        '<br/>
         <br/>',
         ifelse(length(covars()) > 0,
         paste0('These estimates adjusted for the following confounders/covariates: ', confounders ,'.
@@ -168,6 +195,7 @@ modelResultsServer <- function(id,
         statement = statement,
         modelFormRender = modelFormRender,
         fixedTab = fixedTab,
+        interpretation = interpretation,
         randomTab = randomTab,
         N = N
         )
