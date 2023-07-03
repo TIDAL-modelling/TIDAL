@@ -8,6 +8,7 @@ params:
   formCodeRender : NA
   statement : NA
   fixedTab : NA
+  interpretation: NA
   randomTab : NA
   N : NA
   mainPlot : NA
@@ -22,6 +23,7 @@ params:
 ```{r, echo=F, warning=F}
 library(knitr)
 library(kableExtra)
+library(stringr)
 
 include_graphics("TIDAL.png")
 ```
@@ -73,6 +75,14 @@ Fixed effects can be interpreted as the effects of time/age (and any additional 
 kbl(params$fixedTab[,3:ncol(params$fixedTab)], digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
+
+```{r , echo = F, results='asis', warning=F}
+text <- str_replace_all(params$interpretation, "<br/>", "\n")
+text <- str_remove(text, "Please note, this section does not estimate group specific trajectories. See the Interaction Variable tab for group specific interactions and trajectories.")
+text <- str_remove(text, "However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.")
+cat(text)
+```
+
 
 ### Random Effects
 

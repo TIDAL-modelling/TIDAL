@@ -276,7 +276,7 @@ server <- function(input, output, session) {
                                              formCodeRender = modelResultsServer$modelFormRender,
                                              statement = modelResultsServer$statement,
                                              fixedTab = modelResultsServer$fixedTab,
-                                             interpretation = modelResultsServer$interpretation
+                                             interpretation = modelResultsServer$interpretation,
                                              randomTab = modelResultsServer$randomTab,
                                              N = modelResultsServer$N,
                                              mainPlot = modelPlotServer$mainPlot,
