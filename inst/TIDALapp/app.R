@@ -195,6 +195,7 @@ server <- function(input, output, session) {
                                                    modelFit = modelRunServer$fit,
                                                    warningMsg = modelRunServer$warning,
                                                    modelData = selectDataServer$data,
+                                                   modelType = selectDataServer$modelType,
                                                    age = selectDataServer$age,
                                                    traj = selectDataServer$traj,
                                                    covars = selectDataServer$covars)
@@ -227,6 +228,7 @@ server <- function(input, output, session) {
                                              formCodeRender = modelResultsServer$modelFormRender,
                                              statement = modelResultsServer$statement,
                                              fixedTab = modelResultsServer$fixedTab,
+                                             interpretation = modelResultsServer$interpretation
                                              randomTab = modelResultsServer$randomTab,
                                              N = modelResultsServer$N,
                                              mainPlot = modelPlotServer$mainPlot,
