@@ -30,9 +30,9 @@ theme_set(my_theme())
 
 
 ## Accessibility features - dark mode, high contrast, large font
-light <- bs_theme(version = version_default(), bootswatch = "cerulean")
-dark <- bs_theme(version = version_default(), bootswatch = "darkly")
-contrast <- bs_theme(version = version_default(),
+light <- bs_theme(version = 4, bootswatch = "cerulean")
+dark <- bs_theme(version = 4, bootswatch = "darkly")
+contrast <- bs_theme(version = 4,
                      bg = "#000000",
                      fg = "#FFFFFF",
                      primary = "#FFFF00",
@@ -41,8 +41,8 @@ contrast <- bs_theme(version = version_default(),
                      info = "#00ffff",
                      warning = "#FFCF00",
                      danger = "#FFFF00")
-large <- bs_theme(version = version_default(), bootswatch = "cerulean", font_scale = 3)
-largecontrast <- bs_theme(version = version_default(),
+large <- bs_theme(version = 4, bootswatch = "cerulean", font_scale = 3)
+largecontrast <- bs_theme(version = 4,
                           bg = "#000000",
                           fg = "#FFFFFF",
                           primary = "#FFFF00",
@@ -65,6 +65,7 @@ welcome_page <- tabPanel(
               choices = c("Default", "Dark mode", "High contrast",
                           "Large font", "High contrast large font")),
   fluidPage(
+    theme = bs_theme(version = 4, bootswatch = "cerulean"),
     HTML('<center><img src="TIDAL.png" width="550"></center>'),
     h1("Tool to Implement Developmental Analyses of Longitudinal Data"),
     p("The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people."),
@@ -99,6 +100,7 @@ welcome_page <- tabPanel(
 format_page <- tabPanel(
   title = "Data Preparation",
   fluidPage(
+    theme = bs_theme(version = 4, bootswatch = "cerulean"),
     TIDAL:::wide2longUI("wide2long")
   )
 )
@@ -107,6 +109,7 @@ format_page <- tabPanel(
 overview_page <-   tabPanel(
   title = "Data Exploration",
   fluidPage(
+    theme = bs_theme(version = 4, bootswatch = "cerulean"),
     tabsetPanel(
       tabPanel("Instructions",
                tagList(
@@ -149,6 +152,7 @@ overview_page <-   tabPanel(
 intervention_page <- tabPanel(
   title = "Interaction Variable",
   fluidPage(
+    theme = bs_theme(version = 4, bootswatch = "cerulean"),
     TIDAL:::modelCondUI("modelCond")
   )
 )
@@ -157,6 +161,7 @@ intervention_page <- tabPanel(
 singeTraj_page <-  tabPanel(
   title = "Individual Trajectories",
   fluidPage(
+    theme = bs_theme(version = 4, bootswatch = "cerulean"),
     tabsetPanel(
       tabPanel("Instructions",
                tagList(
@@ -174,6 +179,7 @@ singeTraj_page <-  tabPanel(
 importantTimepoint_page <- tabPanel(
   title = "Important Time Points",
   fluidPage(
+    theme = bs_theme(version = 4, bootswatch = "cerulean"),
     tabsetPanel(
       tabPanel("Instructions",
                tagList(
@@ -192,6 +198,7 @@ importantTimepoint_page <- tabPanel(
   tabPanel(
   title = "Important Time Points",
   fluidPage(
+    theme = bs_theme(version = 4, bootswatch = "cerulean"),
     TIDAL:::importantAgeUI("importantAge")
   )
 )
@@ -199,7 +206,7 @@ importantTimepoint_page <- tabPanel(
 
 ui <- navbarPage(
   title = "TIDAL",
-  theme = shinytheme('cerulean'),
+  theme = bs_theme(version = 4, bootswatch = "cerulean"),
   tags$style(type="text/css",
              ".shiny-output-error { visibility: hidden; }",
              ".shiny-output-error:before { visibility: hidden; }"
@@ -299,11 +306,18 @@ server <- function(input, output, session) {
   ### this should change the font to whatever is selected but I get this error #### HELP PLS
   ## Error in : session$setCurrentTheme() cannot be used to change the Bootstrap version from  to 5. Try using `bs_theme(version = 5)` for initial theme.
   observe(session$setCurrentTheme(
-    if (input$Theme == "Dark mode") {dark} else
-      if (input$Theme == "High contrast"){contrast} else
-        if (input$Theme == "Large font"){large} else
-          if (input$Theme == "High contrast large font"){largecontrast} else
-          {light}))
+    if (input$Theme == "Dark mode"){
+        dark
+      }else if(input$Theme == "High contrast"){
+        contrast
+      }else if(input$Theme == "Large font"){
+        large
+      }else if(input$Theme == "High contrast large font"){
+        largecontrast
+      }else{
+        light
+      }
+    ))
 }
 
 # Run the application
