@@ -84,13 +84,19 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                        br(),
                        br()
                      )
-            )
+            ),
+            tabPanel("Download Results",
+                     tagList(
+                       p("When you have run the model with your interaction variable of choice, please download a pdf report of the interaction variable analyses."),
+                       p('Note the download button will only appear once you have clicked "Run Model" in the side panel.'),
+                       br(),
+                       uiOutput(ns("buttonHere")))
           )
         )
       )
     )
   )
+)
 
-
-  }
+}
 

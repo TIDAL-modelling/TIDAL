@@ -25,7 +25,12 @@ downloadExploreServer <- function(id,
                             N,
                             mainPlot,
                             phenotype,
-                            modelType
+                            modelType,
+                            datExAltTable,
+                            datExAltPlot,
+                            AUC,
+                            plotAUC,
+                            tableAUC
                             ) {
   moduleServer(
     id,
@@ -33,31 +38,19 @@ downloadExploreServer <- function(id,
 
       ns <- NS(id)
 
-      # ------------------------------------------
-      # Suffix for name:
-      name <- reactive({
-        if(input$suffix != ""){
-          paste0("_", input$suffix, "_")
-        }else{
-          "_"
-        }
-      })
 
       # ------------------------------------------
       # Add UI to download results
       output$buttonHere <- renderUI({
         req(mainPlot())
         tagList(
-          textInput(ns("suffix"),
-                    "File name suffix:"
-          ),
           downloadButton(ns("downloadReport"), "Download report")
           )
       })
 
       output$downloadReport <- downloadHandler(
         filename = function(){
-          paste0("Explore_Data", name(), Sys.Date(), ".pdf")
+          paste0("Explore_Data_", Sys.Date(), ".pdf")
         },
         content = function(file) {
           # Copy the report file to a temporary directory before processing it, in
@@ -67,6 +60,62 @@ downloadExploreServer <- function(id,
           file.copy("exploreData.Rmd", tempReport, overwrite = TRUE)
 
           # Set up parameters to pass to Rmd document
+
+
+          # if datExAltTable/Plot plotAUC/tableAUC don't exist then save those variables as NA values
+
+          if( is.null(datExAltTable()) & length(AUC()) == 0 ){
+            params <- list(
+              descTable = descTable(),
+              warningMsg = warningMsg(),
+              formCodeRender = formCodeRender(),
+              statement = statement(),
+              fixedTab = fixedTab(),
+              randomTab = randomTab(),
+              N = N(),
+              mainPlot = mainPlot(),
+              phenotype = phenotype(),
+              modelType = modelType(),
+              datExAltTable = NA,
+              datExAltPlot = NA,
+              plotAUC = NA,
+              tableAUC = NA
+            )
+          }else if( is.null(datExAltTable()) & length(AUC()) > 0 ){
+            params <- list(
+              descTable = descTable(),
+              warningMsg = warningMsg(),
+              formCodeRender = formCodeRender(),
+              statement = statement(),
+              fixedTab = fixedTab(),
+              randomTab = randomTab(),
+              N = N(),
+              mainPlot = mainPlot(),
+              phenotype = phenotype(),
+              modelType = modelType(),
+              datExAltTable = NA,
+              datExAltPlot = NA,
+              plotAUC = plotAUC(),
+              tableAUC = tableAUC()
+            )
+          }else if( !is.null(datExAltTable()) & length(AUC()) == 0 ){
+            params <- list(
+              descTable = descTable(),
+              warningMsg = warningMsg(),
+              formCodeRender = formCodeRender(),
+              statement = statement(),
+              fixedTab = fixedTab(),
+              randomTab = randomTab(),
+              N = N(),
+              mainPlot = mainPlot(),
+              phenotype = phenotype(),
+              modelType = modelType(),
+              datExAltTable = datExAltTable(),
+              datExAltPlot = datExAltPlot(),
+              plotAUC = NA,
+              tableAUC = NA
+            )
+          }else{
           params <- list(
             descTable = descTable(),
             warningMsg = warningMsg(),
@@ -77,8 +126,13 @@ downloadExploreServer <- function(id,
             N = N(),
             mainPlot = mainPlot(),
             phenotype = phenotype(),
-            modelType = modelType()
+            modelType = modelType(),
+            datExAltTable = datExAltTable(),
+            datExAltPlot = datExAltPlot(),
+            plotAUC = plotAUC(),
+            tableAUC = tableAUC()
           )
+          }
 
           # Knit the document, passing in the `params` list, and eval it in a
           # child of the global environment (this isolates the code in the document
@@ -89,6 +143,7 @@ downloadExploreServer <- function(id,
           )
         }
       )
+
     }
   )
 }

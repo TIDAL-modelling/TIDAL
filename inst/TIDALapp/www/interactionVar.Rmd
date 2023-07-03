@@ -1,0 +1,113 @@
+---
+title: ""
+output:
+  pdf_document: default
+params:
+  cond : NA
+  condtype: NA
+  condPlot : NA
+  condModelForm : NA
+  condFixed : NA
+  condRandom : NA
+  modelDataEdit : NA
+  plotScore : NA
+  tableScore : NA
+  AUCplot : NA
+  AUCtable : NA
+  traj : NA
+  modelType : NA
+---
+
+
+``` {r, echo=F, warning=F}
+library(knitr)
+library(kableExtra)
+
+include_graphics("TIDAL.png")
+```
+
+``` {r, echo = F}
+vartype = if(params$condtype == "cat"){"Categorical"} else {"Continuous"}
+```
+
+
+# TIDAL Interaction Variable
+
+For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
+
+Date generated: `r Sys.Date()`
+
+Phenotype: `r params$traj`
+
+Condition: `r params$cond`
+
+Condition type: `r vartype`
+
+`r params$condModelForm`
+
+Model type: `r params$modelType`
+
+
+``` {r, echo = F}
+
+params$condPlot
+
+```
+
+## Fixed effects
+
+```{r, echo=F}
+kbl(params$condFixed[,3:ncol(params$condFixed)], digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+
+## Random effects
+
+```{r, echo=F}
+kbl(params$condRandom[,3:ncol(params$condRandom)], digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+```
+
+
+```{r, echo = F, results='asis', warning=F}
+if(!is.na(params$plotScore)){
+cat("### Scores at Ages")
+}
+```
+
+```{r, echo=F, warning=F}
+if(!is.na(params$plotScore)){
+params$plotScore
+}
+```
+
+
+```{r, echo=F, warning=F}
+if(!is.na(params$tableScore)){
+kbl(params$tableScore, digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+}
+```
+
+
+``` {r, echo = F, results='asis', warning=F}
+if(!is.na(params$AUCplot)){
+cat("### Area Under the Curve")
+}
+```
+
+```{r, echo=F, warning=F}
+if(!is.na(params$AUCplot)){
+params$AUCplot
+}
+```
+
+
+```{r, echo=F, warning=F}
+if(!is.na(params$AUCtable)){
+kbl(params$AUCtable, digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+}
+```
+

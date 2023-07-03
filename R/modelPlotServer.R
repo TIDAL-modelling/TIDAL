@@ -68,7 +68,7 @@ modelPlotServer <- function(id,
       })
 
       # ------------------------------------------
-      mainPlot <- eventReactive(c(input$plotCheckbox), {
+      mainPlot <- eventReactive(c(input$plotCheckbox, modelFit()), {
         if(input$plotCheckbox == TRUE){
         ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
           geom_point()+

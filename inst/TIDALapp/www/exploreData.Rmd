@@ -13,10 +13,13 @@ params:
   mainPlot : NA
   phenotype : NA
   modelType : NA
+  datExAltTable : NA
+  datExAltPlot : NA
+  plotAUC : NA
+  tableAUC : NA
 ---
 
-
-``` {r, echo=F, warning=F}
+```{r, echo=F, warning=F}
 library(knitr)
 library(kableExtra)
 
@@ -28,7 +31,6 @@ include_graphics("TIDAL.png")
 For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
 
 Date generated: `r Sys.Date()`
-File uploaded:
 
 ## Descriptive Statistics
 
@@ -43,21 +45,17 @@ kbl(params$descTable, digits = 3) %>%
 
 time_point: Time point of data collection. N: Number of measurements (e.g. people) at each time point. mean: Mean `r params$phenotype`. SD: standard deviation of `r params$phenotype`. median: Median of `r params$phenotype`. IQR: Interquartile range of `r params$phenotype`
 
-
 ## Model Results
 
-`r params$modelType` model was run using [lme4](https://cran.r-project.org/web/packages/lme4/index.html) with
-`r params$formCode`. 
+`r params$modelType` model was run using [lme4](https://cran.r-project.org/web/packages/lme4/index.html) with `r params$formCode`.
 
 `r strsplit(params$warningMsg, " Please")[[1]][1]` For more information on lme4 optimisers, see [here](https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html). The use of alternative lme4 optimisers is currently not supported.
-
 
 ### Number of observations and groups
 
 `r params$statement`
 
 `r params$N`
-
 
 ## Plot
 
@@ -66,8 +64,6 @@ params$mainPlot
 ```
 
 `r params$modelType` `r params$formCode`. "Phenotype" on the y-axis is `r params$phenotype`. Note that any categorical covariates/confounders are set to level zero.
-
-
 
 ### Fixed Effects
 
@@ -78,8 +74,6 @@ kbl(params$fixedTab[,3:ncol(params$fixedTab)], digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
 
-
-
 ### Random Effects
 
 Random effects can be interpreted as the effects on `r params$phenotype` due to variation between subjects.
@@ -87,5 +81,48 @@ Random effects can be interpreted as the effects on `r params$phenotype` due to 
 ```{r, echo=F}
 kbl(params$randomTab, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
+```
+
+
+
+```{r, echo = F, results='asis', warning=F}
+if(!is.na(params$datExAltPlot)){
+cat("### Scores at Ages")
+}
+```
+
+```{r, echo=F, warning=F}
+if(!is.na(params$datExAltPlot)){
+params$datExAltPlot
+}
+```
+
+
+```{r, echo=F, warning=F}
+if(!is.na(params$datExAltTable)){
+kbl(params$datExAltTable, digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+}
+```
+
+
+``` {r, echo = F, results='asis', warning=F}
+if(!is.na(params$plotAUC)){
+cat("### Area Under the Curve")
+}
+```
+
+```{r, echo=F, warning=F}
+if(!is.na(params$plotAUC)){
+params$plotAUC
+}
+```
+
+
+```{r, echo=F, warning=F}
+if(!is.na(params$tableAUC)){
+kbl(params$tableAUC, digits = 3)  %>%
+  kable_styling(latex_options = "hold_position")
+}
 ```
 

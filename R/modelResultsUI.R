@@ -20,14 +20,14 @@ modelResultsUI <- function(id, label = "Model") {
   tagList(
     withSpinner(htmlOutput(ns("formulaText")), proxy.height = "100px"),
     br(),
-    textOutput(ns("ageMean")),
-    br(),
     htmlOutput(ns("warning")),
     br(),
     h4("Number of observations and groups"),
     textOutput(ns("Ndims")),
+    br(),
     h4("Fixed Effects"),
     withSpinner(tableOutput(ns("modelStatsFixed")), proxy.height = "100px"),
+    withSpinner(htmlOutput(ns("interFixed")), proxy.height = "100px"),
     h4("Random Effects"),
     withSpinner(tableOutput(ns("modelStatsRandom")), proxy.height = "100px")
     )

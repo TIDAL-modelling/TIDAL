@@ -230,7 +230,9 @@ server <- function(input, output, session) {
                                                    modelFit = modelRunServer$fit,
                                                    warningMsg = modelRunServer$warning,
                                                    modelData = selectDataServer$data,
-                                                   age = selectDataServer$age)
+                                                   age = selectDataServer$age,
+                                                   traj = selectDataServer$traj,
+                                                   covars = selectDataServer$covars)
   modelPlotServer <- TIDAL:::modelPlotServer("modelPlot",
                                              modelData = modelRunServer$data,
                                              modelFit = modelRunServer$fit,
@@ -264,7 +266,13 @@ server <- function(input, output, session) {
                                              N = modelResultsServer$N,
                                              mainPlot = modelPlotServer$mainPlot,
                                              phenotype = selectDataServer$traj,
-                                             modelType = selectDataServer$modelType
+                                             modelType = selectDataServer$modelType,
+                                             datExAltTable = datExAltServer$datExAltTable,
+                                             datExAltPlot = datExAltServer$datExAltPlot,
+                                             AUC = datExAUCServer$AUC,
+                                             plotAUC = datExAUCServer$plotAUC,
+                                             tableAUC = datExAUCServer$tableAUC
+
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                              modelData = modelRunServer$data,
@@ -274,6 +282,7 @@ server <- function(input, output, session) {
                                              age = selectDataServer$age,
                                              timePoint = selectDataServer$timePoint,
                                              modelType = selectDataServer$modelType)
+
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
                                                subject = selectDataServer$ID,
                                                age = selectDataServer$age,
