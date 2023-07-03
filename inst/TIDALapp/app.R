@@ -60,10 +60,16 @@ largecontrast <- bs_theme(version = version_default(),
 welcome_page <- tabPanel(
   title = "Overview",
 
-  #### this bit should allow the user to select from a dropdown list of themes #### HELP PLS
-  selectInput("Theme", label = "Display Theme",
-              choices = c("Default", "Dark mode", "High contrast",
-                          "Large font", "High contrast large font")),
+  #### this bit should allow the user to select from a list of themes
+  radioButtons("Theme",
+               "",
+               choiceNames = list(tags$span(style = "font-size: 25px;", "Default Theme"),
+                                  tags$span(style = "font-size: 25px;", "Dark Mode") ,
+                                  tags$span(style = "font-size: 25px;", "High Contrast"),
+                                  tags$span(style = "font-size: 25px;", "Large Font") ,
+                                  tags$span(style = "font-size: 25px;", "High Contrast & Large Font") ),
+               choiceValues = list("Default Theme", "Dark Mode", "High Contrast", "Large Font", "High Contrast & Large Font"),
+               inline = TRUE),
   fluidPage(
     theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
     HTML('<center><img src="TIDAL.png" width="550"></center>'),
@@ -303,22 +309,21 @@ server <- function(input, output, session) {
                                                    modelType = selectDataServer$modelType,
                                                    modelFit = modelRunServer$fit,
                                                    age = selectDataServer$age)
-  ### this should change the font to whatever is selected but I get this error #### HELP PLS
-  ## Error in : session$setCurrentTheme() cannot be used to change the Bootstrap version from  to 5. Try using `bs_theme(version = 5)` for initial theme.
   observe(session$setCurrentTheme(
-    if (input$Theme == "Dark mode"){
+    if (input$Theme == "Dark Mode"){
         dark
-      }else if(input$Theme == "High contrast"){
+      }else if(input$Theme == "High Contrast"){
         contrast
-      }else if(input$Theme == "Large font"){
+      }else if(input$Theme == "Large Font"){
         large
-      }else if(input$Theme == "High contrast large font"){
+      }else if(input$Theme == "High Contrast & Large Font"){
         largecontrast
       }else{
         light
       }
     ))
 }
+
 
 # Run the application
 shinyApp(ui = ui, server = server)
