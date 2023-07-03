@@ -8,7 +8,6 @@ params:
   formCodeRender : NA
   statement : NA
   fixedTab : NA
-  interaction : NA
   randomTab : NA
   N : NA
   mainPlot : NA
@@ -73,10 +72,6 @@ Fixed effects can be interpreted as the effects of time/age (and any additional 
 ```{r, echo=F}
 kbl(params$fixedTab[,3:ncol(params$fixedTab)], digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
-```
-
-``` {r, echo = F, results='asis', warning=F}
-cat(params$interaction)
 ```
 
 ### Random Effects
