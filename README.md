@@ -39,7 +39,7 @@ To use this tool online please do not upload any sensitive data. Only use the [s
 
 ## Main Features
 
-![](tabs.png)
+![](_includes/tabs.png)
 
 ### Overview
 
@@ -103,9 +103,9 @@ This page allows the user to view trajectories for specific individuals. The use
 
 ## Links
 
-[FAQs and troubleshooting](FAQs.md)
+[FAQs and troubleshooting](Documentation/FAQs.md)
 
-[Statistics guide](StatsGuide.md)
+[Statistics guide](Documentation/StatsGuide.md)
 
 ## Bugs and Feature Requests
 Please raise an issue if you find a bug or have a feature request using the templates provided.

@@ -12,7 +12,7 @@ Researchers recruit a sample of children and have their parents report on their 
 
 They want to know how the rate of depression changes as children grow older. This longitudinal data can tell us that young children have low levels of depression symptoms, but as they enter adolescence these rates of depression increase. Using this data, the researchers could also study if boys and girls differ in this increase in depression - perhaps girls have a more extreme increase in depression than boys do. 
 
-![](simulated-plot.png)
+![](../_includes/simulated-plot.png)
 
 
 
@@ -24,7 +24,7 @@ Mixed effects models are useful in analysing longitudinal measures, as taking re
 
 In a longitudinal study, each person has multiple measurements taken. Each of these individual measurements, or data points, can be thought of as belonging to a particular person. This is known as *nesting* or *grouping* - the person who the data came from is our grouping factor. 
 
-![](nesteddata.png)
+![](../_includes/nesteddata.png)
 
 In mixed effects models, we estimate both *fixed effects* and *random effects*. Fixed effects are similar to the results of a standard linear regression - they are the effect of our predictive or explanatory variable on our outcome variable. In contrast, random effects allow us to control for the grouping factors that make our data points violate independence. The estimates from random effects capture the differences in our outcome due to the differences between levels of our grouping variable (in this case, people).
 
