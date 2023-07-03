@@ -1,6 +1,6 @@
 # TIDAL Troubleshooting and FAQs
 
-If you run into any bugs or issues not listed below, please email TIDAL@ed.ac.uk
+If you run into any bugs or issues not listed below, please email TIDAL@ed.ac.uk or raise a new GitHub issue using a provided template.
 
 <details>
     <summary>Can I upload my own data to use with TIDAL?</summary>
