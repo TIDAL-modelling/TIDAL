@@ -2,7 +2,6 @@
 
 library(shinythemes)
 library(ggplot2)
-library(bslib)
 
 # Increase maximum file size that can be uploaded
 options(shiny.maxRequestSize = 100*1024^2)
@@ -28,50 +27,10 @@ my_theme <- function(base_size = 16, base_family = ""){
 
 theme_set(my_theme())
 
-
-## Accessibility features - dark mode, high contrast, large font
-light <- bs_theme(version = version_default(), bootswatch = "cerulean")
-dark <- bs_theme(version = version_default(), bootswatch = "darkly")
-contrast <- bs_theme(version = version_default(),
-                     bg = "#000000",
-                     fg = "#FFFFFF",
-                     primary = "#FFFF00",
-                     secondary = "#EA80FC",
-                     success = "#00FF00",
-                     info = "#00ffff",
-                     warning = "#FFCF00",
-                     danger = "#FFFF00")
-large <- bs_theme(version = version_default(), bootswatch = "cerulean", font_scale = 3)
-largecontrast <- bs_theme(version = version_default(),
-                          bg = "#000000",
-                          fg = "#FFFFFF",
-                          primary = "#FFFF00",
-                          secondary = "#EA80FC",
-                          success = "#00FF00",
-                          info = "#00ffff",
-                          warning = "#FFCF00",
-                          danger = "#FFFF00",
-                          font_scale = 3)
-
-
-
-
 # User interface
 welcome_page <- tabPanel(
   title = "Overview",
-
-  #### this bit should allow the user to select from a list of themes
-  radioButtons("Theme",
-               "",
-               choiceNames = list(tags$span(style = "font-size: 25px;", "Default Theme"),
-                                  tags$span(style = "font-size: 25px;", "Dark Mode") ,
-                                  tags$span(style = "font-size: 25px;", "High Contrast"),
-                                  tags$span(style = "font-size: 25px;", "Large Font") ,
-                                  tags$span(style = "font-size: 25px;", "High Contrast & Large Font") ),
-               choiceValues = list("Default Theme", "Dark Mode", "High Contrast", "Large Font", "High Contrast & Large Font"),
-               inline = TRUE),
   fluidPage(
-    theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
     HTML('<center><img src="TIDAL.png" width="550"></center>'),
     h1("Tool to Implement Developmental Analyses of Longitudinal Data"),
     p("The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people."),
@@ -106,7 +65,6 @@ welcome_page <- tabPanel(
 format_page <- tabPanel(
   title = "Data Preparation",
   fluidPage(
-    theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
     TIDAL:::wide2longUI("wide2long")
   )
 )
@@ -115,7 +73,6 @@ format_page <- tabPanel(
 overview_page <-   tabPanel(
   title = "Data Exploration",
   fluidPage(
-    theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
     tabsetPanel(
       tabPanel("Instructions",
                tagList(
@@ -158,7 +115,6 @@ overview_page <-   tabPanel(
 intervention_page <- tabPanel(
   title = "Interaction Variable",
   fluidPage(
-    theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
     TIDAL:::modelCondUI("modelCond")
   )
 )
@@ -167,7 +123,6 @@ intervention_page <- tabPanel(
 singeTraj_page <-  tabPanel(
   title = "Individual Trajectories",
   fluidPage(
-    theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
     tabsetPanel(
       tabPanel("Instructions",
                tagList(
@@ -185,7 +140,6 @@ singeTraj_page <-  tabPanel(
 importantTimepoint_page <- tabPanel(
   title = "Important Time Points",
   fluidPage(
-    theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
     tabsetPanel(
       tabPanel("Instructions",
                tagList(
@@ -204,7 +158,6 @@ importantTimepoint_page <- tabPanel(
   tabPanel(
   title = "Important Time Points",
   fluidPage(
-    theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
     TIDAL:::importantAgeUI("importantAge")
   )
 )
@@ -212,12 +165,11 @@ importantTimepoint_page <- tabPanel(
 
 ui <- navbarPage(
   title = "TIDAL",
-  theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
+  theme = shinytheme('cerulean'),
   tags$style(type="text/css",
              ".shiny-output-error { visibility: hidden; }",
              ".shiny-output-error:before { visibility: hidden; }"
-  ), #### i thought this might be a problem but removing it doesn't help #### HELP PLS
-  ### setting it to bs_theme(version = 5, bootswatch = "cerulean") doesn't fix it though
+  ),
   welcome_page,
   format_page,
   overview_page,
@@ -276,18 +228,12 @@ server <- function(input, output, session) {
                                              formCodeRender = modelResultsServer$modelFormRender,
                                              statement = modelResultsServer$statement,
                                              fixedTab = modelResultsServer$fixedTab,
-                                             interpretation = modelResultsServer$interpretation
+                                             interpretation = modelResultsServer$interpretation,
                                              randomTab = modelResultsServer$randomTab,
                                              N = modelResultsServer$N,
                                              mainPlot = modelPlotServer$mainPlot,
                                              phenotype = selectDataServer$traj,
-                                             modelType = selectDataServer$modelType,
-                                             datExAltTable = datExAltServer$datExAltTable,
-                                             datExAltPlot = datExAltServer$datExAltPlot,
-                                             AUC = datExAUCServer$AUC,
-                                             plotAUC = datExAUCServer$plotAUC,
-                                             tableAUC = datExAUCServer$tableAUC
-
+                                             modelType = selectDataServer$modelType
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
                                              modelData = modelRunServer$data,
@@ -297,7 +243,6 @@ server <- function(input, output, session) {
                                              age = selectDataServer$age,
                                              timePoint = selectDataServer$timePoint,
                                              modelType = selectDataServer$modelType)
-
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
                                                subject = selectDataServer$ID,
                                                age = selectDataServer$age,
@@ -311,21 +256,7 @@ server <- function(input, output, session) {
                                                    modelType = selectDataServer$modelType,
                                                    modelFit = modelRunServer$fit,
                                                    age = selectDataServer$age)
-  observe(session$setCurrentTheme(
-    if (input$Theme == "Dark Mode"){
-        dark
-      }else if(input$Theme == "High Contrast"){
-        contrast
-      }else if(input$Theme == "Large Font"){
-        large
-      }else if(input$Theme == "High Contrast & Large Font"){
-        largecontrast
-      }else{
-        light
-      }
-    ))
 }
-
 
 # Run the application
 shinyApp(ui = ui, server = server)
