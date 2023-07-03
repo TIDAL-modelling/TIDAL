@@ -696,7 +696,7 @@ modelCondServer <- function(id,
       # ------------------------------------------
       # Plot the score at the given age
 
-      plotScoreAll <- eventReactive(input$ageInputScore, {
+      plotScoreAll <- eventReactive(c(input$ageInputScore,input$button), {
 
         if(input$varType == "cat"){
           req(score_glht())
@@ -706,6 +706,7 @@ modelCondServer <- function(id,
               dplyr::select(estimate)
           })  %>% do.call(cbind, .)
           colnames(estimate) <- input$ageInputScore
+          if(!is.null(estimate)){
           estimate <- estimate %>%
             gather(age, score, 1:ncol(estimate)) %>%
             mutate(age = as.numeric(age))
@@ -732,14 +733,14 @@ modelCondServer <- function(id,
             geom_point(data = estimate, aes(x = age, y = score), col = "#1D86C7", size = 5) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
-
+          }
         }else if(input$varType == "cont"){
+          if(is.numeric((score()$scoreCont))){
           # points of intersection of age and score
           points <- data.frame(x = as.numeric(input$ageInputScore),
                                y = score()$scoreCont
           )
 
-          req(score()$scoreCont)
           ggplot() +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
             scale_colour_discrete(na.translate = F) +
@@ -747,6 +748,7 @@ modelCondServer <- function(id,
             geom_point(data = points, aes(x = x, y = y), col = "#1D86C7", size = 5) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
+          }
         }
       })
       output$plotScore <- renderPlot({
@@ -757,7 +759,7 @@ modelCondServer <- function(id,
       # Return a table of the score for all the ages
       # --- Age | Score
       # Change "Score" to the actual column name from the dataframe - which the user previously specified
-      tableScoreAll <- eventReactive(input$ageInputScore, {
+      tableScoreAll <- eventReactive(c(input$ageInputScore,input$button), {
         if(input$varType == "cat"){
           req(score_glht())
 
@@ -770,12 +772,14 @@ modelCondServer <- function(id,
           estimateCI
 
         }else if(input$varType == "cont"){
-          req(score()$scoreCont)
-          df <- t(data.frame( score()$scoreCont ))
-          rowname <- paste0("Score (", traj(), ") [", input$condition, "]")
-          rownames(df) <- c(rowname)
-          colnames(df) <- input$ageInputScore
-          df
+          if(is.numeric((score()$scoreCont))){
+            req(score()$scoreCont)
+            df <- t(data.frame( score()$scoreCont ))
+            rowname <- paste0("Score (", traj(), ") [", input$condition, "]")
+            rownames(df) <- c(rowname)
+            colnames(df) <- input$ageInputScore
+            df
+          }
         }
       })
 
