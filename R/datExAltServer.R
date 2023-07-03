@@ -106,6 +106,7 @@ datExAltServer <- function(id,
 
       # ------------------------------------------
       # Plot the score at the given age
+
       # points of intersection of age and score
       plotScoreAll <- eventReactive(input$ageInput, {
 
@@ -153,7 +154,7 @@ datExAltServer <- function(id,
       # Return a table of the score for all the ages
       # --- Age | Score -----
       # Change "Score" to the actual column name from the dataframe - which the user previously specified
-      output$table <- renderTable({
+      datExAltTable <- reactive({
         req(score_glht())
 
         estimateCI <- lapply(score_glht(), function(df) {
@@ -163,9 +164,19 @@ datExAltServer <- function(id,
         })  %>% do.call(cbind, .)
         colnames(estimateCI) <- input$ageInputScore
         estimateCI
+      })
+
+      output$table <- renderTable({
+        datExAltTable()
 
       }, colnames = TRUE, rownames = TRUE)
       # ------------------------------------------
+
+      return(list(
+        datExAltTable = datExAltTable,
+             datExAltPlot = plotScoreAll
+        ))
+
     }
   )
 }
