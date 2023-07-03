@@ -1014,31 +1014,17 @@ modelCondServer <- function(id,
       #################################################################################
       # ----- DOWNLOADING RESULTS TAB -------
       ###############################################################
-      # ------------------------------------------
-      # Suffix for name:
-      name <- reactive({
-        if(input$suffix != ""){
-          paste0("_", input$suffix, "_")
-        }else{
-          "_"
-        }
-      })
-
-      # ------------------------------------------
       # Add UI to download results
       output$buttonHere <- renderUI({
         req(plot())
         tagList(
-          textInput(ns("suffix"),
-                    "File name suffix:"
-          ),
           downloadButton(ns("downloadReport"), "Download report")
         )
       })
 
       output$downloadReport <- downloadHandler(
         filename = function(){
-          paste0("Interaction_Variable", name(), Sys.Date(), ".pdf")
+          paste0("Interaction_Variable_", Sys.Date(), ".pdf")
         },
         content = function(file) {
           # Copy the report file to a temporary directory before processing it, in
@@ -1050,21 +1036,71 @@ modelCondServer <- function(id,
 
 
           # -------Set up parameters to pass to Rmd document--------
-          params <- list(
-            cond = condition(),
-            condtype = vartype(),
-            condPlot = plot(),
-            condModelForm = modelform(),
-            condFixed = modelStatsFixed(),
-            condRandom = modelStatsRandom(),
-            modelDataEdit = modelDataEdit(),
-            plotScore = plotScoreAll(),
-            tableScore = tableScoreAll(),
-            AUCplot = plotAUC(),
-            AUCtable = tableAUC(),
-            traj = traj(),
-            modelType = modelType()
-          )
+          if( length(input$ageInputScore) == 0 & length(input$AUCages) == 0 ){
+            params <- list(
+              cond = condition(),
+              condtype = vartype(),
+              condPlot = plot(),
+              condModelForm = modelform(),
+              condFixed = modelStatsFixed(),
+              condRandom = modelStatsRandom(),
+              modelDataEdit = modelDataEdit(),
+              plotScore = NA,
+              tableScore = NA,
+              AUCplot = NA,
+              AUCtable = NA,
+              traj = traj(),
+              modelType = modelType()
+            )
+          }else if( length(input$ageInputScore) == 0 & length(input$AUCages) > 0 ){
+            params <- list(
+              cond = condition(),
+              condtype = vartype(),
+              condPlot = plot(),
+              condModelForm = modelform(),
+              condFixed = modelStatsFixed(),
+              condRandom = modelStatsRandom(),
+              modelDataEdit = modelDataEdit(),
+              plotScore = NA,
+              tableScore = NA,
+              AUCplot = plotAUC(),
+              AUCtable = tableAUC(),
+              traj = traj(),
+              modelType = modelType()
+            )
+          }else if( length(input$ageInputScore) > 0 & length(input$AUCages) == 0 ){
+            params <- list(
+              cond = condition(),
+              condtype = vartype(),
+              condPlot = plot(),
+              condModelForm = modelform(),
+              condFixed = modelStatsFixed(),
+              condRandom = modelStatsRandom(),
+              modelDataEdit = modelDataEdit(),
+              plotScore = plotScoreAll(),
+              tableScore = tableScoreAll(),
+              AUCplot = NA,
+              AUCtable = NA,
+              traj = traj(),
+              modelType = modelType()
+            )
+          }else{
+            params <- list(
+              cond = condition(),
+              condtype = vartype(),
+              condPlot = plot(),
+              condModelForm = modelform(),
+              condFixed = modelStatsFixed(),
+              condRandom = modelStatsRandom(),
+              modelDataEdit = modelDataEdit(),
+              plotScore = plotScoreAll(),
+              tableScore = tableScoreAll(),
+              AUCplot = plotAUC(),
+              AUCtable = tableAUC(),
+              traj = traj(),
+              modelType = modelType()
+            )
+          }
 
           # Knit the document, passing in the `params` list, and eval it in a
           # child of the global environment (this isolates the code in the document

@@ -70,33 +70,44 @@ kbl(params$condRandom[,3:ncol(params$condRandom)], digits = 3)  %>%
 ```
 
 
-## Scores at ages
+```{r, echo = F, results='asis', warning=F}
+if(!is.na(params$plotScore)){
+cat("### Scores at Ages")
+}
+```
 
-``` {r, echo = F}
-
+```{r, echo=F, warning=F}
+if(!is.na(params$plotScore)){
 params$plotScore
-
+}
 ```
 
 
-```{r, echo=F}
+```{r, echo=F, warning=F}
+if(!is.na(params$tableScore)){
 kbl(params$tableScore, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
+}
 ```
 
 
+``` {r, echo = F, results='asis', warning=F}
+if(!is.na(params$AUCplot)){
+cat("### Area Under the Curve")
+}
+```
 
-## AUC
-
-``` {r, echo = F}
-
+```{r, echo=F, warning=F}
+if(!is.na(params$AUCplot)){
 params$AUCplot
-
+}
 ```
 
 
-```{r, echo=F}
+```{r, echo=F, warning=F}
+if(!is.na(params$AUCtable)){
 kbl(params$AUCtable, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
+}
 ```
 
