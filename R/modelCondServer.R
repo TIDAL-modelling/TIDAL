@@ -471,119 +471,6 @@ modelCondServer <- function(id,
                            inline = TRUE)
       })
 
-      # ------------------------------------------
-      # Calculate the score at a given age (intercept + slope etc)
-      score <- reactive({
-        ageOrig <- modelDataEdit() %>% pull(age_original)
-        ageOrig <- ageOrig[!is.na(ageOrig)]
-
-        score <- sapply(as.numeric(input$ageInputScore), function(x){
-          if(modelType() == "Linear"){
-            (summary(fit())$coefficients[1,1] +
-               (x - mean(ageOrig)) * summary(fit())$coefficients[2,1]) %>%
-              round(2)
-          } else if(modelType() == "Quadratic"){
-            ( summary(fit())$coefficients[1,1] +
-                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
-                (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1]) %>%
-              round(2)
-          } else if(modelType() == "Cubic"){
-            (summary(fit())$coefficients[1,1] +
-               (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
-               (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
-               (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] )%>%
-              round(2)
-          } else if(modelType() == "Quartic"){
-            ( summary(fit())$coefficients[1,1] +
-                (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
-                (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
-                (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
-                (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1]) %>%
-              round(2)
-          }
-        })
-
-        if(input$varType == "cat"){
-          n <- length(unique(pull(modelDataScaled(), !!sym(input$condition))))
-          rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                       pattern = input$condition) &
-                              str_detect(string = row.names(summary(fit())$coefficients),
-                                         pattern = ":", negate = T))
-
-          rowIndexInteract1 <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                                pattern = input$condition) &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = ":") &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = "\\^", negate = T))
-
-          rowIndexInteract2 <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                                pattern = input$condition) &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = ":") &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = "\\^2"))
-
-          rowIndexInteract3 <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                                pattern = input$condition) &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = ":") &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = "\\^3"))
-
-          rowIndexInteract4 <- which(str_detect(string = row.names(summary(fit())$coefficients),
-                                                pattern = input$condition) &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = ":") &
-                                       str_detect(string = row.names(summary(fit())$coefficients),
-                                                  pattern = "\\^4"))
-
-          scoreCovs <- lapply(1:(n-1), function(i){
-            sapply(as.numeric(input$ageInputScore), function(x){
-              if(modelType() == "Linear"){
-                scoreCov <-   summary(fit())$coefficients[1,1] +
-                              summary(fit())$coefficients[rowIndex[i],1] +
-                              (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
-                              ((x - mean(ageOrig)) * summary(fit())$coefficients[rowIndexInteract1[i],1])
-                round(scoreCov, 2)
-              } else if(modelType() == "Quadratic"){
-                scoreCov <-  summary(fit())$coefficients[1,1] +
-                  summary(fit())$coefficients[rowIndex[i],1] +
-                  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
-                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
-                  ((x - mean(ageOrig)) * summary(fit())$coefficients[rowIndexInteract1[i],1]) +
-                  ((x - mean(ageOrig))^2 * summary(fit())$coefficients[rowIndexInteract2[i],1])
-                round(scoreCov, 2)
-              } else if(modelType() == "Cubic"){
-                scoreCov <-  summary(fit())$coefficients[1,1] +
-                  summary(fit())$coefficients[rowIndex[i],1] +
-                  (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
-                  (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
-                  (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
-                  ((x - mean(ageOrig)) * summary(fit())$coefficients[rowIndexInteract1[i],1]) +
-                  ((x - mean(ageOrig))^2 * summary(fit())$coefficients[rowIndexInteract2[i],1]) +
-                  ((x - mean(ageOrig))^3 * summary(fit())$coefficients[rowIndexInteract3[i],1])
-                round(scoreCov, 2)
-              } else if(modelType() == "Quartic"){
-                scoreCov <-  summary(fit())$coefficients[1,1] +
-                             summary(fit())$coefficients[rowIndex[i],1]  +
-                             (x - mean(ageOrig)) * summary(fit())$coefficients[2,1] +
-                             (x - mean(ageOrig))^2 * summary(fit())$coefficients[3,1] +
-                             (x - mean(ageOrig))^3 * summary(fit())$coefficients[4,1] +
-                             (x - mean(ageOrig))^4 * summary(fit())$coefficients[5,1] +
-                             ((x - mean(ageOrig)) * summary(fit())$coefficients[rowIndexInteract1[i],1]) +
-                             ((x - mean(ageOrig))^2 * summary(fit())$coefficients[rowIndexInteract2[i],1]) +
-                             ((x - mean(ageOrig))^3 * summary(fit())$coefficients[rowIndexInteract3[i],1]) +
-                             ((x - mean(ageOrig))^4 * summary(fit())$coefficients[rowIndexInteract4[i],1])
-                round(scoreCov, 2)
-              }
-            })
-          })
-          return( list(score = score, scoreCovs = scoreCovs) )
-        }else{
-          return(list(scoreCont = score))
-        }
-      })
 
       # ------------------------------------------
       # use glht to calculate scores at ages
@@ -593,7 +480,9 @@ modelCondServer <- function(id,
 
         score <- lapply(as.numeric(input$ageInputScore), function(x){
 
+          if(input$varType == "cat"){
           n <- length(unique(pull(modelDataEdit(), !!sym(input$condition))))
+          }
 
           rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
                                        pattern = input$condition) &
@@ -609,13 +498,19 @@ modelCondServer <- function(id,
           # --------------------
           # Change for model type
           if(modelType() == "Linear"){
-          equations <- sapply(1:(n-1), function(i){
-            paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[rowIndex[i]] , " + ", rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " == 0")
-          })
+            if(input$varType == "cat"){
+              equations <- sapply(1:(n-1), function(i){
+                paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[rowIndex[i]] , " + ", rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " == 0")
+              })
+            }else if(input$varType == "cont"){
+              equations <- c(paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[rowIndex] , " + ", rowNames[2], ":", rowNames[rowIndex],"*",ageInput , " == 0") ,
+                             paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " - ", rowNames[rowIndex] , " - ", rowNames[2], ":", rowNames[rowIndex],"*",ageInput , " == 0") )
+            }
 
-          res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " == 0"), equations) )
+            res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " == 0"), equations) )
+
           }else if(modelType() == "Quadratic"){
-
+            if(input$varType == "cat"){
             equations <- sapply(1:(n-1), function(i){
               paste0(rowNames[1], " + ",
                      rowNames[rowIndex[i]] , " + ",
@@ -626,24 +521,64 @@ modelCondServer <- function(id,
                      " == 0")
             })
 
+            }else if(input$varType == "cont"){
+              equations <- c(paste0(rowNames[1], " + ",
+                       rowNames[rowIndex] , " + ",
+                       rowNames[2], "*", ageInput, " + \`",
+                       rowNames[3], "\`*", ageInput2, " + ",
+                       rowNames[2], ":", rowNames[rowIndex],"*",ageInput , " + \`",
+                       rowNames[3], ":", rowNames[rowIndex],"\`*",ageInput2 , "",
+                       " == 0"),
+                paste0(rowNames[1], " - ",
+                       rowNames[rowIndex] , " + ",
+                       rowNames[2], "*", ageInput, " + \`",
+                       rowNames[3], "\`*", ageInput2, " - ",
+                       rowNames[2], ":", rowNames[rowIndex],"*",ageInput , " - \`",
+                       rowNames[3], ":", rowNames[rowIndex],"\`*",ageInput2 , "",
+                       " == 0"))
+            }
+
             res <- glht(fit(), linfct = c( paste0(rowNames[1], " + ",
                                                 rowNames[2], "*", ageInput," + \`",
                                                 rowNames[3], "\`*", ageInput2,
                                                 " == 0"),
                                          equations) )
            } else if(modelType() == "Cubic"){
+             if(input$varType == "cat"){
+               equations <- sapply(1:(n-1), function(i){
+                 paste0(rowNames[1], " + ",
+                        rowNames[rowIndex[i]] , " + ",
+                        rowNames[2], "*", ageInput, " + \`",
+                        rowNames[3], "\`*", ageInput2, " + \`",
+                        rowNames[4], "\`*", ageInput3,  " + ",
+                        rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " + \`",
+                        rowNames[3], ":", rowNames[rowIndex[i]],"\`*",ageInput2 , " + \`",
+                        rowNames[4], ":", rowNames[rowIndex[i]],"\`*",ageInput3 ,
+                        " == 0")
+               })
 
-             equations <- sapply(1:(n-1), function(i){
-               paste0(rowNames[1], " + ",
-                      rowNames[rowIndex[i]] , " + ",
-                      rowNames[2], "*", ageInput, " + \`",
-                      rowNames[3], "\`*", ageInput2, " + \`",
-                      rowNames[4], "\`*", ageInput3,  " + ",
-                      rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " + \`",
-                      rowNames[3], ":", rowNames[rowIndex[i]],"\`*",ageInput2 , " + \`",
-                      rowNames[4], ":", rowNames[rowIndex[i]],"\`*",ageInput3 ,
-                      " == 0")
-             })
+             }else if(input$varType == "cont"){
+               equations <-
+                 c(paste0(rowNames[1], " + ",
+                        rowNames[rowIndex] , " + ",
+                        rowNames[2], "*", ageInput, " + \`",
+                        rowNames[3], "\`*", ageInput2, " + \`",
+                        rowNames[4], "\`*", ageInput3,  " + ",
+                        rowNames[2], ":", rowNames[rowIndex],"*",ageInput , " + \`",
+                        rowNames[3], ":", rowNames[rowIndex],"\`*",ageInput2 , " + \`",
+                        rowNames[4], ":", rowNames[rowIndex],"\`*",ageInput3 ,
+                        " == 0"),
+                   paste0(rowNames[1], " - ",
+                          rowNames[rowIndex] , " + ",
+                          rowNames[2], "*", ageInput, " + \`",
+                          rowNames[3], "\`*", ageInput2, " + \`",
+                          rowNames[4], "\`*", ageInput3,  " - ",
+                          rowNames[2], ":", rowNames[rowIndex],"*",ageInput , " - \`",
+                          rowNames[3], ":", rowNames[rowIndex],"\`*",ageInput2 , " - \`",
+                          rowNames[4], ":", rowNames[rowIndex],"\`*",ageInput3 ,
+                          " == 0"))
+
+             }
 
              res <- glht(fit(), linfct = c( paste0(rowNames[1], " + ",
                                                  rowNames[2], "*", ageInput," + \`",
@@ -653,19 +588,46 @@ modelCondServer <- function(id,
                                           equations) )
 
            } else if(modelType() == "Quartic"){
-             equations <- sapply(1:(n-1), function(i){
-               paste0(rowNames[1], " + ",
-                      rowNames[rowIndex[i]] , " + ",
-                      rowNames[2], "*", ageInput, " + \`",
-                      rowNames[3], "\`*", ageInput2, " + \`",
-                      rowNames[4], "\`*", ageInput3,  " + \`",
-                      rowNames[5], "\`*", ageInput4,  " + ",
-                      rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " + \`",
-                      rowNames[3], ":", rowNames[rowIndex[i]],"\`*",ageInput2 , " + \`",
-                      rowNames[4], ":", rowNames[rowIndex[i]],"\`*",ageInput3 , " + \`",
-                      rowNames[5], ":", rowNames[rowIndex[i]],"\`*",ageInput4 ,
-                      " == 0")
-             })
+             if(input$varType == "cat"){
+               equations <- sapply(1:(n-1), function(i){
+                 paste0(rowNames[1], " + ",
+                        rowNames[rowIndex[i]] , " + ",
+                        rowNames[2], "*", ageInput, " + \`",
+                        rowNames[3], "\`*", ageInput2, " + \`",
+                        rowNames[4], "\`*", ageInput3,  " + \`",
+                        rowNames[5], "\`*", ageInput4,  " + ",
+                        rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " + \`",
+                        rowNames[3], ":", rowNames[rowIndex[i]],"\`*",ageInput2 , " + \`",
+                        rowNames[4], ":", rowNames[rowIndex[i]],"\`*",ageInput3 , " + \`",
+                        rowNames[5], ":", rowNames[rowIndex[i]],"\`*",ageInput4 ,
+                        " == 0")
+               })
+
+             }else if(input$varType == "cont"){
+               equations <- c(
+                 paste0(rowNames[1], " + ",
+                        rowNames[rowIndex] , " + ",
+                        rowNames[2], "*", ageInput, " + \`",
+                        rowNames[3], "\`*", ageInput2, " + \`",
+                        rowNames[4], "\`*", ageInput3,  " + \`",
+                        rowNames[5], "\`*", ageInput4,  " + ",
+                        rowNames[2], ":", rowNames[rowIndex],"*",ageInput , " + \`",
+                        rowNames[3], ":", rowNames[rowIndex],"\`*",ageInput2 , " + \`",
+                        rowNames[4], ":", rowNames[rowIndex],"\`*",ageInput3 , " + \`",
+                        rowNames[5], ":", rowNames[rowIndex],"\`*",ageInput4 ,
+                        " == 0"),
+                 paste0(rowNames[1], " - ",
+                        rowNames[rowIndex] , " + ",
+                        rowNames[2], "*", ageInput, " + \`",
+                        rowNames[3], "\`*", ageInput2, " + \`",
+                        rowNames[4], "\`*", ageInput3,  " + \`",
+                        rowNames[5], "\`*", ageInput4,  " - ",
+                        rowNames[2], ":", rowNames[rowIndex],"*",ageInput , " + \`",
+                        rowNames[3], ":", rowNames[rowIndex],"\`*",ageInput2 , " - \`",
+                        rowNames[4], ":", rowNames[rowIndex],"\`*",ageInput3 , " - \`",
+                        rowNames[5], ":", rowNames[rowIndex],"\`*",ageInput4 ,
+                        " == 0"))
+             }
 
              res <- glht(fit(), linfct = c( paste0(rowNames[1], " + ",
                                                    rowNames[2], "*", ageInput," + \`",
@@ -680,12 +642,20 @@ modelCondServer <- function(id,
           res <- tidy(confint(res))
 
           rowname <- paste0("Score (", traj(), ")")
+
+          if(input$varType == "cat"){
           levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
 
           res <-  res %>%
             mutate(contrast = paste0(rowname, " [", input$condition, ", level = ", levelNames, " ] (95% CIs)")) %>%
             column_to_rownames(var = "contrast") %>%
             mutate(across(where(is.numeric), round, 2))
+          }else if(input$varType == "cont"){
+            res <-  res %>%
+              mutate(contrast = paste0(paste0(rowname, " [", input$condition, " ] "), c("Population Average", "+ 1 SD", "- 1 SD") ) ) %>%
+              column_to_rownames(var = "contrast") %>%
+              mutate(across(where(is.numeric), round, 2))
+          }
 
           return( res )
         })
@@ -698,7 +668,7 @@ modelCondServer <- function(id,
 
       plotScoreAll <- eventReactive(c(input$ageInputScore,input$button), {
 
-        if(input$varType == "cat"){
+
           req(score_glht())
 
           estimate <- lapply(score_glht(), function(df) {
@@ -707,49 +677,50 @@ modelCondServer <- function(id,
           })  %>% do.call(cbind, .)
           colnames(estimate) <- input$ageInputScore
           if(!is.null(estimate)){
-          estimate <- estimate %>%
-            gather(age, score, 1:ncol(estimate)) %>%
-            mutate(age = as.numeric(age))
+            estimate <- estimate %>%
+              gather(age, score, 1:ncol(estimate)) %>%
+              mutate(age = as.numeric(age))
 
-          conf.low <- lapply(score_glht(), function(df) {df %>% dplyr::select(conf.low)}) %>% do.call(cbind, .)
-          colnames(conf.low) <- input$ageInputScore
-          conf.low  <- conf.low %>%
-            gather(age, conf.low, 1:ncol(conf.low)) %>%
-            mutate(age = as.numeric(age))
+            conf.low <- lapply(score_glht(), function(df) {df %>% dplyr::select(conf.low)}) %>% do.call(cbind, .)
+            colnames(conf.low) <- input$ageInputScore
+            conf.low  <- conf.low %>%
+              gather(age, conf.low, 1:ncol(conf.low)) %>%
+              mutate(age = as.numeric(age))
 
-          conf.high <- lapply(score_glht(), function(df) {df %>% dplyr::select(conf.high)}) %>% do.call(cbind, .)
-          colnames(conf.high) <- input$ageInputScore
-          conf.high  <- conf.high %>%
-            gather(age, conf.high, 1:ncol(conf.high)) %>%
-            mutate(age = as.numeric(age))%>%
-            dplyr::select(-age)
+            conf.high <- lapply(score_glht(), function(df) {df %>% dplyr::select(conf.high)}) %>% do.call(cbind, .)
+            colnames(conf.high) <- input$ageInputScore
+            conf.high  <- conf.high %>%
+              gather(age, conf.high, 1:ncol(conf.high)) %>%
+              mutate(age = as.numeric(age))%>%
+              dplyr::select(-age)
 
-          conf <- cbind(conf.low, conf.high, "age")
+            conf <- cbind(conf.low, conf.high, "age")
 
-          ggplot() +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
-            theme(legend.text = element_text(color = "black")) +
-            geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high), width = 0.5) +
-            geom_point(data = estimate, aes(x = age, y = score), col = "#1D86C7", size = 5) +
-            ylab(paste0("Score (", traj(), ")")) +
-            xlab("Age")
+            if(input$varType == "cat"){
+              ggplot() +
+                geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+                theme(legend.text = element_text(color = "black")) +
+                geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high), width = 0.5) +
+                geom_point(data = estimate, aes(x = age, y = score), col = "#1D86C7", size = 5) +
+                ylab(paste0("Score (", traj(), ")")) +
+                xlab("Age")
+            }else if(input$varType == "cont"){
+              ggplot() +
+                geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = "Population Average" ) , linewidth = 1.5, na.rm=T)+
+                geom_line(data = modelDataEdit(), aes(x= age_original ,  y = plus, color = "+ 1 SD" ) , na.rm=T)+
+                geom_line(data = modelDataEdit(), aes(x= age_original ,  y = minus, color = "- 1 SD" ) , na.rm=T) +
+                theme(legend.text = element_text(color = "black"))+
+                geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high), width = 0.5) +
+                geom_point(data = estimate, aes(x = age, y = score), col = "#1D86C7", size = 5) +
+                labs(color = "") +
+                scale_color_manual(
+                  breaks = c("+ 1 SD", "Population Average", "- 1 SD"),
+                  values = c("#d55e00", "black", "#0072b2")) +
+                ylab(paste0("Score (", traj(), ")")) +
+                xlab("Age")
+            }
           }
-        }else if(input$varType == "cont"){
-          if(is.numeric((score()$scoreCont))){
-          # points of intersection of age and score
-          points <- data.frame(x = as.numeric(input$ageInputScore),
-                               y = score()$scoreCont
-          )
 
-          ggplot() +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
-            scale_colour_discrete(na.translate = F) +
-            theme(legend.text = element_text(color = "black")) +
-            geom_point(data = points, aes(x = x, y = y), col = "#1D86C7", size = 5) +
-            ylab(paste0("Score (", traj(), ")")) +
-            xlab("Age")
-          }
-        }
       })
       output$plotScore <- renderPlot({
         plotScoreAll()
@@ -760,7 +731,6 @@ modelCondServer <- function(id,
       # --- Age | Score
       # Change "Score" to the actual column name from the dataframe - which the user previously specified
       tableScoreAll <- eventReactive(c(input$ageInputScore,input$button), {
-        if(input$varType == "cat"){
           req(score_glht())
 
           estimateCI <- lapply(score_glht(), function(df) {
@@ -770,17 +740,6 @@ modelCondServer <- function(id,
           })  %>% do.call(cbind, .)
           colnames(estimateCI) <- input$ageInputScore
           estimateCI
-
-        }else if(input$varType == "cont"){
-          if(is.numeric((score()$scoreCont))){
-            req(score()$scoreCont)
-            df <- t(data.frame( score()$scoreCont ))
-            rowname <- paste0("Score (", traj(), ") [", input$condition, "]")
-            rownames(df) <- c(rowname)
-            colnames(df) <- input$ageInputScore
-            df
-          }
-        }
       })
 
       output$tableScore <- renderTable({
