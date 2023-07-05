@@ -95,7 +95,7 @@ importantAgeServer <- function(id,
         "Age at maximum symptoms cannot be calculated for linear models."
         } else if(modelType() == "Quadratic" | modelType() == "Cubic"){
           if(is.na(valuesList()$maxSymptoms)){
-            "No real roots. Age at maximum symptoms cannot be determined."
+            "No real roots. Age at maximum symptoms cannot be determined." # There might be a bug here, maybe plot it anyway even if it's out of range.
           }else{
             paste0("Age at maximum symptoms: ", round(valuesList()$maxSymptoms, 2))
           }
