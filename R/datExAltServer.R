@@ -100,11 +100,6 @@ datExAltServer <- function(id,
       })
 
       # ------------------------------------------
-      output$test <- renderText({
-        paste0(score_glht)
-      })
-
-      # ------------------------------------------
       # Plot the score at the given age
 
       # points of intersection of age and score
@@ -157,24 +152,23 @@ datExAltServer <- function(id,
       datExAltTable <- reactive({
         req(score_glht())
 
-        estimateCI_df <- lapply(score_glht(), function(df) {
+        estimateCI <- lapply(score_glht(), function(df) {
           df %>%
             mutate(estimateCI = paste0(estimate, " (", conf.low, " - ", conf.high, ")")) %>%
             dplyr::select(estimateCI)
         })  %>% do.call(cbind, .)
-        colnames(estimateCI_df) <- as.character(input$ageInput)
-        estimateCI_df
+        colnames(estimateCI) <- input$ageInput
+        estimateCI
       })
 
       output$table <- renderTable({
         datExAltTable()
-
-      }, rownames = TRUE)
+      }, colnames = TRUE, rownames = TRUE)
       # ------------------------------------------
 
       return(list(
-        datExAltTable = datExAltTable,
-             datExAltPlot = plotScoreAll
+            datExAltTable = datExAltTable,
+            datExAltPlot = plotScoreAll
         ))
 
     }

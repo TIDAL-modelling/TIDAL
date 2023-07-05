@@ -24,6 +24,7 @@ params:
 library(knitr)
 library(kableExtra)
 library(stringr)
+library(ggplot2)
 
 include_graphics("TIDAL.png")
 ```
@@ -96,20 +97,20 @@ kbl(params$randomTab, digits = 3)  %>%
 
 
 ```{r, echo = F, results='asis', warning=F}
-if(!is.na(params$datExAltPlot)){
+if(is.ggplot(params$datExAltPlot)){
 cat("### Scores at Ages")
 }
 ```
 
 ```{r, echo=F, warning=F}
-if(!is.na(params$datExAltPlot)){
+if(is.ggplot(params$datExAltPlot)){
 params$datExAltPlot
 }
 ```
 
 
 ```{r, echo=F, warning=F}
-if(!is.na(params$datExAltTable)){
+if(is.ggplot(params$datExAltPlot)){
 kbl(params$datExAltTable, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 }
@@ -117,20 +118,20 @@ kbl(params$datExAltTable, digits = 3)  %>%
 
 
 ``` {r, echo = F, results='asis', warning=F}
-if(!is.na(params$plotAUC)){
+if(is.ggplot(params$plotAUC)){
 cat("### Area Under the Curve")
 }
 ```
 
 ```{r, echo=F, warning=F}
-if(!is.na(params$plotAUC)){
+if(is.ggplot(params$plotAUC)){
 params$plotAUC
 }
 ```
 
 
 ```{r, echo=F, warning=F}
-if(!is.na(params$tableAUC)){
+if(is.ggplot(params$plotAUC)){
 kbl(params$tableAUC, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 }
