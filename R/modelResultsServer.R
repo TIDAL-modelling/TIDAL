@@ -69,9 +69,10 @@ modelResultsServer <- function(id,
           mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
           mutate(p.z = ifelse(p.z <= 0, "p < 0.001", round(p.z, 3)))
       })
-      output$modelStatsFixed <- renderTable(
+
+      output$modelStatsFixed <- renderTable({
         fixedTab()
-      )
+      }, digits = 3)
 
       # ------------------------------------------
       # Interpretation of fixed effects
@@ -145,9 +146,9 @@ modelResultsServer <- function(id,
           mutate(across(where(is.numeric), round, 3))
       })
 
-      output$modelStatsRandom <- renderTable(
+      output$modelStatsRandom <- renderTable({
         randomTab()
-      )
+      }, digits = 3)
 
       # number of observations (measurements) and the number of groups (people)
       N <- reactive({

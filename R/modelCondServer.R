@@ -362,7 +362,9 @@ modelCondServer <- function(id,
         }
       })
 
-      output$modelStatsFixed <- renderTable({modelStatsFixed()})
+      output$modelStatsFixed <- renderTable({
+        modelStatsFixed()
+        }, digits = 3)
 
       modelStatsRandom <- reactive({
         if(str_detect(formCodeCovars(), input$condition)){
@@ -373,7 +375,9 @@ modelCondServer <- function(id,
         }
       })
 
-      output$modelStatsRandom <- renderTable({modelStatsRandom()})
+      output$modelStatsRandom <- renderTable({
+        modelStatsRandom()
+        }, digits = 3)
 
       # ---------------------------------------
       # Paste the model formula for the user to see (don't want it to appear straight away - could improve this)
