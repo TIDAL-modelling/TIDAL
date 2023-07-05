@@ -919,13 +919,17 @@ modelCondServer <- function(id,
                         aes(x = age_original, ymax = pred, ymin = 0),
                         alpha = 0.1, show.legend = FALSE, fill = "#1D86C7") +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred ) , na.rm=T)+
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = plus, color = "+ 1 SD" ) , na.rm=T)+
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = minus, color = "- 1 SD" ) , na.rm=T)+
             coord_cartesian(xlim = c(input$AUCages[1], input$AUCages[2])) +
-            scale_colour_discrete(na.translate = F) +
             theme(legend.text = element_text(color = "black")) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age") +
             scale_x_continuous(breaks = seq(round(min(modelDataEdit()$age_original, na.rm =T)), round(max(modelDataEdit()$age_original, na.rm =T)), by = 1),
                                expand = c(0, 0)) +
+            scale_color_manual(
+              breaks = c("+ 1 SD", "Population Average", "- 1 SD"),
+              values = c("#d55e00", "black", "#0072b2")) +
             scale_y_continuous(expand = c(0, 0))
         }
       })
@@ -959,7 +963,7 @@ modelCondServer <- function(id,
                        round(AUC()$AUC_SD[1], 2),
                        round(AUC()$AUC_SD[2], 2))
           )
-          rowname <- paste0(paste0("AUC (", traj(), ") [", input$condition, " ]"), c("Population Average", "+ 1 SD", "- 1 SD")  )
+          rowname <- paste0(paste0("AUC (", traj(), ") [", input$condition, " ] "), c("Population Average", "+ 1 SD", "- 1 SD")  )
           rownames(df) <- c("Age Range", rowname)
           df
         }
