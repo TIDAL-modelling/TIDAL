@@ -157,19 +157,19 @@ datExAltServer <- function(id,
       datExAltTable <- reactive({
         req(score_glht())
 
-        estimateCI <- lapply(score_glht(), function(df) {
+        estimateCI_df <- lapply(score_glht(), function(df) {
           df %>%
             mutate(estimateCI = paste0(estimate, " (", conf.low, " - ", conf.high, ")")) %>%
             dplyr::select(estimateCI)
         })  %>% do.call(cbind, .)
-        colnames(estimateCI) <- input$ageInputScore
-        estimateCI
+        colnames(estimateCI_df) <- as.character(input$ageInput)
+        estimateCI_df
       })
 
       output$table <- renderTable({
         datExAltTable()
 
-      }, colnames = TRUE, rownames = TRUE)
+      }, rownames = TRUE)
       # ------------------------------------------
 
       return(list(
