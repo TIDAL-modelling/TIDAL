@@ -91,15 +91,15 @@ welcome_page <- tabPanel(
     h4("Data Preparation"),
     p("This allows the user to upload a wide format of their longitudinal dataset. Select which columns measure time and the phenotype they want to model trajectories on. Converts the dataframe to long format. Allows the user to download the long format dataset."),
     h4("Data Exploration"),
-    p("This is the first stage of the trajectory modelling. Here the user either uploads a long format dataset or uses the dataset formatted on the previous page (Data Preparation). They specify the columns relatated to the variables to include in the model. There is a choice of model type and the user can see which model type looks like it best fits their data to explore further on the following pages."),
-    h4("Group Interactions"),
-    p("Split the trajectories by varaibles to examine the differences in trajectories."),
+    p("This is the first stage of the trajectory modelling. Here the user either uploads a long format dataset or uses the dataset formatted on the previous page (Data Preparation). They specify the columns relatated to the variables to include in the model. There is a choice of model type and the user can see which model type looks like it best fits their data to explore further."),
+    h4("Interaction Variable"),
+    p("Explore the effect of a categorical or continuous variable on the trajectories."),
     h4("Individual Trajectories"),
     p("View trajectories for specific individuals. Choose from a random sample, specific individuals of interest, individuals within a specific variable, eg. a random sample of females only."),
-    h4("Points of acceleration (In Development)"),
-    p("Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory."),
-    h4("Stability (In Development)"),
-    p("Captures within-individual variability in depressive symptoms over time and compare how this varies by different forms of interventions or combinations of interventions.")
+    # h4("Points of acceleration (In Development)"),
+    # p("Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory."),
+    # h4("Stability (In Development)"),
+    # p("Captures within-individual variability in depressive symptoms over time and compare how this varies by different forms of interventions or combinations of interventions.")
   )
 )
 
@@ -182,32 +182,23 @@ singeTraj_page <-  tabPanel(
   )
 )
 
-importantTimepoint_page <- tabPanel(
-  title = "Important Time Points",
-  fluidPage(
-    theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
-    tabsetPanel(
-      tabPanel("Instructions",
-               tagList(
-                 h4("Important Time Points"),
-                 p("Determine the age where symptoms or scores are their maximum.
-              No user input is required as the model determined on the Data Exploration page is carried forward.")
-               )),
-
-      TIDAL:::importantAgeUI("importantAge")
-
-    )
-  )
-)
-
-
-  tabPanel(
-  title = "Important Time Points",
-  fluidPage(
-    theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
-    TIDAL:::importantAgeUI("importantAge")
-  )
-)
+# importantTimepoint_page <- tabPanel(
+#   title = "Important Time Points",
+#   fluidPage(
+#     theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
+#     tabsetPanel(
+#       tabPanel("Instructions",
+#                tagList(
+#                  h4("Important Time Points"),
+#                  p("Determine the age where symptoms or scores are their maximum.
+#               No user input is required as the model determined on the Data Exploration page is carried forward.")
+#                )),
+#
+#       TIDAL:::importantAgeUI("importantAge")
+#
+#     )
+#   )
+# )
 
 
 ui <- navbarPage(
@@ -222,8 +213,8 @@ ui <- navbarPage(
   format_page,
   overview_page,
   intervention_page,
-  singeTraj_page,
-  importantTimepoint_page
+  singeTraj_page#,
+  # importantTimepoint_page
 )
 
 # Main server
