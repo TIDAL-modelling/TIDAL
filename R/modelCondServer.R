@@ -1155,10 +1155,15 @@ modelCondServer <- function(id,
 
 
           # -------Set up parameters to pass to Rmd document--------
+          # pass condition selection to an object for report?
+          condition <- reactive({ input$condition })
+          # pass vartype to an object for report?
+          vartype <- reactive({ input$varType })
+
           if( length(input$ageInputScore) == 0 & length(input$AUCages) == 0 ){
             params <- list(
-              cond = input$condition,
-              condtype = input$input$varType,
+              cond = condition(),
+              condtype = vartype(),
               condPlot = plot(),
               condModelForm = modelform(),
               condFixed = modelStatsFixed(),
@@ -1173,8 +1178,8 @@ modelCondServer <- function(id,
             )
           }else if( length(input$ageInputScore) == 0 & length(input$AUCages) > 0 ){
             params <- list(
-              cond = input$condition,
-              condtype = input$input$varType,
+              cond = condition(),
+              condtype = vartype(),
               condPlot = plot(),
               condModelForm = modelform(),
               condFixed = modelStatsFixed(),
@@ -1189,8 +1194,8 @@ modelCondServer <- function(id,
             )
           }else if( length(input$ageInputScore) > 0 & length(input$AUCages) == 0 ){
             params <- list(
-              cond = input$condition,
-              condtype = input$input$varType,
+              cond = condition(),
+              condtype = vartype(),
               condPlot = plot(),
               condModelForm = modelform(),
               condFixed = modelStatsFixed(),
@@ -1205,8 +1210,8 @@ modelCondServer <- function(id,
             )
           }else{
             params <- list(
-              cond = input$condition,
-              condtype = input$input$varType,
+              cond = condition(),
+              condtype = vartype(),
               condPlot = plot(),
               condModelForm = modelform(),
               condFixed = modelStatsFixed(),
