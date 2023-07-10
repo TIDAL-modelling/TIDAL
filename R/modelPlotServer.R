@@ -108,6 +108,7 @@ modelPlotServer <- function(id,
       })
 
       # ------------------------------------------
+
       mainPlot <- eventReactive(c(input$plotCheckbox, modelFit()), {
         if(input$plotCheckbox == TRUE){
         ggplot() +
