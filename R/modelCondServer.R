@@ -537,8 +537,15 @@ modelCondServer <- function(id,
           }
         }else if(input$plotCheckbox == FALSE){
           if(input$varType == "cat"){
+            # Create a subset of the color palette based on the selected levels
+            levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
+            selected_colors <- getOption("ggplot2.discrete.colour")[which(levelNames %in% input$plotCheckboxLevels)]
+
             ggplot() +
               geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
+              geom_ribbon(data = filter(modelDataEdit(), !!sym(input$condition) %in% input$plotCheckboxLevels ) , aes(x= age_original , ymin = minus95, ymax = plus95, fill = !!sym(input$condition)), alpha = 0.2) +
+              scale_color_manual(values = getOption("ggplot2.discrete.colour")) +
+              scale_fill_manual(values = selected_colors) +
               theme(legend.text = element_text(color = "black")) +
               ylab(paste0("Score (", traj(), ")")) +
               xlab("Age")
