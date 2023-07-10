@@ -509,7 +509,7 @@ modelCondServer <- function(id,
 
             ggplot() +
               geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
-              geom_ribbon(data = filter(modelDataEdit(), !!sym(input$condition) %in% input$plotCheckboxLevels ) , aes(x= age_original , ymin = minus95, ymax = plus95, fill = !!sym(input$condition)), alpha = 0.2) +
+              geom_ribbon(data = filter(modelDataEdit(), !!sym(input$condition) %in% input$plotCheckboxLevels ) , aes(x= age_original , ymin = minus95, ymax = plus95, fill = !!sym(input$condition)), alpha = 0.2, na.rm = T) +
               scale_color_manual(values = getOption("ggplot2.discrete.colour")) +
               scale_fill_manual(values = selected_colors) +
               geom_point(data = dfPlot(),aes(x=Age, y=Phenotype))+
@@ -543,7 +543,7 @@ modelCondServer <- function(id,
 
             ggplot() +
               geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred, color = !!sym(input$condition) ) , na.rm=T) +
-              geom_ribbon(data = filter(modelDataEdit(), !!sym(input$condition) %in% input$plotCheckboxLevels ) , aes(x= age_original , ymin = minus95, ymax = plus95, fill = !!sym(input$condition)), alpha = 0.2) +
+              geom_ribbon(data = filter(modelDataEdit(), !!sym(input$condition) %in% input$plotCheckboxLevels ) , aes(x= age_original , ymin = minus95, ymax = plus95, fill = !!sym(input$condition)), alpha = 0.2, na.rm = T) +
               scale_color_manual(values = getOption("ggplot2.discrete.colour")) +
               scale_fill_manual(values = selected_colors) +
               theme(legend.text = element_text(color = "black")) +

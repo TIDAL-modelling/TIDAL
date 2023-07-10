@@ -113,7 +113,7 @@ modelPlotServer <- function(id,
         if(input$plotCheckbox == TRUE){
         ggplot() +
           geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), color = "#1D86C7", linewidth = 1.5, na.rm=T) +
-          geom_ribbon(data = modelDataEdit(), aes(x= age_original , ymin = minus95, ymax = plus95), fill = "#1D86C7", alpha = 0.2) +
+          geom_ribbon(data = modelDataEdit(), aes(x= age_original , ymin = minus95, ymax = plus95), fill = "#1D86C7", alpha = 0.2, na.rm = T) +
           geom_point(data = df.plot(),aes(x=Age, y=Phenotype))+
           geom_line(data = df.plot(),aes(x=Age, y=Phenotype)) +
           geom_errorbar(data = df.plot(), aes(x=Age, y=Phenotype, ymin = lower, ymax = upper)) +
