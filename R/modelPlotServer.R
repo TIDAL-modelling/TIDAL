@@ -26,30 +26,70 @@ modelPlotServer <- function(id,
     function(input, output, session) {
 
       # ------------------------------------------
-      # add the "prediction"/model col to dataframe
+      # add the "prediction"/model col to dataframe (adjustedScore)
+      # also add the 95% CIs for these estimates, by subbing in beta ± 1.96*SE
+      # in coef: column index 1 is estimate, column index 2 is SE
+
       modelDataEdit <- eventReactive(button(), {
 
         age <- modelData() %>% pull(!!age())
 
+        coef <- summary(modelFit())$coefficients
 
         if(modelType() == "Linear"){
-          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
+
+          adjustedScore <- age * coef[2,1] + coef[1,1]
+
+          plus95 <- age * (coef[2,1] + 1.96*coef[2,2]) + (coef[1,1] + 1.96*coef[1,2])
+
+          minus95 <- age * (coef[2,1] - 1.96*coef[2,2]) + (coef[1,1] - 1.96*coef[1,2])
+
         } else if(modelType() == "Quadratic"){
-          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1] +
-            age^2 * summary(modelFit())$coefficients[3,1]
+
+          adjustedScore <- age * coef[2,1] + coef[1,1] +
+            age^2 * coef[3,1]
+
+          plus95 <- age * (coef[2,1] + 1.96*coef[2,2]) + (coef[1,1] + 1.96*coef[1,2]) +
+            age^2 * (coef[3,1] + 1.96*coef[3,2])
+
+          minus95 <- age * (coef[2,1] - 1.96*coef[2,2]) + (coef[1,1] - 1.96*coef[1,2]) +
+            age^2 * (coef[3,1] - 1.96*coef[3,2])
+
         } else if(modelType() == "Cubic"){
-          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
-            age^2 * summary(modelFit())$coefficients[3,1] +
-            age^3 * summary(modelFit())$coefficients[4,1]
+          adjustedScore <- age * coef[2,1] + coef[1,1]  +
+            age^2 * coef[3,1] +
+            age^3 * coef[4,1]
+
+          plus95 <- age * (coef[2,1] + 1.96*coef[2,2]) + (coef[1,1] + 1.96*coef[1,2]) +
+            age^2 * (coef[3,1] + 1.96*coef[3,2]) +
+            age^3 * (coef[4,1] + 1.96*coef[4,2])
+
+          minus95 <- age * (coef[2,1] - 1.96*coef[2,2]) + (coef[1,1] - 1.96*coef[1,2]) +
+            age^2 * (coef[3,1] - 1.96*coef[3,2]) +
+            age^3 * (coef[4,1] - 1.96*coef[4,2])
+
         } else if(modelType() == "Quartic"){
-          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
-            age^2 * summary(modelFit())$coefficients[3,1] +
-            age^3 * summary(modelFit())$coefficients[4,1] +
-            age^4 * summary(modelFit())$coefficients[5,1]
+          adjustedScore <- age * coef[2,1] + coef[1,1]  +
+            age^2 * coef[3,1] +
+            age^3 * coef[4,1] +
+            age^4 * coef[5,1]
+
+          plus95 <- age * (coef[2,1] + 1.96*coef[2,2]) + (coef[1,1] + 1.96*coef[1,2]) +
+            age^2 * (coef[3,1] + 1.96*coef[3,2]) +
+            age^3 * (coef[4,1] + 1.96*coef[4,2]) +
+            age^4 * (coef[5,1] + 1.96*coef[5,2])
+
+          minus95 <-  age * (coef[2,1] - 1.96*coef[2,2]) + (coef[1,1] - 1.96*coef[1,2]) +
+            age^2 * (coef[3,1] - 1.96*coef[3,2]) +
+            age^3 * (coef[4,1] - 1.96*coef[4,2]) +
+            age^4 * (coef[5,1] - 1.96*coef[5,2])
+
         }
 
         modelData() %>%
-          mutate(pred = adjustedScore)
+          mutate(pred = adjustedScore) %>%
+          mutate(plus95 = plus95) %>%
+          mutate(minus95 = minus95)
       })
 
       # ------------------------------------------
@@ -68,18 +108,22 @@ modelPlotServer <- function(id,
       })
 
       # ------------------------------------------
+
       mainPlot <- eventReactive(c(input$plotCheckbox, modelFit()), {
         if(input$plotCheckbox == TRUE){
-        ggplot(df.plot(),aes(x=Age, y=Phenotype)) +
-          geom_point()+
-          geom_line() +
-          geom_errorbar(aes(ymin = lower, ymax = upper)) +
-          geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T) +
+        ggplot() +
+          geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), color = "#1D86C7", linewidth = 1.5, na.rm=T) +
+          geom_ribbon(data = modelDataEdit(), aes(x= age_original , ymin = minus95, ymax = plus95), fill = "#1D86C7", alpha = 0.2, na.rm = T) +
+          geom_point(data = df.plot(),aes(x=Age, y=Phenotype))+
+          geom_line(data = df.plot(),aes(x=Age, y=Phenotype)) +
+          geom_errorbar(data = df.plot(), aes(x=Age, y=Phenotype, ymin = lower, ymax = upper)) +
           ylab(paste0("Score (", traj(), ")")) +
           xlab("Age")
+
         }else if(input$plotCheckbox == FALSE){
           ggplot() +
-            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), na.rm=T) +
+            geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), color = "#1D86C7", linewidth = 1.5, na.rm=T) +
+            geom_ribbon(data = modelDataEdit(), aes(x= age_original , ymin = minus95, ymax = plus95), fill = "#1D86C7", alpha = 0.2) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
         }
