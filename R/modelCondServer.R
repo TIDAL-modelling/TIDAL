@@ -32,6 +32,10 @@ modelCondServer <- function(id,
 
       ns <- NS(id)
 
+      # ---------------------------------------
+      # Allow the user to select a variable from the column names of the dataset
+      # Note if the user selects categorical then only columns with less than 40 unique values are shown (as more than this is messy and likely not to be a categorical variable as it's unusual to have that many categories)
+      # If the user selects continuous then only columns with more than 2 unique values are shown, ie. this removes things like males/females and other binary categorical variables.
       vars <- reactive({
         req(modelData())
         if(input$varType == "cat"){
@@ -45,11 +49,6 @@ modelCondServer <- function(id,
 
       observeEvent(vars(),{
         req(modelData())
-        # allow the user to select a variable from the column names of the dataset
-        # critically this should be categorical variables (for the plot to split by a factor)
-        # hacky way to choose a categorical variable is below
-        # user can only select columns with unique values of length < 40. 40 being an arbitary number
-        # but any more than this may not be very useful or visible on a plot, 40 is already a lot.
 
         updateSelectInput(
           session,
@@ -68,10 +67,7 @@ modelCondServer <- function(id,
         }
       })
 
-# pass condition selection to an object for report?
-      condition <- reactive({ input$condition })
-# pass vartype to an object for report?
-      vartype <- reactive({ input$varType })
+
 
       # ---------------------------------------
       # allow the user to change the reference value for the categorical variable, by default i think it's the first item of the factor levels
@@ -1042,8 +1038,8 @@ modelCondServer <- function(id,
           # -------Set up parameters to pass to Rmd document--------
           if( length(input$ageInputScore) == 0 & length(input$AUCages) == 0 ){
             params <- list(
-              cond = condition(),
-              condtype = vartype(),
+              cond = input$condition,
+              condtype = input$input$varType,
               condPlot = plot(),
               condModelForm = modelform(),
               condFixed = modelStatsFixed(),
@@ -1058,8 +1054,8 @@ modelCondServer <- function(id,
             )
           }else if( length(input$ageInputScore) == 0 & length(input$AUCages) > 0 ){
             params <- list(
-              cond = condition(),
-              condtype = vartype(),
+              cond = input$condition,
+              condtype = input$input$varType,
               condPlot = plot(),
               condModelForm = modelform(),
               condFixed = modelStatsFixed(),
@@ -1074,8 +1070,8 @@ modelCondServer <- function(id,
             )
           }else if( length(input$ageInputScore) > 0 & length(input$AUCages) == 0 ){
             params <- list(
-              cond = condition(),
-              condtype = vartype(),
+              cond = input$condition,
+              condtype = input$input$varType,
               condPlot = plot(),
               condModelForm = modelform(),
               condFixed = modelStatsFixed(),
@@ -1090,8 +1086,8 @@ modelCondServer <- function(id,
             )
           }else{
             params <- list(
-              cond = condition(),
-              condtype = vartype(),
+              cond = input$condition,
+              condtype = input$input$varType,
               condPlot = plot(),
               condModelForm = modelform(),
               condFixed = modelStatsFixed(),
