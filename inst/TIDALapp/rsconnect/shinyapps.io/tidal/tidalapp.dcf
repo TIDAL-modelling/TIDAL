@@ -5,7 +5,7 @@ account: tidal
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 8267116
-bundleId: 7423636
+bundleId: 7447850
 url: https://tidal.shinyapps.io/tidalapp/
-when: 1688581207.76744
-lastSyncTime: 1688581207.76746
+when: 1689157940.04485
+lastSyncTime: 1689157940.04487
