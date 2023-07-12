@@ -402,7 +402,7 @@ modelCondServer <- function(id,
       CI_glht <- reactive({
         ageOrig <- modelDataEdit() %>% pull(age_original)
         ageOrig <- ageOrig[!is.na(ageOrig)]
-        ageCalcs <- seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5)
+        ageCalcs <-  c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
 
         score <- lapply(ageCalcs, function(x){
 
@@ -526,7 +526,7 @@ modelCondServer <- function(id,
 
         ageOrig <- modelDataEdit() %>% pull(age_original)
         ageOrig <- ageOrig[!is.na(ageOrig)]
-        ageCalcs <- seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5)
+        ageCalcs <-  c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
         levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), !!sym(input$condition)))))
 
         estimate <- do.call(rbind, CI_glht()) %>%
