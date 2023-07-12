@@ -166,7 +166,7 @@ modelPlotServer <- function(id,
         }else if(input$plotCheckbox == FALSE){
           ggplot() +
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = pred), color = "#1D86C7", linewidth = 1.5, na.rm=T) +
-            geom_ribbon(data = modelDataEdit(), aes(x= age_original , ymin = minus95, ymax = plus95), fill = "#1D86C7", alpha = 0.2) +
+            geom_ribbon(data = estimate, aes(x= age , ymin = conf.low, ymax = conf.high), fill = "#1D86C7", alpha = 0.2, na.rm = T) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age")
         }
