@@ -69,7 +69,7 @@ modelPlotServer <- function(id,
         ageOrig <- modelDataEdit() %>% pull(age_original)
         ageOrig <- ageOrig[!is.na(ageOrig)]
 
-        ageCalcs <- seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5)
+        ageCalcs <- c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
 
         score <- lapply(ageCalcs, function(x){
 
@@ -148,7 +148,7 @@ modelPlotServer <- function(id,
 
         ageOrig <- modelDataEdit() %>% pull(age_original)
         ageOrig <- ageOrig[!is.na(ageOrig)]
-        ageCalcs <- seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5)
+        ageCalcs <- c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
 
         estimate <- do.call(rbind, score_glht()) %>%
                       mutate(age = ageCalcs)
@@ -177,7 +177,6 @@ modelPlotServer <- function(id,
       output$mainPlot <- renderPlot(
         mainPlot()
       )
-
 
       return(
         list(
