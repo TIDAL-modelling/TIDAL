@@ -622,7 +622,7 @@ modelCondServer <- function(id,
 
         checkboxGroupInput(ns("ageInputScore"),
                            "What ages do you want to calculate scores for?",
-                           seq(round(min(ageOrig, na.rm =T)),round(max(ageOrig, na.rm =T))),
+                           seq(ceiling(min(ageOrig, na.rm =T)),floor(max(ageOrig, na.rm =T))),
                            inline = TRUE)
       })
 
