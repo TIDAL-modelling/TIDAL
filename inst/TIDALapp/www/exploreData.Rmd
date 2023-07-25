@@ -111,7 +111,7 @@ params$datExAltPlot
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$datExAltPlot)){
-kbl(params$datExAltTable, digits = 3)  %>%
+kbl(t(params$datExAltTable), digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 }
 ```
