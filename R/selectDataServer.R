@@ -57,9 +57,31 @@ selectDataServer <- function(id, dataFormatted) {
                       selected = NULL,
                       multiple = TRUE),
           selectInput(ns("modelType"), "Model Type:", choices = c("Linear", "Quadratic", "Cubic", "Quartic")),
-          actionButton(ns("button"), "Run Model")
+
+
         )
       })
+
+      randomFX_choices <- reactive({
+        req(data())
+        if(input$modelType == "Linear"){
+          randomFX_choices <- c("No random slope", "Linear")
+        } else if(input$modelType %in% c("Quadratic", "Cubic","Quartic") ){
+          randomFX_choices <- c("No random slope", "Linear", "Linear and Quadratic")
+        }
+        randomFX_choices
+      })
+
+      output$randomFX_UI <- renderUI({
+        req(data())
+        selectInput(ns("randomFX"), "Choose random slope terms:", choices = randomFX_choices(), multiple = FALSE)
+      })
+
+      output$button_UI <- renderUI({
+        req(data())
+        actionButton(ns("button"), "Run Model")
+      })
+
 
       # edit dataframe so that categorical covariates are factorised and polynomial age columns are added
       dataEdit <- reactive({
@@ -80,13 +102,41 @@ selectDataServer <- function(id, dataFormatted) {
       # add what type of model to run and input the different formula here
       # This only runs when the user clicks on the button
       modelForm <- eventReactive(input$button, {
-        if(input$modelType == "Linear"){
-          form <- paste0(input$traj," ~ ", input$age, " + ", "(", input$age, "|" , input$ID, ")")
-        } else if(input$modelType == "Quadratic"){
+        # Linear model and linear random effect
+        if(input$modelType == "Linear" & input$randomFX == "Linear"){
+          form <- paste0(input$traj," ~ ", input$age, " + ", "(1 + ", input$age, "|" , input$ID, ")")
+        # Linear model and no random effects
+        } else if(input$modelType == "Linear" & input$randomFX == "No random slope"){
+          form <- paste0(input$traj," ~ ", input$age, " + ", "( 1 |" , input$ID, ")")
+
+          # Quadratic model and no random effects
+        } else if(input$modelType == "Quadratic" & input$randomFX == "No random slope" ){
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (1 |" , input$ID, ")" )
+          # Cubic model and no random effects
+        } else if(input$modelType == "Cubic" & input$randomFX == "No random slope"){
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (1 |" , input$ID, ")")
+          # Quartic model  and no random effects
+        } else if(input$modelType == "Quartic" & input$randomFX == "No random slope"){
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (1 |" , input$ID, ")")
+
+          # Quadratic model and linear  random effects
+        } else if(input$modelType == "Quadratic" & input$randomFX == "Linear" ){
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (1 + ", input$age, " |" , input$ID, ")" )
+          # Cubic model and linear random effects
+        } else if(input$modelType == "Cubic" & input$randomFX == "Linear"){
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (1 + ", input$age, " |" , input$ID, ")")
+          # Quartic model  and linear random effects
+        } else if(input$modelType == "Quartic" & input$randomFX == "Linear"){
+          form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (1 + ", input$age, " |" , input$ID, ")")
+
+        # Quadratic model and linear and quadratic random effects
+        } else if(input$modelType == "Quadratic" & input$randomFX == "Linear and Quadratic" ){
           form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2) + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")" )
-        } else if(input$modelType == "Cubic"){
+        # Cubic model and linear and quadratic random effects
+        } else if(input$modelType == "Cubic" & input$randomFX == "Linear and Quadratic"){
           form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
-        } else if(input$modelType == "Quartic"){
+        # Quartic model  and linear and quadratic random effects
+        } else if(input$modelType == "Quartic" & input$randomFX == "Linear and Quadratic"){
           form <- paste0(input$traj," ~ ", input$age, " + I(", input$age   ,"^2)", " + I(", input$age   ,"^3)" , " + I(", input$age   ,"^4)" ," + (1 + ", input$age, " + I(",input$age, "^2) |" , input$ID, ")")
         }
         form
