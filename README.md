@@ -125,7 +125,9 @@ Please contact us at TIDAL@ed.ac.uk
      </ol>
 * We would also like to acknowledge cohort participants and those who have given feedback to our tool, including clinicians, teachers, researchers and our young people advisory group.
 * This project is funded by The Wellcome Trust and Social Finance, Grant Ref: 226686/Z/22/Z.
-
+<p align="left">
+<img width="100" alt="Wellcome Trust Logo" src="inst/TIDALapp/www/wellcome-logo-black.jpg">
+</p>
 
 
 
