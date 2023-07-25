@@ -96,7 +96,9 @@ datExAUCServer <- function(id,
     })
 
     output$AUCplot <- renderPlot({
+      if(class(modelFit()) != "try-error"){
       plotAUC()
+      }
     })
 
 
@@ -116,7 +118,9 @@ datExAUCServer <- function(id,
 
 
     output$AUCtable <- renderTable({
+      if(class(modelFit()) != "try-error"){
       tableAUC()
+      }
     }, colnames = FALSE, rownames = TRUE)
 
 
