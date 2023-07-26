@@ -100,6 +100,8 @@ welcome_page <- tabPanel(
     # p("Examine timing of peak velocity of trajectories. This feature highlights a critical period at which further support or interventions could be introduced to dramatically shift an individual’s illness trajectory."),
     # h4("Stability (In Development)"),
     # p("Captures within-individual variability in depressive symptoms over time and compare how this varies by different forms of interventions or combinations of interventions.")
+    HTML('<left><img src="wellcome-logo-black.jpg" width="100"></left>'),
+    p("Funded by The Wellcome Trust and Social Finance, Grant Ref: 226686/Z/22/Z."),
   )
 )
 
