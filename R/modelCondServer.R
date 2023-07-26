@@ -430,7 +430,7 @@ modelCondServer <- function(id,
               })
             }
 
-            res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + `", rowNames[2], "`*`", ageInput, "` == 0"), equations) )
+            res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + \`", rowNames[2], "\`*\`", ageInput, "\` == 0"), equations) )
 
           }else if(modelType() == "Quadratic"){
             if(input$varType == "cat"){
