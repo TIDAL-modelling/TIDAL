@@ -426,7 +426,7 @@ modelCondServer <- function(id,
           if(modelType() == "Linear"){
             if(input$varType == "cat"){
               equations <- sapply(1:(n-1), function(i){
-                paste0(rowNames[1], " + `", rowNames[2], "`*`", ageInput, "` + `", rowNames[rowIndex[i]] , "` + `", rowNames[2], "`:`", rowNames[rowIndex[i]],"`*`",ageInput , "` == 0")
+                paste0(rowNames[1], " + \`", rowNames[2], "\`*\`", ageInput, "\` + \`", rowNames[rowIndex[i]] , "\` + \`", rowNames[2], "\`:`", rowNames[rowIndex[i]],"\`*\`",ageInput , "\` == 0")
               })
             }
 
