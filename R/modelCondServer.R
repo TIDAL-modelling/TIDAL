@@ -245,17 +245,15 @@ modelCondServer <- function(id,
           })
 
 
-          num <- str_subset(row.names(coef), input$condition) %>%
-            str_sub(-1)%>%
-            unique()
+          num <-  as.character(levels(as.factor(pull(modelDataScaled(), !!sym(input$condition)))))
 
-          names(predCovs) <- paste0(input$condition, "_", num)
+          names(predCovs) <- 1:length(predCovs)
 
           modelDataEdit <- cbind(modelDataScaled(), do.call(cbind, predCovs)) %>%
             mutate(zero = zero) %>%
             mutate(!!input$condition := as.factor(.[[colSplit]]) ) %>%
             mutate(pred =  eval(parse(text =
-                                        paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero",
+                                        paste0(paste0("ifelse(", input$condition, " == '", num, "', ", names(predCovs)  ,",", collapse = " "), "zero",
                                                paste0(rep(")", length(num)), collapse = ""), collapse = "")
             )))
         }else if(input$varType == "cont"){
@@ -426,11 +424,11 @@ modelCondServer <- function(id,
           if(modelType() == "Linear"){
             if(input$varType == "cat"){
               equations <- sapply(1:(n-1), function(i){
-                paste0(rowNames[1], " + \`", rowNames[2], "\`*\`", ageInput, "\` + \`", rowNames[rowIndex[i]] , "\` + \`", rowNames[2], "\`:`", rowNames[rowIndex[i]],"\`*\`",ageInput , "\` == 0")
+                paste0(rowNames[1], " + \`", rowNames[2], "\`*", ageInput, " + \`", rowNames[rowIndex[i]] , "\` + \`", rowNames[2], ":", rowNames[rowIndex[i]],"\`*",ageInput , " == 0")
               })
             }
 
-            res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + \`", rowNames[2], "\`*\`", ageInput, "\` == 0"), equations) )
+            res <- multcomp::glht(fit(), linfct = c( paste0(rowNames[1], " + \`", rowNames[2], "\`*", ageInput, " == 0"), equations) )
 
           }else if(modelType() == "Quadratic"){
             if(input$varType == "cat"){
