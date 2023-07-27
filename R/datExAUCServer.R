@@ -138,7 +138,7 @@ datExAUCServer <- function(id,
                      AUC())
         )
 
-        rowname <- paste0("AUC (", traj(), ")")
+        rowname <- paste0("AUC (", traj(), ") (95% CIs)")
         rownames(df) <- c("Age Range", rowname)
         df
 

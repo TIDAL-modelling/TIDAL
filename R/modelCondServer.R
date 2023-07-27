@@ -1296,25 +1296,25 @@ modelCondServer <- function(id,
           df <- t(
             cbind(
               data.frame(paste0(input$AUCages[1], " - ", input$AUCages[2]),
-                         round(AUC()$AUC, 2)),
-              do.call(cbind, AUC()$AUCCovs)
+                         AUC_delta()$AUC),
+              do.call(cbind, AUC_delta()$AUCCovs)
             )
           )
 
           rowname <- paste0("AUC (", traj(), ")")
           levelNames <- as.character(levels(as.factor(pull(modelDataEdit(), input$condition))))
-          rownames(df) <- c("Age Range", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ]") )
+          rownames(df) <- c("Age Range", paste0(rowname, " [", input$condition, ", level = ", levelNames, " ] (95% CIs)") )
           df
 
         }else if(input$varType == "cont"){
           req(AUC()$AUCCont)
           df <- t(
             data.frame(paste0(input$AUCages[1], " - ", input$AUCages[2]),
-                       round(AUC()$AUCCont, 2),
-                       round(AUC()$AUC_SD[1], 2),
-                       round(AUC()$AUC_SD[2], 2))
+                       AUC_delta()$AUCCont,
+                       AUC_delta()$AUC_SD[1],
+                       AUC_delta()$AUC_SD[2])
           )
-          rowname <- paste0(paste0("AUC (", traj(), ") [", input$condition, " ] "), c("Population Average", "+ 1 SD", "- 1 SD")  )
+          rowname <- paste0(paste0("AUC (", traj(), ") [", input$condition, " ] (95% CIs) "), c("Population Average", "+ 1 SD", "- 1 SD")  )
           rownames(df) <- c("Age Range", rowname)
           df
         }
@@ -1324,11 +1324,6 @@ modelCondServer <- function(id,
       output$AUCtable <- renderTable({
         tableAUC()
       }, colnames = FALSE, rownames = TRUE)
-
-
-      output$AUCtable_delta <- renderText({
-        paste0(AUC_delta())
-      })
 
       # ------
       # User select which 2 levels of their factor they want to see a difference between

@@ -78,7 +78,6 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                          column(width = 6,
                                 tagList(
                                   withSpinner(tableOutput(ns("AUCtable")), proxy.height = "100px"),
-                                  textOutput(ns("AUCtable_delta")),
                                 textOutput(ns("test"))
                                 )
                          )
