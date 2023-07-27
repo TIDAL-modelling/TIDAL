@@ -944,21 +944,19 @@ modelCondServer <- function(id,
         age2 <- input$AUCages[2] - mean(ageOrig)
 
         rowNames <- rownames(coef) %>%
-          str_remove_all("I|\\(|\\^|\\)")
+          str_remove_all("I|\\(|\\^|\\)|\\:")
 
         AUC <-
           if(modelType() == "Linear"){
-            deltaMethod(fit(), c( paste0("((", age2, "*", rowNames[1], ") + (", rowNames[2], "*", age2, "^2/2)) - ((", age1,"*", rowNames[1], ") - (", rowNames[2], "*", age1, "^2/2))") ), parameterNames = rowNames )
+            deltaMethod(fit(), c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2))") ) , parameterNames = rowNames)
           } else if(modelType() == "Quadratic"){
-            deltaMethod(fit(), c( paste0("((", age2, "*", rowNames[1], ") + (", rowNames[2], "*", age2, "^2/2) + (", rowNames[3], "*", age2, "^3/3)) - ((", age1,"*", rowNames[1], ") - (", rowNames[2], "*", age1, "^2/2) + (", rowNames[3], "*", age1, "^3/3))") ), parameterNames = rowNames )
+            deltaMethod(fit(), c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2) + ((", rowNames[3], ")*(", age2, ")^3/3)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2) + ((", rowNames[3], ")*(", age1, ")^3/3))") ), parameterNames = rowNames )
           } else if(modelType() == "Cubic"){
-            deltaMethod(fit(), c( paste0("((", age2, "*", rowNames[1], ") + (", rowNames[2], "*", age2, "^2/2) + (", rowNames[3], "*", age2, "^3/3) + (", rowNames[4], "*", age2, "^4/4)) - ((", age1,"*", rowNames[1], ") - (", rowNames[2], "*", age1, "^2/2) + (", rowNames[3], "*", age1, "^3/3) - (", rowNames[4], "*", age1, "^4/4))") ), parameterNames = rowNames )
+            deltaMethod(fit(), c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2) + ((", rowNames[3], ")*(", age2, ")^3/3) + ((", rowNames[4], ")*(", age2, ")^4/4)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2) + ((", rowNames[3], ")*(", age1, ")^3/3) + ((", rowNames[4], ")*(", age1, ")^4/4))") ), parameterNames = rowNames )
           } else if(modelType() == "Quartic"){
-            deltaMethod(fit(), c( paste0("((", age2, "*", rowNames[1], ") + (", rowNames[2], "*", age2, "^2/2) + (", rowNames[3], "*", age2, "^3/3) + (", rowNames[4], "*", age2, "^4/4) + (", rowNames[5], "*", age2, "^5/5)) - ((", age1,"*", rowNames[1], ") - (", rowNames[2], "*", age1, "^2/2) + (", rowNames[3], "*", age1, "^3/3) - (", rowNames[4], "*", age1, "^4/4) + (", rowNames[5], "*", age1, "^5/5))") ), parameterNames = rowNames )
+            deltaMethod(fit(), c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2) + ((", rowNames[3], ")*(", age2, ")^3/3) + ((", rowNames[4], ")*(", age2, ")^4/4) + ((", rowNames[5], ")*(", age2, ")^5/5)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2) + ((", rowNames[3], ")*(", age1, ")^3/3) + ((", rowNames[4], ")*(", age1, ")^4/4) + ((", rowNames[5], ")*(", age1, ")^5/5))") ), parameterNames = rowNames )
           }
         AUC <- paste0( round(AUC$Estimate, 2), " (", round(AUC$`2.5 %`,2), " - ", round(AUC$`97.5 %`,2), ")")
-
-
 
 
       rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
@@ -1000,27 +998,127 @@ modelCondServer <- function(id,
         AUCCovs <- lapply(1:(n-1), function(i){
           if(modelType() == "Linear"){
 
-            AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[rowIndex[i],1]*age2) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age2^2/2) ) -
-              ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[rowIndex[i],1]*age1) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age1^2/2) )
-
             AUC <- deltaMethod(fit(),
-                               c( paste0("((", age2, "*", rowNames[1], ") + (", rowNames[2], "*", age2, "^2/2)) - ((", age1,"*", rowNames[1], ") - (", rowNames[2], "*", age1, "^2/2))") )
+                               c( paste0(
+                                 "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[rowIndex[i]],")*(",age2,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age2,")^2/2) ) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[rowIndex[i]],")*(",age1,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age1,")^2/2) )"
+                               ) )
                                , parameterNames = rowNames )
 
           } else if(modelType() == "Quadratic"){
-            AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[rowIndex[i],1]*age2) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age2^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age2^3/3) ) -
-              ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[rowIndex[i],1]*age1) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age1^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age1^3/3))
+
+            AUC <- deltaMethod(fit(),
+                               c( paste0(
+                                 "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[rowIndex[i]],")*(",age2,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age2,")^2/2) + ((",rowNames[rowIndexInteract2[i]],")*(",age2,")^3/3) ) -
+              (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3) + ((",rowNames[rowIndex[i]],")*(",age1,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age1,")^2/2) + ((",rowNames[rowIndexInteract2[i]],")*(",age1,")^3/3) )"
+                               ) )
+                               , parameterNames = rowNames )
+
           } else if(modelType() == "Cubic"){
-            AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[rowIndex[i],1]*age2) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age2^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age2^3/3) + (summary(fit())$coefficients[rowIndexInteract3[i],1]*age2^4/4) ) -
-              ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) + (coef[rowIndex[i],1]*age1) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age1^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age1^3/3) + (summary(fit())$coefficients[rowIndexInteract3[i],1]*age1^4/4))
+
+            AUC <- deltaMethod(fit(),
+                               c( paste0(
+                                 "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4) + ((",rowNames[rowIndex[i]],")*(",age2,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age2,")^2/2) + ((",rowNames[rowIndexInteract2[i]], ")*(",age2,")^3/3) + ((",rowNames[rowIndexInteract3[i]], ")*(", age2, ")^4/4) ) -
+                                 (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3) + ((",rowNames[4],")*(",age1,")^4/4) + ((",rowNames[rowIndex[i]],")*(",age1,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age1,")^2/2) + ((",rowNames[rowIndexInteract2[i]], ")*(",age1,")^3/3) + ((",rowNames[rowIndexInteract3[i]], ")*(", age1, ")^4/4) )"
+                               ) )
+                               , parameterNames = rowNames )
+
           } else if(modelType() == "Quartic"){
-            AUC <- ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5) + (coef[rowIndex[i],1]*age2)  + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age2^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age2^3/3) + (summary(fit())$coefficients[rowIndexInteract3[i],1]*age2^4/4) + (summary(fit())$coefficients[rowIndexInteract4[i],1]*age2^5/5)) -
-              ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5) + (coef[rowIndex[i],1]*age1) + (summary(fit())$coefficients[rowIndexInteract1[i],1]*age1^2/2) + (summary(fit())$coefficients[rowIndexInteract2[i],1]*age1^3/3) + (summary(fit())$coefficients[rowIndexInteract3[i],1]*age1^4/4) + (summary(fit())$coefficients[rowIndexInteract4[i],1]*age1^5/5))
+
+            AUC <- deltaMethod(fit(),
+                               c( paste0(
+                                 "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4) + ((",rowNames[5],")*(",age2,")^5/5) + ((",rowNames[rowIndex[i]],")*(",age2,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age2,")^2/2) + ((",rowNames[rowIndexInteract2[i]], ")*(",age2,")^3/3) + ((",rowNames[rowIndexInteract3[i]], ")*(", age2, ")^4/4)  + ((",rowNames[rowIndexInteract4[i]], ")*(", age2, ")^5/5)) -
+                                 (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3) + ((",rowNames[4],")*(",age1,")^4/4) + ((",rowNames[5],")*(",age1,")^5/5) + ((",rowNames[rowIndex[i]],")*(",age1,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age1,")^2/2) + ((",rowNames[rowIndexInteract2[i]], ")*(",age1,")^3/3) + ((",rowNames[rowIndexInteract3[i]], ")*(", age1, ")^4/4) + ((",rowNames[rowIndexInteract4[i]], ")*(", age1, ")^5/5) )"
+                               ) )
+                               , parameterNames = rowNames )
+
           }
-          AUC <- round(AUC, 2)
+          AUC <- paste0( round(AUC$Estimate, 2), " (", round(AUC$`2.5 %`,2), " - ", round(AUC$`97.5 %`,2), ")")
         })
         return( list(AUC = AUC, AUCCovs = AUCCovs) )
 
+      }else if(input$varType == "cont"){
+
+        # continuous variable, calculate AUC ±1 sd
+        AUC_SD <-
+          if(modelType() == "Linear"){
+
+            plus <- deltaMethod(fit(),
+                               c( paste0(
+                                 "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[rowIndex],")*(",age2,")) + ((",rowNames[rowIndexInteract1],")*(",age2,")^2/2) ) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[rowIndex],")*(",age1,")) + ((",rowNames[rowIndexInteract1],")*(",age1,")^2/2) )"
+                               ) )
+                               , parameterNames = rowNames )
+
+            minus <- deltaMethod(fit(),
+                                c( paste0(
+                                  "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) - ((",rowNames[rowIndex],")*(",age2,")) - ((",rowNames[rowIndexInteract1],")*(",age2,")^2/2) ) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) - ((",rowNames[rowIndex],")*(",age1,")) - ((",rowNames[rowIndexInteract1],")*(",age1,")^2/2) )"
+                                ) )
+                                , parameterNames = rowNames )
+
+            c(paste0( round(plus$Estimate, 2), " (", round(plus$`2.5 %`,2), " - ", round(plus$`97.5 %`,2), ")"),
+              paste0( round(minus$Estimate, 2), " (", round(minus$`2.5 %`,2), " - ", round(minus$`97.5 %`,2), ")"))
+
+          } else if(modelType() == "Quadratic"){
+
+            plus <- deltaMethod(fit(),
+                                c( paste0(
+                                  "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[rowIndex],")*(",age2,")) + ((",rowNames[rowIndexInteract1],")*(",age2,")^2/2) + ((",rowNames[rowIndexInteract2],")*(",age2,")^3/3)) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3) + ((",rowNames[rowIndex],")*(",age1,")) + ((",rowNames[rowIndexInteract1],")*(",age1,")^2/2) + ((",rowNames[rowIndexInteract2],")*(",age1,")^3/3) )"
+                                ) )
+                                , parameterNames = rowNames )
+
+            minus <- deltaMethod(fit(),
+                                 c( paste0(
+                                   "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[3],")*(",age2,")^3/3) - ((",rowNames[rowIndex],")*(",age2,")) - ((",rowNames[rowIndexInteract1],")*(",age2,")^2/2) - ((",rowNames[rowIndexInteract2],")*(",age2,")^3/3)) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3) - ((",rowNames[rowIndex],")*(",age1,")) - ((",rowNames[rowIndexInteract1],")*(",age1,")^2/2) - ((",rowNames[rowIndexInteract2],")*(",age1,")^3/3) )"
+                                 ) )
+                                 , parameterNames = rowNames )
+
+            c(paste0( round(plus$Estimate, 2), " (", round(plus$`2.5 %`,2), " - ", round(plus$`97.5 %`,2), ")"),
+              paste0( round(minus$Estimate, 2), " (", round(minus$`2.5 %`,2), " - ", round(minus$`97.5 %`,2), ")"))
+
+          } else if(modelType() == "Cubic"){
+
+            plus <- deltaMethod(fit(),
+                                c( paste0(
+                                  "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4) + ((",rowNames[rowIndex],")*(",age2,")) + ((",rowNames[rowIndexInteract1],")*(",age2,")^2/2) + ((",rowNames[rowIndexInteract2],")*(",age2,")^3/3) + ((",rowNames[rowIndexInteract3],")*(",age2,")^4/4) ) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3) + ((",rowNames[4],")*(",age1,")^4/4) + ((",rowNames[rowIndex],")*(",age1,")) + ((",rowNames[rowIndexInteract1],")*(",age1,")^2/2) + ((",rowNames[rowIndexInteract2],")*(",age1,")^3/3) + ((",rowNames[rowIndexInteract3],")*(",age1,")^4/4) )"
+                                ) )
+                                , parameterNames = rowNames )
+
+            minus <- deltaMethod(fit(),
+                                 c( paste0(
+                                   "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4) - ((",rowNames[rowIndex],")*(",age2,")) - ((",rowNames[rowIndexInteract1],")*(",age2,")^2/2) - ((",rowNames[rowIndexInteract2],")*(",age2,")^3/3) - ((",rowNames[rowIndexInteract3],")*(",age2,")^4/4) ) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3) + ((",rowNames[4],")*(",age1,")^4/4) - ((",rowNames[rowIndex],")*(",age1,")) - ((",rowNames[rowIndexInteract1],")*(",age1,")^2/2) - ((",rowNames[rowIndexInteract2],")*(",age1,")^3/3) - ((",rowNames[rowIndexInteract3],")*(",age1,")^4/4) )"
+                                 ) )
+                                 , parameterNames = rowNames )
+
+            c(paste0( round(plus$Estimate, 2), " (", round(plus$`2.5 %`,2), " - ", round(plus$`97.5 %`,2), ")"),
+              paste0( round(minus$Estimate, 2), " (", round(minus$`2.5 %`,2), " - ", round(minus$`97.5 %`,2), ")"))
+
+          } else if(modelType() == "Quartic"){
+
+            plus <- deltaMethod(fit(),
+                                c( paste0(
+                                  "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4) + ((",rowNames[5],")*(",age2,")^5/5) + ((",rowNames[rowIndex],")*(",age2,")) + ((",rowNames[rowIndexInteract1],")*(",age2,")^2/2) + ((",rowNames[rowIndexInteract2],")*(",age2,")^3/3) + ((",rowNames[rowIndexInteract3],")*(",age2,")^4/4) + ((",rowNames[rowIndexInteract4],")*(",age2,")^5/5) ) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3) + ((",rowNames[4],")*(",age1,")^4/4) + ((",rowNames[5],")*(",age1,")^5/5) + ((",rowNames[rowIndex],")*(",age1,")) + ((",rowNames[rowIndexInteract1],")*(",age1,")^2/2) + ((",rowNames[rowIndexInteract2],")*(",age1,")^3/3) + ((",rowNames[rowIndexInteract3],")*(",age1,")^4/4) + ((",rowNames[rowIndexInteract4],")*(",age1,")^5/5) )"
+                                ) )
+                                , parameterNames = rowNames )
+
+            minus <- deltaMethod(fit(),
+                                 c( paste0(
+                                   "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4) + ((",rowNames[5],")*(",age2,")^5/5) - ((",rowNames[rowIndex],")*(",age2,")) - ((",rowNames[rowIndexInteract1],")*(",age2,")^2/2) - ((",rowNames[rowIndexInteract2],")*(",age2,")^3/3) - ((",rowNames[rowIndexInteract3],")*(",age2,")^4/4) - ((",rowNames[rowIndexInteract4],")*(",age2,")^5/5) ) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3) + ((",rowNames[4],")*(",age1,")^4/4) + ((",rowNames[5],")*(",age1,")^5/5) - ((",rowNames[rowIndex],")*(",age1,")) - ((",rowNames[rowIndexInteract1],")*(",age1,")^2/2) - ((",rowNames[rowIndexInteract2],")*(",age1,")^3/3) - ((",rowNames[rowIndexInteract3],")*(",age1,")^4/4) - ((",rowNames[rowIndexInteract4],")*(",age1,")^5/5) )"
+                                 ) )
+                                 , parameterNames = rowNames )
+
+            c(paste0( round(plus$Estimate, 2), " (", round(plus$`2.5 %`,2), " - ", round(plus$`97.5 %`,2), ")"),
+              paste0( round(minus$Estimate, 2), " (", round(minus$`2.5 %`,2), " - ", round(minus$`97.5 %`,2), ")"))
+
+          }
+        return(list(AUCCont = AUC, AUC_SD = AUC_SD))
       }
 
       })
@@ -1226,6 +1324,11 @@ modelCondServer <- function(id,
       output$AUCtable <- renderTable({
         tableAUC()
       }, colnames = FALSE, rownames = TRUE)
+
+
+      output$AUCtable_delta <- renderText({
+        paste0(AUC_delta())
+      })
 
       # ------
       # User select which 2 levels of their factor they want to see a difference between
