@@ -1293,7 +1293,13 @@ modelCondServer <- function(id,
 
       output$test <- renderText({
         if(input$varType == "cat" & length(input$levelsAUC == 2)){
-          paste0("The difference between the two factor levels for the age ranges you selected is ", difference() ,".")
+          ageOrig <- modelDataEdit() %>%
+            pull(age_original)
+          ageOrig <- ageOrig[!is.na(ageOrig)]
+          age1 <- input$AUCages[1] - mean(ageOrig)
+          age2 <- input$AUCages[2] - mean(ageOrig)
+
+          paste0("The difference between the two factor levels for the age ranges ", age1, " - ", age2 ," is ", difference() ,".")
         }else{
 
         }
