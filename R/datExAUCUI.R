@@ -23,7 +23,8 @@ datExAUCUI <- function(id, label = "Model") {
     p(""),
     uiOutput(ns("AUCagesUI")),
     withSpinner(plotOutput(ns("AUCplot")), proxy.height = "100px"),
-    withSpinner(tableOutput(ns("AUCtable")), proxy.height = "100px")
+    withSpinner(tableOutput(ns("AUCtable")), proxy.height = "100px"),
+    textOutput(ns("test"))
   )
 
 }
