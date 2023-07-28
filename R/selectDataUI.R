@@ -18,6 +18,8 @@ selectDataUI <- function(id, label = "data") {
                 "Select a dataset:",
                 c("Upload a long format dataset", "Data formatted on previous page")),
     uiOutput(ns("uploadFile")),
-    uiOutput(ns("additional"))
+    uiOutput(ns("additional")),
+    uiOutput(ns("randomFX_UI")),
+    uiOutput(ns("button_UI"))
   )
 }
