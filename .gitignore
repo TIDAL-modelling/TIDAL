@@ -5,3 +5,5 @@
 .DS_Store
 R/.DS_Store
 man/.DS_Store
+inst/TIDALapp/app_cache/
+
