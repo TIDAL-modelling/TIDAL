@@ -14,6 +14,7 @@ params:
   tableScore : NA
   AUCplot : NA
   AUCtable : NA
+  difference: NA
   traj : NA
   modelType : NA
 ---
@@ -110,6 +111,12 @@ params$AUCplot
 if(is.ggplot(params$AUCplot)){
 kbl(params$AUCtable, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
+}
+```
+
+```{r, echo=F, warning=F}
+if(is.ggplot(params$AUCplot)){
+  params$difference
 }
 ```
 

@@ -1231,6 +1231,7 @@ modelCondServer <- function(id,
 
 
       difference <- reactive({
+        if(input$varType == "cat" & length(input$levelsAUC == 2)){
         levelNames <- paste0(input$condition,input$levelsAUC) %>%
           str_remove_all("I|\\(|\\^|\\)|\\:")
 
@@ -1287,25 +1288,19 @@ modelCondServer <- function(id,
 
         }
         }
-        paste0( round(res$Estimate, 2), " 95% CI: (", round(res$`2.5 %`,2), " - ", round(res$`97.5 %`,2), ")")
+        dif <- paste0( round(res$Estimate, 2), " 95% CI: (", round(res$`2.5 %`,2), " - ", round(res$`97.5 %`,2), ")")
+        statement <- paste0("The difference between the two factor levels (for the age ranges ", input$AUCages[1], " - ", input$AUCages[2] ,") is ", dif ,".")
+
+        return(statement)
+        }else{
+          return(NULL)
+        }
 
       })
 
       output$test <- renderText({
-        if(input$varType == "cat" & length(input$levelsAUC == 2)){
-          ageOrig <- modelDataEdit() %>%
-            pull(age_original)
-          ageOrig <- ageOrig[!is.na(ageOrig)]
-          age1 <- input$AUCages[1] - mean(ageOrig)
-          age2 <- input$AUCages[2] - mean(ageOrig)
-
-          paste0("The difference between the two factor levels for the age ranges ", age1, " - ", age2 ," is ", difference() ,".")
-        }else{
-
-        }
+        difference()
       })
-
-
 
       #################################################################################
       # ----- DOWNLOADING RESULTS TAB -------
@@ -1350,6 +1345,7 @@ modelCondServer <- function(id,
               tableScore = NA,
               AUCplot = NA,
               AUCtable = NA,
+              difference = NA,
               traj = traj(),
               modelType = modelType()
             )
@@ -1366,6 +1362,7 @@ modelCondServer <- function(id,
               tableScore = NA,
               AUCplot = plotAUC(),
               AUCtable = tableAUC(),
+              difference = difference(),
               traj = traj(),
               modelType = modelType()
             )
@@ -1382,6 +1379,7 @@ modelCondServer <- function(id,
               tableScore = tableScoreAll(),
               AUCplot = NA,
               AUCtable = NA,
+              difference = difference(),
               traj = traj(),
               modelType = modelType()
             )
@@ -1398,6 +1396,7 @@ modelCondServer <- function(id,
               tableScore = tableScoreAll(),
               AUCplot = plotAUC(),
               AUCtable = tableAUC(),
+              difference = difference(),
               traj = traj(),
               modelType = modelType()
             )
