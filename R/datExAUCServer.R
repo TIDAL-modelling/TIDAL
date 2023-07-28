@@ -7,6 +7,8 @@
 #' @import data.table
 #' @import shinyjs
 #' @import tidyr
+#' @import stringr
+#' @import car
 #'
 #' @noRd
 #' @keywords internal
@@ -52,6 +54,34 @@ datExAUCServer <- function(id,
     # ------------------------------------------
     # Calculate the AUC for the ages the user has chosen for the chosen input$condition levels
     AUC <- reactive({
+      req(modelFit())
+      coef <- summary(modelFit())$coefficients
+
+      ageOrig <- modelDataEdit() %>%
+        pull(age_original)
+      ageOrig <- ageOrig[!is.na(ageOrig)]
+      age1 <- input$AUCages[1] - mean(ageOrig)
+      age2 <- input$AUCages[2] - mean(ageOrig)
+
+      rowNames <- rownames(coef) %>%
+                  str_remove_all("I|\\(|\\^|\\)")
+
+      AUC <-
+        if(modelType() == "Linear"){
+          deltaMethod(modelFit(), c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2))") ) , parameterNames = rowNames)
+        } else if(modelType() == "Quadratic"){
+          deltaMethod(modelFit(), c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2) + ((", rowNames[3], ")*(", age2, ")^3/3)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2) + ((", rowNames[3], ")*(", age1, ")^3/3))") ), parameterNames = rowNames )
+        } else if(modelType() == "Cubic"){
+          deltaMethod(modelFit(), c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2) + ((", rowNames[3], ")*(", age2, ")^3/3) + ((", rowNames[4], ")*(", age2, ")^4/4)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2) + ((", rowNames[3], ")*(", age1, ")^3/3) + ((", rowNames[4], ")*(", age1, ")^4/4))") ), parameterNames = rowNames )
+        } else if(modelType() == "Quartic"){
+          deltaMethod(modelFit(), c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2) + ((", rowNames[3], ")*(", age2, ")^3/3) + ((", rowNames[4], ")*(", age2, ")^4/4) + ((", rowNames[5], ")*(", age2, ")^5/5)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2) + ((", rowNames[3], ")*(", age1, ")^3/3) + ((", rowNames[4], ")*(", age1, ")^4/4) + ((", rowNames[5], ")*(", age1, ")^5/5))") ), parameterNames = rowNames )
+        }
+
+        AUC <- paste0( round(AUC$Estimate, 2), " (", round(AUC$`2.5 %`,2), " - ", round(AUC$`97.5 %`,2), ")")
+        return(AUC)
+    })
+
+    old_AUC <- reactive({
       coef <- summary(modelFit())$coefficients
 
       ageOrig <- modelDataEdit() %>%
@@ -70,7 +100,7 @@ datExAUCServer <- function(id,
         } else if(modelType() == "Quartic"){
           ((age2*coef[1,1]) + (coef[2,1]*age2^2/2) + (coef[3,1]*age2^3/3) + (coef[4,1]*age2^4/4) + (coef[5,1]*age2^5/5)) - ((age1*coef[1,1]) + (coef[2,1]*age1^2/2) + (coef[3,1]*age1^3/3) + (coef[4,1]*age1^4/4) +  (coef[5,1]*age1^5/5))
         }
-        return(AUC)
+      return(AUC)
     })
 
     # ------------------------------------------
@@ -96,7 +126,9 @@ datExAUCServer <- function(id,
     })
 
     output$AUCplot <- renderPlot({
+      if(class(modelFit()) != "try-error"){
       plotAUC()
+      }
     })
 
 
@@ -105,10 +137,10 @@ datExAUCServer <- function(id,
         req(AUC())
         df <- t(
           data.frame(paste0(input$AUCages[1], " - ", input$AUCages[2]),
-                     round(AUC(), 2))
+                     AUC())
         )
 
-        rowname <- paste0("AUC (", traj(), ")")
+        rowname <- paste0("AUC (", traj(), ") (95% CIs)")
         rownames(df) <- c("Age Range", rowname)
         df
 
@@ -116,8 +148,14 @@ datExAUCServer <- function(id,
 
 
     output$AUCtable <- renderTable({
+      if(class(modelFit()) != "try-error"){
       tableAUC()
+      }
     }, colnames = FALSE, rownames = TRUE)
+
+    output$test <- renderText({
+      paste0(round(old_AUC(), 2))
+    })
 
 
     return(list(

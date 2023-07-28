@@ -2,6 +2,8 @@
 title: ""
 output:
   pdf_document: default
+header-includes:
+  - \usepackage{pdflscape}
 params:
   cond : NA
   condtype: NA
@@ -12,19 +14,22 @@ params:
   modelDataEdit : NA
   plotScore : NA
   tableScore : NA
+  difTab : NA
   AUCplot : NA
   AUCtable : NA
+  difference: NA
   traj : NA
   modelType : NA
 ---
 
 
 ``` {r, echo=F, warning=F}
-library(knitr)
-library(kableExtra)
+# library(knitr)
+# library(kableExtra)
 library(ggplot2)
+library(dplyr)
 
-include_graphics("TIDAL.png")
+knitr::include_graphics("TIDAL.png")
 ```
 
 ``` {r, echo = F}
@@ -34,19 +39,13 @@ vartype = if(params$condtype == "cat"){"Categorical"} else {"Continuous"}
 
 # TIDAL Interaction Variable
 
-For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
-
-Date generated: `r Sys.Date()`
-
-Phenotype: `r params$traj`
-
-Condition: `r params$cond`
-
-Condition type: `r vartype`
-
-`r params$condModelForm`
-
-Model type: `r params$modelType`
+For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)  
+Date generated: `r Sys.Date()`  
+Phenotype: `r params$traj`  
+Condition: `r params$cond`  
+Condition type: `r vartype`  
+`r params$condModelForm`   
+Model type: `r params$modelType`  
 
 
 ``` {r, echo = F}
@@ -58,16 +57,16 @@ params$condPlot
 ## Fixed effects
 
 ```{r, echo=F}
-kbl(params$condFixed[,3:ncol(params$condFixed)], digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(params$condFixed[,3:ncol(params$condFixed)], digits = 3)  %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
 
 ## Random effects
 
 ```{r, echo=F}
-kbl(params$condRandom[,3:ncol(params$condRandom)], digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(params$condRandom[,3:ncol(params$condRandom)], digits = 3)  %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
 
@@ -83,12 +82,25 @@ params$plotScore
 }
 ```
 
-
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$plotScore)){
-kbl(params$tableScore, digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+  
+  tablescore = t(params$tableScore)
+  knitr::kable(tablescore, digits = 3,  "latex")  %>%
+      # kableExtra::column_spec(2:ncol(tablescore), width = c("10em")) %>%
+      kableExtra::kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+      kableExtra::landscape() 
+  
 }
+```
+
+
+```{r, echo=F, warning=F}
+if(!is.na(params$difTab)){
+  difTab = t(params$difTab)
+    knitr::kable(difTab, digits = 3,  "latex")  %>%
+    kableExtra::kable_styling(latex_options = c("hold_position"))
+  }
 ```
 
 
@@ -107,8 +119,16 @@ params$AUCplot
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$AUCplot)){
-kbl(params$AUCtable, digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(params$AUCtable, digits = 3)  %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
+}
+```
+
+```{r, echo=F, warning=F, results = 'asis'}
+if(is.ggplot(params$AUCplot)){
+  if(params$difference != "NA"){
+    cat(params$difference)
+  }
 }
 ```
 

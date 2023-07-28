@@ -31,8 +31,7 @@ include_graphics("TIDAL.png")
 
 # TIDAL Data Exploration
 
-For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
-
+For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)  
 Date generated: `r Sys.Date()`
 
 ## Descriptive Statistics
@@ -46,7 +45,12 @@ kbl(params$descTable, digits = 3) %>%
 
 ```
 
-time_point: Time point of data collection. N: Number of measurements (e.g. people) at each time point. mean: Mean `r params$phenotype`. SD: standard deviation of `r params$phenotype`. median: Median of `r params$phenotype`. IQR: Interquartile range of `r params$phenotype`
+time_point: Time point of data collection.  
+N: Number of measurements (e.g. people) at each time point.  
+mean: Mean `r params$phenotype`.  
+SD: standard deviation of `r params$phenotype`.  
+median: Median of `r params$phenotype`.  
+IQR: Interquartile range of `r params$phenotype`
 
 ## Model Results
 
@@ -111,7 +115,7 @@ params$datExAltPlot
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$datExAltPlot)){
-kbl(params$datExAltTable, digits = 3)  %>%
+kbl(t(params$datExAltTable), digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 }
 ```
