@@ -12,6 +12,7 @@ params:
   modelDataEdit : NA
   plotScore : NA
   tableScore : NA
+  difTab : NA
   AUCplot : NA
   AUCtable : NA
   difference: NA
@@ -89,6 +90,15 @@ params$plotScore
 if(is.ggplot(params$plotScore)){
 kbl(params$tableScore, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
+}
+```
+
+```{r, echo=F, warning=F}
+if(is.ggplot(params$plotScore)){
+  if(!is.na(params$difTab[1,1])){
+    kbl(params$difTab, digits = 3)  %>%
+      kable_styling(latex_options = "hold_position")
+  }
 }
 ```
 

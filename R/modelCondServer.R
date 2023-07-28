@@ -1016,12 +1016,21 @@ modelCondServer <- function(id,
         }
       })
 
+      difTab <- reactive({
+        if(input$varType == "cat" & length(input$levelsScores == 2)){
+        difTab <- do.call(cbind, differenceScores())
+        colnames(difTab) <- input$ageInputScore
+        rownames(difTab) <- paste0("Difference between ",input$levelsScores[1]," and ", input$levelsScores[2]," (95% CI)")
+        difTab
+        }else{
+          data.frame(NA)
+        }
+      })
+
       output$scoresDif <- renderTable({
-        req(differenceScores())
-          difTab <- do.call(cbind, differenceScores())
-          colnames(difTab) <- input$ageInputScore
-          rownames(difTab) <- paste0("Difference between ",input$levelsScores[1]," and ", input$levelsScores[2]," (95% CI)")
-          difTab
+        if(input$varType == "cat" & length(input$levelsScores == 2)){
+        difTab()
+        }
       }, rownames = TRUE)
 
 
@@ -1465,6 +1474,7 @@ modelCondServer <- function(id,
               modelDataEdit = modelDataEdit(),
               plotScore = NA,
               tableScore = NA,
+              difTab = NA,
               AUCplot = NA,
               AUCtable = NA,
               difference = NA,
@@ -1482,6 +1492,7 @@ modelCondServer <- function(id,
               modelDataEdit = modelDataEdit(),
               plotScore = NA,
               tableScore = NA,
+              difTab = NA,
               AUCplot = plotAUC(),
               AUCtable = tableAUC(),
               difference = difference(),
@@ -1499,6 +1510,7 @@ modelCondServer <- function(id,
               modelDataEdit = modelDataEdit(),
               plotScore = plotScoreAll(),
               tableScore = tableScoreAll(),
+              difTab = difTab(),
               AUCplot = NA,
               AUCtable = NA,
               difference = difference(),
@@ -1516,6 +1528,7 @@ modelCondServer <- function(id,
               modelDataEdit = modelDataEdit(),
               plotScore = plotScoreAll(),
               tableScore = tableScoreAll(),
+              difTab = difTab(),
               AUCplot = plotAUC(),
               AUCtable = tableAUC(),
               difference = difference(),
