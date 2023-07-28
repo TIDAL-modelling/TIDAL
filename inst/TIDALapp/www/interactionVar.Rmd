@@ -80,8 +80,7 @@ cat("### Scores at Ages")
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$plotScore)){
-kbl(t(params$plotScore), digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+params$plotScore
 }
 ```
 
