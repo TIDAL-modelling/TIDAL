@@ -60,8 +60,10 @@ modelCondUI <- function(id, label = "Model Condition Run") {
             tabPanel("Scores At Ages",
                        tagList(
                          uiOutput(ns("selectAgeScore")),
+                         uiOutput(ns("levelsScoresUI")),
                          withSpinner(plotOutput(ns("plotScore")), proxy.height = "100px"),
-                         withSpinner(tableOutput(ns("tableScore")), proxy.height = "100px")
+                         withSpinner(tableOutput(ns("tableScore")), proxy.height = "100px"),
+                         withSpinner(tableOutput(ns("scoresDif")), proxy.height = "100px")
                        )
             ),
             tabPanel("Area Under Curve",

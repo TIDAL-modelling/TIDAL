@@ -902,6 +902,86 @@ modelCondServer <- function(id,
         tableScoreAll()
       }, colnames =TRUE, rownames = TRUE)
 
+      # ------------------------------------------
+      # Difference in scores at ages (with 95% CIs)
+
+      # User select which 2 levels of their factor they want to see a difference between
+      # if input var is categorical
+      output$levelsScoresUI <- renderUI({
+        if(input$varType == "cat"){
+          if(length(unique(pull(modelDataEdit(), !!sym(input$condition)))) > 2){
+            selectizeInput(ns("levelsScores"), "Select two levels from your factor to calculate the difference in scores:",
+                           sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
+                           multiple = TRUE,
+                           options = list(maxItems = 2))
+          }else if(length(unique(pull(modelDataEdit(), !!sym(input$condition)))) == 2){
+            selectizeInput(ns("levelsScores"), "Select two levels from your factor to calculate the difference in scores:",
+                           sort(unique(pull(modelDataEdit(), !!sym(input$condition)))),
+                           multiple = TRUE,
+                           options = list(maxItems = 2),
+                           selected = sort(unique(pull(modelDataEdit(), !!sym(input$condition)))))
+          }
+        }else{
+
+        }
+      })
+
+      differenceScores <- reactive({
+        if(input$varType == "cat" & length(input$levelsScores == 2)){
+
+          ageOrig <- modelDataEdit() %>% pull(age_original)
+          ageOrig <- ageOrig[!is.na(ageOrig)]
+
+          statements <- lapply(as.numeric(input$ageInputScore), function(x){
+            ageInput <- round(x - mean(ageOrig), 3)
+            ageInput2 <- ageInput^2
+            ageInput3 <- ageInput^3
+            ageInput4 <- ageInput^4
+
+            coef <- summary(fit())$coefficients
+
+            rowIndex <- which(str_detect(string = row.names(coef),
+                                         pattern = input$condition) &
+                                str_detect(string = row.names(coef),
+                                           pattern = ":", negate = T))
+
+            rowNames <- rownames(coef) %>%
+              str_remove_all("I|\\(|\\^|\\)|\\:")
+
+            levelNames <- paste0(input$condition,input$levelsScores) %>%
+              str_remove_all("I|\\(|\\^|\\)|\\:")
+
+            if( sum(str_detect(rowNames, levelNames[1])) == sum(str_detect(rowNames, levelNames[2])) ){
+
+              levelNames1 <- rowNames[str_detect(rowNames, levelNames[1])]
+              levelNames2 <- rowNames[str_detect(rowNames, levelNames[2])]
+
+              if(modelType() == "Linear"){
+                res <- deltaMethod(fit(), c(paste0(
+                  "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, ") - (",rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", levelNames2[1], " + ", levelNames2[2], "*", ageInput, ")"
+                )), parameterNames = rowNames )
+
+              }
+            }
+
+            dif <- paste0( round(res$Estimate, 2), " (", round(res$`2.5 %`,2), " - ", round(res$`97.5 %`,2), ")")
+            res <- data.frame(age = dif)
+            return(res)
+          })
+          return(statements)
+        }else{
+          return(NULL)
+        }
+      })
+
+      output$scoresDif <- renderTable({
+        req(differenceScores())
+          difTab <- do.call(cbind, differenceScores())
+          colnames(difTab) <- input$ageInputScore
+          rownames(difTab) <- paste0("Difference between ",input$levelsScores[1]," and ", input$levelsScores[2]," (95% CI)")
+          difTab
+      }, rownames = TRUE)
+
 
       # ------------------------------------------
       ###############################################################
