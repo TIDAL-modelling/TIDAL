@@ -36,19 +36,13 @@ vartype = if(params$condtype == "cat"){"Categorical"} else {"Continuous"}
 
 # TIDAL Interaction Variable
 
-For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
-
-Date generated: `r Sys.Date()`
-
-Phenotype: `r params$traj`
-
-Condition: `r params$cond`
-
-Condition type: `r vartype`
-
-`r params$condModelForm`
-
-Model type: `r params$modelType`
+For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)  
+Date generated: `r Sys.Date()`  
+Phenotype: `r params$traj`  
+Condition: `r params$cond`  
+Condition type: `r vartype`  
+`r params$condModelForm`   
+Model type: `r params$modelType`  
 
 
 ``` {r, echo = F}
@@ -85,21 +79,24 @@ params$plotScore
 }
 ```
 
-
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$plotScore)){
-kbl(params$tableScore, digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+  
+  tablescore = t(params$tableScore)
+  kable(tablescore, digits = 3,  "latex")  %>%
+      #column_spec(2:ncol(tablescore), width = c("10em")) %>%
+      kable_styling(latex_options = c("hold_position")) 
+  
 }
 ```
 
+
 ```{r, echo=F, warning=F}
-if(is.ggplot(params$plotScore)){
-  if(!is.na(params$difTab[1,1])){
-    kbl(params$difTab, digits = 3)  %>%
-      kable_styling(latex_options = "hold_position")
+if(!is.na(params$difTab)){
+  difTab = t(params$difTab)
+    kable(difTab, digits = 3,  "latex")  %>%
+    kable_styling(latex_options = c("hold_position"))
   }
-}
 ```
 
 
@@ -123,10 +120,10 @@ kbl(params$AUCtable, digits = 3)  %>%
 }
 ```
 
-```{r, echo=F, warning=F}
+```{r, echo=F, warning=F, results = 'asis'}
 if(is.ggplot(params$AUCplot)){
   if(params$difference != "NA"){
-    params$difference
+    cat(params$difference)
   }
 }
 ```
