@@ -1424,13 +1424,17 @@ modelCondServer <- function(id,
 
         return(statement)
         }else{
-          return(NULL)
+          return(paste0(NA))
         }
 
       })
 
-      output$test <- renderText({
+      output$AUCdifText <- renderText({
+        if(input$varType == "cat" & length(input$levelsAUC == 2)){
         difference()
+        }else{
+        " "
+        }
       })
 
       #################################################################################

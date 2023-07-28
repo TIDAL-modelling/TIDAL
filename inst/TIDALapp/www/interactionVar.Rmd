@@ -125,7 +125,9 @@ kbl(params$AUCtable, digits = 3)  %>%
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$AUCplot)){
-  params$difference
+  if(params$difference != "NA"){
+    params$difference
+  }
 }
 ```
 
