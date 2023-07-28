@@ -13,6 +13,7 @@
 #' @import tinytex
 #' @import rmarkdown
 #' @import kableExtra
+#' @import car
 #'
 #' @noRd
 #' @keywords internal
@@ -957,11 +958,52 @@ modelCondServer <- function(id,
               levelNames2 <- rowNames[str_detect(rowNames, levelNames[2])]
 
               if(modelType() == "Linear"){
+
                 res <- deltaMethod(fit(), c(paste0(
                   "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, ") - (",rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", levelNames2[1], " + ", levelNames2[2], "*", ageInput, ")"
                 )), parameterNames = rowNames )
 
+              }else if(modelType() == "Quadratic"){
+                res <- deltaMethod(fit(), c(paste0(
+                  "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, " + ", levelNames1[3], "*", ageInput2,  ") - (", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", levelNames2[1], " + ", levelNames2[2], "*", ageInput, " + ", levelNames2[3], "*", ageInput2,  ")"
+                )), parameterNames = rowNames )
+
+              }else if(modelType() == "Cubic"){
+                res <- deltaMethod(fit(), c(paste0(
+                  "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, " + ", levelNames1[3], "*", ageInput2, " + ", levelNames1[4], "*", ageInput3,  ") - (", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", levelNames2[1], " + ", levelNames2[2], "*", ageInput, " + ", levelNames2[3], "*", ageInput2, " + ", levelNames2[4], "*", ageInput3,  ")"
+                )), parameterNames = rowNames )
+
+              }else if(modelType() == "Quartic"){
+                res <- deltaMethod(fit(), c(paste0(
+                  "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", rowNames[5], "*", ageInput4, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, " + ", levelNames1[3], "*", ageInput2, " + ", levelNames1[4], "*", ageInput3, " + ", levelNames1[5], "*", ageInput4,  ") - (", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", rowNames[5], "*", ageInput4, " + ", levelNames2[1], " + ", levelNames2[2], "*", ageInput, " + ", levelNames2[3], "*", ageInput2, " + ", levelNames2[4], "*", ageInput3, " + ", levelNames2[5], "*", ageInput4,  ")"
+                )), parameterNames = rowNames )
               }
+
+            }else{
+              levelNames1 <- rowNames[str_detect(rowNames, paste0(levelNames, collapse = "|"))]
+
+              if(modelType() == "Linear"){
+
+                res <- deltaMethod(fit(), c(paste0(
+                  "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, ") - (",rowNames[1], " + ", rowNames[2], "*", ageInput, ")"
+                )), parameterNames = rowNames )
+
+              }else if(modelType() == "Quadratic"){
+                res <- deltaMethod(fit(), c(paste0(
+                  "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, " + ", levelNames1[3], "*", ageInput2,  ") - (", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2,  ")"
+                )), parameterNames = rowNames )
+
+              }else if(modelType() == "Cubic"){
+                res <- deltaMethod(fit(), c(paste0(
+                  "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, " + ", levelNames1[3], "*", ageInput2, " + ", levelNames1[4], "*", ageInput3,  ") - (", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3,  ")"
+                )), parameterNames = rowNames )
+
+              }else if(modelType() == "Quartic"){
+                res <- deltaMethod(fit(), c(paste0(
+                  "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", rowNames[5], "*", ageInput4, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, " + ", levelNames1[3], "*", ageInput2, " + ", levelNames1[4], "*", ageInput3, " + ", levelNames1[5], "*", ageInput4,  ") - (", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", rowNames[5], "*", ageInput4,   ")"
+                )), parameterNames = rowNames )
+              }
+
             }
 
             dif <- paste0( round(res$Estimate, 2), " (", round(res$`2.5 %`,2), " - ", round(res$`97.5 %`,2), ")")

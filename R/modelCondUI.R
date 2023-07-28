@@ -63,7 +63,7 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                          uiOutput(ns("levelsScoresUI")),
                          withSpinner(plotOutput(ns("plotScore")), proxy.height = "100px"),
                          withSpinner(tableOutput(ns("tableScore")), proxy.height = "100px"),
-                         withSpinner(tableOutput(ns("scoresDif")), proxy.height = "100px")
+                         tableOutput(ns("scoresDif"))
                        )
             ),
             tabPanel("Area Under Curve",
