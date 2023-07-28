@@ -1231,8 +1231,8 @@ modelCondServer <- function(id,
 
 
       difference <- reactive({
-        levelNames <- as.character(input$levelsAUC) %>%
-                          str_remove_all("I|\\(|\\^|\\)|\\:")
+        levelNames <- paste0(input$condition,input$levelsAUC) %>%
+          str_remove_all("I|\\(|\\^|\\)|\\:")
 
         coef <- summary(fit())$coefficients
 
