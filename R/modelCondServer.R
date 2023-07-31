@@ -77,7 +77,7 @@ modelCondServer <- function(id,
         if(input$varType == "cat"){
           modelData() %>%
             filter(!is.na(!!sym(input$condition))) %>%
-            mutate(!!input$condition := factor(.[[colSplit]]) )
+            mutate(!!input$condition := factor( str_replace_all(.[[colSplit]], " |-|/", "_") ) )
 
         }else if(input$varType == "cont"){
           modelData() %>%
@@ -245,18 +245,20 @@ modelCondServer <- function(id,
             }
           })
 
+          num <- str_subset(row.names(coef), input$condition) %>%
+            sub(paste0(".*", input$condition), "", .) %>%
+            unique()
 
-          num <-  as.character(levels(as.factor(pull(modelDataScaled(), !!sym(input$condition)))))
-
-          names(predCovs) <- 1:length(predCovs)
+          names(predCovs) <- paste0(input$condition, "_", num)
 
           modelDataEdit <- cbind(modelDataScaled(), do.call(cbind, predCovs)) %>%
             mutate(zero = zero) %>%
             mutate(!!input$condition := as.factor(.[[colSplit]]) ) %>%
             mutate(pred =  eval(parse(text =
-                                        paste0(paste0("ifelse(", input$condition, " == '", num, "', ", names(predCovs)  ,",", collapse = " "), "zero",
+                                        paste0(paste0("ifelse(", input$condition, " == '", num, "', ", input$condition, "_",num,",", collapse = " "), "zero",
                                                paste0(rep(")", length(num)), collapse = ""), collapse = "")
             )))
+
         }else if(input$varType == "cont"){
         # Get the ±1 SD for this predict/population average line
           if(modelType() == "Linear"){
