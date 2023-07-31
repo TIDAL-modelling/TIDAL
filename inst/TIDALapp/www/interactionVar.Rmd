@@ -2,6 +2,8 @@
 title: ""
 output:
   pdf_document: default
+header-includes:
+  - \usepackage{pdflscape}
 params:
   cond : NA
   condtype: NA
@@ -12,13 +14,15 @@ params:
   modelDataEdit : NA
   plotScore : NA
   tableScore : NA
+  difTab : NA
   AUCplot : NA
   AUCtable : NA
+  difference: NA
   traj : NA
   modelType : NA
 ---
-
-
+  
+  
 ``` {r, echo=F, warning=F}
 library(knitr)
 library(kableExtra)
@@ -34,19 +38,13 @@ vartype = if(params$condtype == "cat"){"Categorical"} else {"Continuous"}
 
 # TIDAL Interaction Variable
 
-For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)
-
-Date generated: `r Sys.Date()`
-
-Phenotype: `r params$traj`
-
-Condition: `r params$cond`
-
-Condition type: `r vartype`
-
-`r params$condModelForm`
-
-Model type: `r params$modelType`
+For more information, see the [TIDAL GitHub page](https://github.com/AmeliaES/TIDAL)  
+Date generated: `r Sys.Date()`  
+Phenotype: `r params$traj`  
+Condition: `r params$cond`  
+Condition type: `r vartype`  
+`r params$condModelForm`   
+Model type: `r params$modelType`  
 
 
 ``` {r, echo = F}
@@ -73,43 +71,63 @@ kbl(params$condRandom[,3:ncol(params$condRandom)], digits = 3)  %>%
 
 ```{r, echo = F, results='asis', warning=F}
 if(is.ggplot(params$plotScore)){
-cat("### Scores at Ages")
+  cat("### Scores at Ages")
 }
 ```
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$plotScore)){
-kbl(t(params$plotScore), digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+  params$plotScore
+}
+```
+
+```{r, echo=F, warning=F}
+if(is.ggplot(params$plotScore)){
+  
+  tablescore = t(params$tableScore)
+  kable(tablescore, digits = 3,  "latex")  %>%
+    # column_spec(2:ncol(tablescore), width = c("10em")) %>%
+    kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+    landscape() 
+  
 }
 ```
 
 
 ```{r, echo=F, warning=F}
-if(is.ggplot(params$plotScore)){
-kbl(params$tableScore, digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+if(!is.na(params$difTab)){
+  difTab = t(params$difTab)
+  kable(difTab, digits = 3,  "latex")  %>%
+    kable_styling(latex_options = c("hold_position"))
 }
 ```
 
 
 ``` {r, echo = F, results='asis', warning=F}
 if(is.ggplot(params$AUCplot)){
-cat("### Area Under the Curve")
+  cat("### Area Under the Curve")
 }
 ```
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$AUCplot)){
-params$AUCplot
+  params$AUCplot
 }
 ```
 
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$AUCplot)){
-kbl(params$AUCtable, digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+  kbl(params$AUCtable, digits = 3)  %>%
+    kable_styling(latex_options = "hold_position")
+}
+```
+
+```{r, echo=F, warning=F, results = 'asis'}
+if(is.ggplot(params$AUCplot)){
+  if(params$difference != "NA"){
+    cat(params$difference)
+  }
 }
 ```
 
