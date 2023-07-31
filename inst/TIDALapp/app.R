@@ -4,6 +4,14 @@ library(shinythemes)
 library(ggplot2)
 library(bslib)
 
+# source all R scripts
+path <- "./../../R/"
+files.sources <- list.files(path, full.names = TRUE)
+for(f in files.sources){
+  source(f, local = TRUE)
+}
+
+
 # Increase maximum file size that can be uploaded
 options(shiny.maxRequestSize = 100*1024^2)
 
@@ -318,7 +326,6 @@ server <- function(input, output, session) {
       }
     ))
 }
-
 
 # Run the application
 shinyApp(ui = ui, server = server)
