@@ -47,6 +47,7 @@ selectDataServer <- function(id, dataFormatted) {
           selectInput(ns("ID"), "Participant ID variable:", choices = names(data()), selected = names(select(data(), where(is.numeric)) )[1]),
           selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[3]),
           selectInput(ns("age"), "Variable for age at time point (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[2]),
+          checkboxInput(ns("toYears"), "Convert age in months to years?", value = FALSE),
           selectInput(ns("timePoint"), "Variable for time point (categorical):", choices = names(data()) , selected = names(data())[2]),
           selectInput(ns("covarsCat"), "Categorical Confounders (optional):",
                       choices = names(data()) ,
@@ -83,12 +84,20 @@ selectDataServer <- function(id, dataFormatted) {
       })
 
 
-      # edit dataframe so that categorical covariates are factorised and polynomial age columns are added
+      # edit dataframe age column if convert to years is ticked
       dataEdit <- reactive({
-        dataEdit <- data() %>%
-          mutate_at(vars(all_of(input$covarsCat)), factor)
-
+        if (isTRUE(input$toYears)) {
+          dataEdit <- data() %>% mutate_at(vars(input$age), ~./12) %>%
+            mutate_at(vars(all_of(input$covarsCat)), factor)
+        } else {
+          dataEdit <- data() %>%
+            mutate_at(vars(all_of(input$covarsCat)), factor)
+        }
       })
+
+
+      # edit dataframe so that categorical covariates are factorised and polynomial age columns are added
+
 
       covars <- reactive({
         c(input$covarsCat, input$covarsCont)
