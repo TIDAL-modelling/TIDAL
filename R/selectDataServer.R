@@ -1,11 +1,14 @@
 #' Shiny module - Selecting and reading in the dataset
 #'
+#' @import shinyBS
+#'
 #' @noRd
 #' @keywords internal
 #' @export
 selectDataServer <- function(id, dataFormatted) {
   moduleServer(
     id,
+
     # Below is the module function
     function(input, output, session) {
       ns <- NS(id)
@@ -18,8 +21,8 @@ selectDataServer <- function(id, dataFormatted) {
           )
         }
       })
-      # if the user wants to use data formatted on previous page, from wide to long format then save this as "data()"
 
+      # if the user wants to use data formatted on previous page, from wide to long format then save this as "data()"
       data <- reactive ({
         if (input$select == "Upload a long format dataset"){
           req(input$uploadFile)
@@ -47,6 +50,12 @@ selectDataServer <- function(id, dataFormatted) {
           selectInput(ns("ID"), "Participant ID variable:", choices = names(data()), selected = names(select(data(), where(is.numeric)) )[1]),
           selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[3]),
           selectInput(ns("age"), "Variable for age at time point (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[2]),
+        tags$div(title = "If your age variable is measured in months check the box to convert it to years.",
+                   checkboxInput(ns("toYears"),
+                                 tags$span("Convert age from months to years",
+                                           tipify(bsButton("pB2", "?", style = "info", size = "extra-small"),
+                                                  "")),
+                                 value = FALSE )),
           selectInput(ns("timePoint"), "Variable for time point (categorical):", choices = names(data()) , selected = names(data())[2]),
           selectInput(ns("covarsCat"), "Categorical Confounders (optional):",
                       choices = names(data()) ,
@@ -83,11 +92,15 @@ selectDataServer <- function(id, dataFormatted) {
       })
 
 
-      # edit dataframe so that categorical covariates are factorised and polynomial age columns are added
+      # edit dataframe so that categorical covariates are factorised and age column is converted to years if ticked
       dataEdit <- reactive({
-        dataEdit <- data() %>%
-          mutate_at(vars(all_of(input$covarsCat)), factor)
-
+        if (isTRUE(input$toYears)) {
+          dataEdit <- data() %>% mutate_at(vars(input$age), ~./12) %>%
+            mutate_at(vars(all_of(input$covarsCat)), factor)
+        } else {
+          dataEdit <- data() %>%
+            mutate_at(vars(all_of(input$covarsCat)), factor)
+        }
       })
 
       covars <- reactive({
