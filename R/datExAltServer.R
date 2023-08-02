@@ -91,8 +91,7 @@ datExAltServer <- function(id,
 
           res <-  res %>%
             mutate(contrast = paste0(rowname, " (95% CIs)")) %>%
-            column_to_rownames(var = "contrast") %>%
-            mutate(across(where(is.numeric), round, 2))
+            column_to_rownames(var = "contrast")
 
           return( res )
         })
@@ -154,7 +153,7 @@ datExAltServer <- function(id,
 
         estimateCI <- lapply(score_glht(), function(df) {
           df %>%
-            mutate(estimateCI = paste0(estimate, " (", conf.low, " - ", conf.high, ")")) %>%
+            mutate(estimateCI = paste0(round(estimate,3) , " (", round(conf.low,3) , " - ", round(conf.high,3) , ")")) %>%
             dplyr::select(estimateCI)
         })  %>% do.call(cbind, .)
         colnames(estimateCI) <- input$ageInput
