@@ -805,20 +805,17 @@ modelCondServer <- function(id,
 
           res <-  res %>%
             mutate(contrast = paste0(rowname, " [", input$condition, ", level = ", levelNames, " ] (95% CIs)")) %>%
-            column_to_rownames(var = "contrast") %>%
-            mutate(across(where(is.numeric), round, 2))
+            column_to_rownames(var = "contrast")
           }else if(input$varType == "cont"){
             res <-  res %>%
               mutate(contrast = paste0(paste0(rowname, " [", input$condition, " ] "), c("Population Average", "+ 1 SD", "- 1 SD") ) ) %>%
-              column_to_rownames(var = "contrast") %>%
-              mutate(across(where(is.numeric), round, 2))
+              column_to_rownames(var = "contrast")
           }
 
           return( res )
         })
         return(score)
       })
-
 
       # ------------------------------------------
       # Plot the score at the given age
@@ -892,7 +889,7 @@ modelCondServer <- function(id,
 
           estimateCI <- lapply(score_glht(), function(df) {
             df %>%
-              mutate(estimateCI = paste0(estimate, " (", conf.low, " - ", conf.high, ")")) %>%
+              mutate(estimateCI = paste0(round(estimate,3) , " (", round(conf.low,3) , " - ", round(conf.high,3) , ")")) %>%
               dplyr::select(estimateCI)
           })  %>% do.call(cbind, .)
           colnames(estimateCI) <- input$ageInputScore
@@ -1006,7 +1003,7 @@ modelCondServer <- function(id,
 
             }
 
-            dif <- paste0( round(res$Estimate, 2), " (", round(res$`2.5 %`,2), " - ", round(res$`97.5 %`,2), ")")
+            dif <- paste0( round(res$Estimate, 3), " (", round(res$`2.5 %`,3), " - ", round(res$`97.5 %`,3), ")")
             res <- data.frame(age = dif)
             return(res)
           })
