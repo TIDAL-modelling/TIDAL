@@ -18,6 +18,7 @@ modelResultsServer <- function(id,
                            warningMsg,
                            modelData ,
                            modelType,
+                           randomFX,
                            age,
                            traj,
                            covars
@@ -65,6 +66,19 @@ modelResultsServer <- function(id,
       output$warning <- renderText({
         warningMsg()
       })
+
+      # ------------------------------------------
+      # number of observations (measurements) and the number of groups (people)
+      N <- reactive({
+        paste0("The number of observations (measurements) is ",
+               format(summary(modelFit())$devcomp$dims[[1]], big.mark=",", scientific=FALSE),
+               " and the number of groups (people) is ",
+               format(summary(modelFit())$ngrps[[1]], big.mark=",", scientific=FALSE) ,
+               ".")
+      })
+      output$Ndims <- renderText(
+        N()
+      )
 
       # ------------------------------------------
       # model results
@@ -131,15 +145,18 @@ modelResultsServer <- function(id,
         confounderEst <- paste0(round(fixedTab()$estimate[i],2) , collapse = ", ")
         }
 
+        # Model fit (deviance)
+        modelDeviance <- round(deviance(modelFit()), 2)
+
         # Text:
         paste0(
-        'The score at the intercept is ', intercept, '. The intercept here has been shifted to the mean age of all the assessments which is ', ageMeanVal, '. You could interpret this as the score at the intercept of ', ageVar,' ', ageMeanVal,' is ', intercept, '.<br/><br/> Every unit increase in ',ageVar,' is associated with ', direction ,' of ', trajVar ,' by ', slope,'. ', ifelse(modelType() ==  "Quadratic", paste0('As you have specified a quadratic model, every unit increase in ', ageVar ,'^2 is also associated with ', direction2 ,' of ', trajVar,' by ',slope2,'. However, it can be difficult to interpret these two estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),paste0('')),ifelse(modelType() == "Cubic",paste0('As you have specified a cubic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,'. However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),paste0('')), ifelse(modelType() == "Quartic",paste0('As you have specified a quartic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,' and every unit increase in ',ageVar,'^4 is associated with ', direction4 ,' in ',trajVar,' by ',slope4, ' However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),paste0('')),'<br/>
-        <br/>',ifelse(length(covars()) > 0,paste0('These estimates are adjusted for the following confounders/covariates: ', confounders ,'.<br/><br/>In addition, the following confounders/covariates: ', confounderLevels ,' are associated with an increase or decrease of ', trajVar ,' by ',confounderEst,' respectively.<br/><br/>Please note, this section does not estimate group specific trajectories. See the Interaction Variable tab for group specific interactions and trajectories.<br/><br/>'), paste0('')))
+          'The score at the intercept is ', intercept, '. The intercept here has been shifted to the mean age of all the assessments which is ', ageMeanVal, '. You could interpret this as the score at the intercept of ', ageVar,' ', ageMeanVal,' is ', intercept, '.<br/><br/> Every unit increase in ',ageVar,' is associated with ', direction ,' of ', trajVar ,' by ', slope,'. ', ifelse(modelType() ==  "Quadratic", paste0('As you have specified a quadratic model, every unit increase in ', ageVar ,'^2 is also associated with ', direction2 ,' of ', trajVar,' by ',slope2,'. However, it can be difficult to interpret these two estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),paste0('')),ifelse(modelType() == "Cubic",paste0('As you have specified a cubic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,'. However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),paste0('')), ifelse(modelType() == "Quartic",paste0('As you have specified a quartic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,' and every unit increase in ',ageVar,'^4 is associated with ', direction4 ,' in ',trajVar,' by ',slope4, ' However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),paste0('')),'<br/>
+        <br/>',ifelse(length(covars()) > 0,paste0('These estimates are adjusted for the following confounders/covariates: ', confounders ,'.<br/><br/>In addition, the following confounders/covariates: ', confounderLevels ,' are associated with an increase or decrease of ', trajVar ,' by ',confounderEst,' respectively.<br/><br/>Please note, this section does not estimate group specific trajectories. See the Interaction Variable tab for group specific interactions and trajectories.<br/><br/>'), paste0('')), 'The model fit (deviance) is ', modelDeviance, ', you can compare this value to other similar models to determine which model has a better fit.<br/><br/>')
       })
 
       output$interFixed <- renderText({
         if(class(modelFit()) != "try-error"){
-        interpretation()
+          interpretation()
         }
       })
 
@@ -151,9 +168,11 @@ modelResultsServer <- function(id,
       # alternatively request "cov.last" to return correlations / covariances last).
 
       randomTab <- reactive({
-        as.data.frame(VarCorr(modelFit()),
+        randomDF <- as.data.frame(VarCorr(modelFit()),
                       order = "lower.tri") %>%
-          mutate(across(where(is.numeric), round, 3))
+                      mutate(across(where(is.numeric), round, 3))
+        colnames(randomDF) <- c("Level", "Variable1", "Variable2", "Variance/Covariance", "SD Variance/Covariance")
+        randomDF
       })
 
       output$modelStatsRandom <- renderTable({
@@ -162,17 +181,73 @@ modelResultsServer <- function(id,
         }
       }, digits = 3)
 
-      # number of observations (measurements) and the number of groups (people)
-      N <- reactive({
-        paste0("The number of observations (measurements) is ",
-               format(summary(modelFit())$devcomp$dims[[1]], big.mark=",", scientific=FALSE),
-               " and the number of groups (people) is ",
-               format(summary(modelFit())$ngrps[[1]], big.mark=",", scientific=FALSE) ,
-               ".")
+
+      # ------------------------------------------
+      # Interpretation of fixed effects
+      interpretationRand <- eventReactive(modelFit(), {
+        req(modelData())
+
+        # age/time
+        ageName <- age()
+
+        # Intercept variance
+        intVar <- randomTab()[1,4]
+
+        # Covariance between intercept and age/time covariance
+        intAgeVar <- randomTab()[2,4]
+
+        if(modelType() ==  "Linear"){
+        # age/time variance
+        ageVar <- randomTab()[3,4]
+
+        # residual variance
+        resVar <- randomTab()[nrow(randomTab()),4]
+
+        # Text:
+          if(randomFX() == "No random slope"){
+            paste0(
+              'The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar ,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }else if(randomFX() == "Linear"){
+          paste0(
+            'The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar ,'. The covariance between the intercept and ', ageName ,' is ', intAgeVar ,'. The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }
+        }else if (modelType() %in%  c("Quadratic", "Cubic", "Quartic")){
+          # age/time variance
+          intAgeVar2 <- randomTab()[3,4]
+
+          # age/time variance
+          ageVar <- randomTab()[4,4]
+
+          # age/time covariance
+          ageAge2CoVar <- randomTab()[5,4]
+
+          # age/time ^2 variance
+          age2Var <- randomTab()[6,4]
+
+          # residual variance
+          resVar <- randomTab()[nrow(randomTab()),4]
+
+          if(randomFX() == "No random slope"){
+          paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }else if(randomFX() == "Linear"){
+            # age/time variance
+            ageVar <- randomTab()[3,4]
+            paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'. The covariance between the intercept and ',ageName,' is ',intAgeVar,'.<br/><br/>The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }else if(randomFX() == "Linear and Quadratic"){
+            # age/time variance
+            ageVar <- randomTab()[4,4]
+            paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'. The covariance between the intercept and ',ageName,' is ',intAgeVar,'. The covariance between the intercept and ',ageName,'^2 is ',intAgeVar2,'.<br/><br/>The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'. The covariance between ',ageName,' and ',ageName,'^2 is ',ageAge2CoVar,'. The ',ageName,'^2 variance (how much variability there is between individuals for their ',ageName,'^2) is ',age2Var,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }
+        }
       })
-      output$Ndims <- renderText(
-        N()
-      )
+
+      output$interRandom  <- renderText({
+        if(class(modelFit()) != "try-error"){
+          interpretationRand()
+        }
+      })
+
+
       return(
         list(
         statement = statement,
@@ -180,6 +255,7 @@ modelResultsServer <- function(id,
         fixedTab = fixedTab,
         interpretation = interpretation,
         randomTab = randomTab,
+        interpretationRand = interpretationRand,
         N = N
         )
       )
