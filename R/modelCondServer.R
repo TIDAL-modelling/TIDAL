@@ -355,26 +355,50 @@ modelCondServer <- function(id,
         modelStatsFixed()
         }, digits = 3)
 
+      # -------------------------------
       # Interpretation of fixed effects
-      interpretation <- eventReactive(modelFit(), {
-        req(modelData())
+      interpretation <- eventReactive(fit(), {
+        req(modelDataEdit())
 
+        if(input$varType == "cat"){
 
+          if(modelType() == "Linear"){
+            paste0('')
+          } else if(modelType() == "Quadratic"){
+            paste0('')
+          } else if(modelType() == "Cubic"){
+            paste0('')
+          } else if(modelType() == "Quartic"){
+            paste0('')
+          }
 
-      })
-
-      output$modelIntFixed <- renderText({
-        if(class(modelFit()) != "try-error"){
-          interpretation()
+        }else if(input$varType == "cont"){
+          if(modelType() == "Linear"){
+            paste0('')
+          } else if(modelType() == "Quadratic"){
+            paste0('')
+          } else if(modelType() == "Cubic"){
+            paste0('')
+          } else if(modelType() == "Quartic"){
+            paste0('')
+          }
         }
       })
 
+      output$modelIntFixed <- renderText({
+          interpretation()
+      })
+
+      # -------------------------------
       modelStatsRandom <- reactive({
         if(str_detect(formCodeCovars(), input$condition)){
           data.frame(NULL)
         }else{
-          as.data.frame(VarCorr(fit()),
-                        order = "lower.tri")
+          randomDF <- as.data.frame(VarCorr(fit()),
+                        order = "lower.tri") %>%
+            mutate(across(where(is.numeric), round, 3))
+          colnames(randomDF) <- c("Level", "Variable1", "Variable2", "Variance/Covariance", "SD Variance/Covariance")
+          randomDF
         }
       })
 
