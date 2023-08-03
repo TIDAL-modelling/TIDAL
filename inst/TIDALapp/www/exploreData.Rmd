@@ -9,6 +9,7 @@ params:
   statement : NA
   fixedTab : NA
   interpretation: NA
+  interpretationRand: NA
   randomTab : NA
   N : NA
   mainPlot : NA
@@ -98,6 +99,10 @@ kbl(params$randomTab, digits = 3)  %>%
   kable_styling(latex_options = "hold_position")
 ```
 
+```{r , echo = F, results='asis', warning=F}
+text <- str_replace_all(params$interpretationRand, "<br/>", "\n")
+cat(text)
+```
 
 
 ```{r, echo = F, results='asis', warning=F}

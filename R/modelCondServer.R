@@ -355,6 +355,20 @@ modelCondServer <- function(id,
         modelStatsFixed()
         }, digits = 3)
 
+      # Interpretation of fixed effects
+      interpretation <- eventReactive(modelFit(), {
+        req(modelData())
+
+
+
+      })
+
+      output$modelIntFixed <- renderText({
+        if(class(modelFit()) != "try-error"){
+          interpretation()
+        }
+      })
+
       modelStatsRandom <- reactive({
         if(str_detect(formCodeCovars(), input$condition)){
           data.frame(NULL)

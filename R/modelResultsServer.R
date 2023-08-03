@@ -255,6 +255,7 @@ modelResultsServer <- function(id,
         fixedTab = fixedTab,
         interpretation = interpretation,
         randomTab = randomTab,
+        interpretationRand = interpretationRand,
         N = N
         )
       )

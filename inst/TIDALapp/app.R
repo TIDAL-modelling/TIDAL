@@ -271,6 +271,7 @@ server <- function(input, output, session) {
                                              statement = modelResultsServer$statement,
                                              fixedTab = modelResultsServer$fixedTab,
                                              interpretation = modelResultsServer$interpretation,
+                                             interpretationRand = modelResultsServer$interpretationRand,
                                              randomTab = modelResultsServer$randomTab,
                                              N = modelResultsServer$N,
                                              mainPlot = modelPlotServer$mainPlot,
