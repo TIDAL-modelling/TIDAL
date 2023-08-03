@@ -83,7 +83,7 @@ selectDataServer <- function(id, dataFormatted) {
 
       output$randomFX_UI <- renderUI({
         req(data())
-        selectInput(ns("randomFX"), "Choose random slope terms:", choices = randomFX_choices(), multiple = FALSE)
+        selectInput(ns("randomFX"), "Choose random slope terms:", choices = randomFX_choices(), multiple = FALSE, selected = randomFX_choices()[length(randomFX_choices())])
       })
 
       output$button_UI <- renderUI({
@@ -191,6 +191,7 @@ selectDataServer <- function(id, dataFormatted) {
           age = reactive({ input$age }),
           timePoint = reactive({ input$timePoint }),
           modelType = reactive({ input$modelType }),
+          randomFX = reactive({ input$randomFX }),
           covariateChoice = covariateChoice,
           covars = covars
         )

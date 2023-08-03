@@ -18,6 +18,7 @@ modelResultsServer <- function(id,
                            warningMsg,
                            modelData ,
                            modelType,
+                           randomFX,
                            age,
                            traj,
                            covars

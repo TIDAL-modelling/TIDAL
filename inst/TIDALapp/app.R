@@ -237,6 +237,7 @@ server <- function(input, output, session) {
                                                    warningMsg = modelRunServer$warning,
                                                    modelData = selectDataServer$data,
                                                    modelType = selectDataServer$modelType,
+                                                   randomFX = selectDataServer$randomFX,
                                                    age = selectDataServer$age,
                                                    traj = selectDataServer$traj,
                                                    covars = selectDataServer$covars)
