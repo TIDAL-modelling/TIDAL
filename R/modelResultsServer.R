@@ -68,6 +68,19 @@ modelResultsServer <- function(id,
       })
 
       # ------------------------------------------
+      # number of observations (measurements) and the number of groups (people)
+      N <- reactive({
+        paste0("The number of observations (measurements) is ",
+               format(summary(modelFit())$devcomp$dims[[1]], big.mark=",", scientific=FALSE),
+               " and the number of groups (people) is ",
+               format(summary(modelFit())$ngrps[[1]], big.mark=",", scientific=FALSE) ,
+               ".")
+      })
+      output$Ndims <- renderText(
+        N()
+      )
+
+      # ------------------------------------------
       # model results
       fixedTab <- reactive({
         cbind(
@@ -155,9 +168,11 @@ modelResultsServer <- function(id,
       # alternatively request "cov.last" to return correlations / covariances last).
 
       randomTab <- reactive({
-        as.data.frame(VarCorr(modelFit()),
+        randomDF <- as.data.frame(VarCorr(modelFit()),
                       order = "lower.tri") %>%
-          mutate(across(where(is.numeric), round, 3))
+                      mutate(across(where(is.numeric), round, 3))
+        colnames(randomDF) <- c("Level", "Variable1", "Variable2", "Variance/Covariance", "SD Variance/Covariance")
+        randomDF
       })
 
       output$modelStatsRandom <- renderTable({
@@ -166,17 +181,69 @@ modelResultsServer <- function(id,
         }
       }, digits = 3)
 
-      # number of observations (measurements) and the number of groups (people)
-      N <- reactive({
-        paste0("The number of observations (measurements) is ",
-               format(summary(modelFit())$devcomp$dims[[1]], big.mark=",", scientific=FALSE),
-               " and the number of groups (people) is ",
-               format(summary(modelFit())$ngrps[[1]], big.mark=",", scientific=FALSE) ,
-               ".")
+
+      # ------------------------------------------
+      # Interpretation of fixed effects
+      interpretationRand <- eventReactive(modelFit(), {
+        req(modelData())
+
+        # age/time
+        ageName <- age()
+
+        # Intercept variance
+        intVar <- randomTab()[1,4]
+
+        # Covariance between intercept and age/time covariance
+        intAgeVar <- randomTab()[2,4]
+
+        if(modelType() ==  "Linear"){
+        # age/time variance
+        ageVar <- randomTab()[3,4]
+
+        # residual variance
+        resVar <- randomTab()[nrow(randomTab()),4]
+
+        # Text:
+          if(randomFX() == "No random slope"){
+            paste0(
+              'The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar ,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }else if(randomFX() == "Linear"){
+          paste0(
+            'The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar ,'. The covariance between the intercept and ', ageName ,' is ', intAgeVar ,'. The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }
+        }else if (modelType() %in%  c("Quadratic", "Cubic", "Quartic")){
+          # age/time variance
+          intAgeVar2 <- randomTab()[3,4]
+
+          # age/time variance
+          ageVar <- randomTab()[4,4]
+
+          # age/time covariance
+          ageAge2CoVar <- randomTab()[5,4]
+
+          # age/time ^2 variance
+          age2Var <- randomTab()[6,4]
+
+          # residual variance
+          resVar <- randomTab()[7,4]
+
+          if(randomFX() == "No random slope"){
+          paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }else if(randomFX() == "Linear"){
+            paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'. The covariance between the intercept and ',ageName,' is ',intAgeVar,'.<br/><br/>The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }else if(randomFX() == "Linear and Quadratic"){
+            paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'. The covariance between the intercept and ',ageName,' is ',intAgeVar,'. The covariance between the intercept and ',ageName,'^2 is ',intAgeVar2,'.<br/><br/>The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'. The covariance between ',ageName,' and ',ageName,'^2 is ',ageAge2CoVar,'. The ',ageName,'^2 variance (how much variability there is between individuals for their ',ageName,'^2) is ',age2Var,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }
+        }
       })
-      output$Ndims <- renderText(
-        N()
-      )
+
+      output$interRandom  <- renderText({
+        if(class(modelFit()) != "try-error"){
+          interpretationRand()
+        }
+      })
+
+
       return(
         list(
         statement = statement,
