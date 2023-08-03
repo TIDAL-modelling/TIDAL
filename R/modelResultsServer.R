@@ -225,13 +225,17 @@ modelResultsServer <- function(id,
           age2Var <- randomTab()[6,4]
 
           # residual variance
-          resVar <- randomTab()[7,4]
+          resVar <- randomTab()[nrow(randomTab()),4]
 
           if(randomFX() == "No random slope"){
           paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
           }else if(randomFX() == "Linear"){
+            # age/time variance
+            ageVar <- randomTab()[3,4]
             paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'. The covariance between the intercept and ',ageName,' is ',intAgeVar,'.<br/><br/>The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
           }else if(randomFX() == "Linear and Quadratic"){
+            # age/time variance
+            ageVar <- randomTab()[4,4]
             paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'. The covariance between the intercept and ',ageName,' is ',intAgeVar,'. The covariance between the intercept and ',ageName,'^2 is ',intAgeVar2,'.<br/><br/>The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'. The covariance between ',ageName,' and ',ageName,'^2 is ',ageAge2CoVar,'. The ',ageName,'^2 variance (how much variability there is between individuals for their ',ageName,'^2) is ',age2Var,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
           }
         }
