@@ -76,7 +76,7 @@ modelRunServer <- function(id,
         if(class(fit()) != "try-error"){
             'The lme4 &quot;bobyqa&quot; optimiser was used by default. Please see more info <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.'
         }else{
-          "The model doesn't run. This could be because there is too much missing data or too few time points."
+          "The model doesn't run. This could be because there is too much missing data or too few time points. Try changing the random slope term."
         }
       })
 
