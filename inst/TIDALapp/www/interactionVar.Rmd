@@ -23,7 +23,7 @@ params:
 ---
   
   
-``` {r, echo=F, warning=F}
+``` {r, echo=F, warning=F, out.width="100%"}
 library(knitr)
 library(kableExtra)
 library(ggplot2)
