@@ -96,11 +96,6 @@ singleTrajServer <- function(id,
       })
 
       # -----------------------------------------------
-      # Get individual combined random and fixed effects:
-      rand <- reactive({
-        coef(modelFit())[[1]]
-      })
-
       # add the "prediction"/model col to dataframe
       modelDataEdit <- reactive({
 
@@ -122,12 +117,19 @@ singleTrajServer <- function(id,
             age^4 * summary(modelFit())$coefficients[5,1]
         }
 
+        # Estimate individual trajectories
+
+        pred_individual <- fitted(modelFit())
+
+        pred_individual_df <- cbind(modelFit()@frame, pred_individual) %>%
+          select(c(subject, age, pred_individual))
 
         # Not all participants were included in the prediction,
         # I assume because they didn't have enough data?
-        modelDataEdit <- modelData() %>%
-          mutate(pred = adjustedScore) %>%
-          filter(!!sym(subject()) %in% row.names(rand()))
+        modelDataPred <- modelData() %>%
+          mutate(pred = adjustedScore)
+
+        modelDataEdit <- merge(modelDataPred, pred_individual_df, by = c("subject", "age"))
 
         return(modelDataEdit)
       })
@@ -140,7 +142,7 @@ singleTrajServer <- function(id,
             sample_n(input$NRand) %>%
             pull(!!sym(subject()))
         }else if(input$choice == "Select specific individuals"){
-          IDs <- strsplit(input$SelectIDs, ",")[[1]] %>% # split string by commas
+          IDs <- strsplit(as.character(input$SelectIDs), ",")[[1]] %>% # split string by commas
             str_remove_all(., "\n") %>%  # remove any new lines (if present)
             str_trim()                   # remove any white space (if present)
           IDs <- IDs[nchar(IDs) != 0] # Remove any empty values due to spurious commas
@@ -160,64 +162,14 @@ singleTrajServer <- function(id,
 
 
       # -----------------------------------------------
-      #################################################
-      # Estimate the individual trajectories:
-      #################################################
+      # Plot the individual trajectories:
       plot <- reactive({
         req(IDs())
 
-        # loop over all participants to calculate their predictions including the random effects
-        pred_random <- lapply(IDs(), function(x){
-
-          x <- as.character(x)
-
-          # get age at each time point
-          ages <- modelDataEdit() %>%
-            filter(!!sym(subject()) == x) %>%
-            pull(age_original)
-
-          # number of unique time points
-          n <- modelDataEdit() %>%
-            filter(!!sym(subject()) == x) %>%
-            nrow()
-
-          if(is.null(cov()) ){
-            # get the random effects for each participant
-            effects <- sapply(1:ncol(rand()), function(i){
-              filter(rand(), row.names(rand()) %in% x)[,i]
-            })
-
-            agesPoly <- sapply(1:(ncol(rand())-1), function(i){
-              ages^i
-            })
-          } else {
-            # get the random effects for each participant
-            effects <- sapply(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|"))), function(i){
-              filter(rand(), row.names(rand()) %in% x)[,i]
-            })
-
-            agesPoly <- sapply(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|")))[-length(which(!str_detect(colnames(rand()), paste0(cov(), collapse = "|"))))], function(i){
-              ages^i
-            })
-          }
-
-          pred_individual <- sapply(1:nrow(agesPoly), function(y){
-            sapply(1:ncol(agesPoly), function(i){
-              effects[i + 1]*agesPoly[y,i]
-            }) %>% sum() + effects[1]
-          }) %>% data.frame("pred_individual" = .)
-
-          cbind(data.frame(ID = x, age = ages),
-                pred_individual)
-
-        }) %>% do.call(rbind,.)
-
-        # -----------------------------------------------
-        # Plot the individual trajectories:
         ggplot() +
           geom_line(data = modelDataEdit(), aes(x= age_original,  y = pred), na.rm=T) +
-          geom_line(data = pred_random ,
-                    aes(x=age,  y = pred_individual, color = as.character(ID)), na.rm=T, linetype="dashed")+
+          geom_line(data = filter(modelDataEdit(), subject %in% IDs())  ,
+                    aes(x=age_original,  y = pred_individual, color = as.factor(subject)), na.rm=T, linetype="dashed")+
           ylab(paste0("Score (", traj(), ")")) +
           xlab("Age") +
           guides(color=guide_legend(title=" "))
