@@ -99,22 +99,22 @@ singleTrajServer <- function(id,
       # add the "prediction"/model col to dataframe
       modelDataEdit <- reactive({
 
-        age <- modelData() %>% pull(!!age())
+        ageVec <- modelData() %>% pull(!!age())
 
         if(modelType() == "Linear"){
-          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
+          adjustedScore <- ageVec * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]
         } else if(modelType() == "Quadratic"){
-          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1] +
-            age^2 * summary(modelFit())$coefficients[3,1]
+          adjustedScore <- ageVec * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1] +
+            ageVec^2 * summary(modelFit())$coefficients[3,1]
         } else if(modelType() == "Cubic"){
-          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
-            age^2 * summary(modelFit())$coefficients[3,1] +
-            age^3 * summary(modelFit())$coefficients[4,1]
+          adjustedScore <- ageVec * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            ageVec^2 * summary(modelFit())$coefficients[3,1] +
+            ageVec^3 * summary(modelFit())$coefficients[4,1]
         } else if(modelType() == "Quartic"){
-          adjustedScore <- age * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
-            age^2 * summary(modelFit())$coefficients[3,1] +
-            age^3 * summary(modelFit())$coefficients[4,1] +
-            age^4 * summary(modelFit())$coefficients[5,1]
+          adjustedScore <- ageVec * summary(modelFit())$coefficients[2,1] + summary(modelFit())$coefficients[1,1]  +
+            ageVec^2 * summary(modelFit())$coefficients[3,1] +
+            ageVec^3 * summary(modelFit())$coefficients[4,1] +
+            ageVec^4 * summary(modelFit())$coefficients[5,1]
         }
 
         # Estimate individual trajectories
@@ -122,14 +122,14 @@ singleTrajServer <- function(id,
         pred_individual <- fitted(modelFit())
 
         pred_individual_df <- cbind(modelFit()@frame, pred_individual) %>%
-          select(c(subject, age, pred_individual))
+          select(c(!!sym(subject()), !!sym(age()), pred_individual))
 
         # Not all participants were included in the prediction,
         # I assume because they didn't have enough data?
         modelDataPred <- modelData() %>%
           mutate(pred = adjustedScore)
 
-        modelDataEdit <- merge(modelDataPred, pred_individual_df, by = c("subject", "age"))
+        modelDataEdit <- merge(modelDataPred, pred_individual_df, by = c(subject(), age()))
 
         return(modelDataEdit)
       })
@@ -168,8 +168,8 @@ singleTrajServer <- function(id,
 
         ggplot() +
           geom_line(data = modelDataEdit(), aes(x= age_original,  y = pred), na.rm=T) +
-          geom_line(data = filter(modelDataEdit(), subject %in% IDs())  ,
-                    aes(x=age_original,  y = pred_individual, color = as.factor(subject)), na.rm=T, linetype="dashed")+
+          geom_line(data = filter(modelDataEdit(), !!sym(subject()) %in% IDs())  ,
+                    aes(x=age_original,  y = pred_individual, color = as.factor(!!sym(subject()))), na.rm=T, linetype="dashed")+
           ylab(paste0("Score (", traj(), ")")) +
           xlab("Age") +
           guides(color=guide_legend(title=" "))
