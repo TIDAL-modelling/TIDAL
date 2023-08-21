@@ -101,6 +101,8 @@ selectDataServer <- function(id, dataFormatted) {
           dataEdit <- data() %>%
             mutate_at(vars(all_of(input$covarsCat)), factor)
         }
+        dataEdit <- dataEdit %>%
+          mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) )
       })
 
       covars <- reactive({

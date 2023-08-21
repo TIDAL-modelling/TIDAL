@@ -131,10 +131,12 @@ wide2longServer <- function(id) {
 
         # now convert wide to long
         dataDep <- dataWide %>%
+          mutate(across(where(is.character), ~ na_if(.,""))) %>%
           mutate(!!input$dep := as.numeric(!!input$dep)) %>%
           gather(dep_cat_test_col, !!input$dep, all_of(input$depCols))
 
         dataLong <- dataWide %>%
+          mutate(across(where(is.character), ~ na_if(.,""))) %>%
           mutate(!!input$age := as.numeric(!!input$age)) %>%
           mutate(!!input$time_point := as.factor(!!input$time_point)) %>%
           gather(!!input$time_point, !!input$age, all_of(input$ageCols))
