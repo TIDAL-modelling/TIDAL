@@ -43,8 +43,8 @@ modelRunServer <- function(id,
         req(age())
         req(modelData())
         modelData() %>%
-          mutate(age_original = !!sym(age()) ) %>%
-          mutate(!!sym(age()) := !!sym(age()) - mean( !!sym(age()), na.rm = T ))
+          mutate(age_original = as.numeric(!!sym(age())) ) %>%
+          mutate(!!sym(age()) := as.numeric(!!sym(age())) - mean( as.numeric(!!sym(age())), na.rm = T ))
       })
 
       # Run the model

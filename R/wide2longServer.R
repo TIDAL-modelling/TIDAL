@@ -70,12 +70,12 @@ wide2longServer <- function(id) {
       # Render additional UI with options as col names
       output$moreControls <- renderUI({
         tagList(
+          selectInput(ns("subjectCol"), "Select column for participant ID:", choices = vars()),
           selectInput(ns("ageCols"), "Select columns for age at each time point:", choices = vars(), multiple = TRUE),
-          selectInput(ns("depCols"), "Select columns for the phenotype (eg. depression) at each time point:", choices = vars(), multiple = TRUE),
+          selectInput(ns("depCols"), "Select columns for the variable to model trajectories\non at each time point eg. depression scores:", choices = vars(), multiple = TRUE),
           textInput(ns("age"), "Name of new column for age:", value = "age"),
           textInput(ns("time_point"), "Name of new column for time point:", value = "time_point"),
-          textInput(ns("dep"), "Name of new column for phenotype:", value = "dep"),
-          textInput(ns("dep_cat"), "Name of new column for phenotype category:", value = "dep_cat"),
+          textInput(ns("dep"), "Name of new column for variable to model trajectories on:", value = "dep"),
           tags$div(title = "Check the box to impute missing\nage with the mean age calculated\nat each time point.",
           checkboxInput(ns("ageImpute"),
                         tags$span("Impute missing age",
@@ -87,7 +87,7 @@ wide2longServer <- function(id) {
 
       # add a message to user on some instructions
       output$warningMsgEmpty <- renderText({
-        ifelse(is.null(input$ageCols) | is.null(input$depCols) & nrow(info()) > 0, '<b style="color:black">Select columns for age and phenotype, in chronological order.</b>', '')
+        ifelse(is.null(input$ageCols) | is.null(input$depCols) & nrow(info()) > 0, '<b style="color:black">Select columns for age and variable to model trajectories on, in chronological order.</b>', '')
       })
 
 
@@ -95,13 +95,13 @@ wide2longServer <- function(id) {
       # We want the user to select the same number of age and depression columns,
       # so include a message telling them to do this when they are not equal
       output$warningMsgLen <- renderText({
-        ifelse(length(input$ageCols) != length(input$depCols), '<b style="color:red">Select the same number of columns for age and phenotype.</b>', '')
+        ifelse(length(input$ageCols) != length(input$depCols), '<b style="color:red">Select the same number of columns for age and variable to model trajectories on.</b>', '')
       })
 
       # -------------------------------
       # We want the user to not type in names that match existing column names
       output$warningMsgColName <- renderText({
-        ifelse(c(input$dep_cat, input$dep,input$time_point,input$age) %in%  colnames(info())  ,
+        ifelse(c(input$dep,input$time_point,input$age) %in%  colnames(info())  ,
                '<b style="color:red">Please type in column names that are unique and do not already exist in your dataset.</b>', '')
       })
       # -------------------------------
@@ -132,19 +132,19 @@ wide2longServer <- function(id) {
         # now convert wide to long
         dataDep <- dataWide %>%
           mutate(!!input$dep := as.numeric(!!input$dep)) %>%
-          mutate(!!input$dep_cat := as.factor(!!input$dep_cat)) %>%
-          gather(!!input$dep_cat, !!input$dep, all_of(input$depCols))
+          gather(dep_cat_test_col, !!input$dep, all_of(input$depCols))
 
         dataLong <- dataWide %>%
           mutate(!!input$age := as.numeric(!!input$age)) %>%
           mutate(!!input$time_point := as.factor(!!input$time_point)) %>%
           gather(!!input$time_point, !!input$age, all_of(input$ageCols))
 
-        dataLong[,input$dep_cat] <- dataDep[,input$dep_cat]
         dataLong[,input$dep] <- dataDep[,input$dep]
 
         dataLong <- dataLong %>%
-          relocate(c(!!input$time_point, !!input$age, !!input$dep_cat, !!input$dep), .after = 1)
+          relocate(c(!!input$subjectCol, !!input$time_point, !!input$age, !!input$dep), .after = 1) %>%
+          arrange(!!sym(input$subjectCol)) %>%
+          select(-c(input$depCols))
 
         dataLong
       })
@@ -152,8 +152,9 @@ wide2longServer <- function(id) {
       # show a preview of the new long dataframe
       output$preview <- renderTable({
         dataLong() %>%
-          select(1:5) %>%
-          head()
+          select(1:4) %>%
+          mutate(!!input$age := round(as.numeric(!!sym(input$age)),3) ) %>%
+          head(n = 10)
       })
 
       # -------------------------------

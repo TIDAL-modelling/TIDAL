@@ -45,7 +45,7 @@ wide2longUI <- function(id, label = "wide2long") {
                    h4("Steps:"),
                    tags$ol(
                      tags$li('Upload a wide format comma separated *.csv or tab delimited *txt or *.tsv file of your dataset. It is recommended your longitudinal dataset has at least 4 time points. This must be less than 30 MB and column names must not have any spaces in them. Click on the "Output" tab and proceed with the following steps.'),
-                     tags$li("Select which columns correspond to age and the phenotype you want to model, eg. depression, at each time point. Make sure that you select these in the correct chronological order and have the same corresponding time points for the phenotype and age."),
+                     tags$li("Select which columns correspond to age and the variable you want to model, eg. depression, at each time point. Make sure that you select these in the correct chronological order and have the same corresponding time points for the variable you want to model and age."),
                      tags$li('Default names for the new columns are "age", "time_point", "dep" and "dep_cat". You can change these in the text boxes provided if you wish, but make sure they are unique and also are not names of columns that already exist in your dataset.'),
                      tags$li('If you have missing data for age there is an option to impute the mean from each time point for this variable. There is a tick box you can check to do this.'
                      ),
@@ -58,6 +58,7 @@ wide2longUI <- function(id, label = "wide2long") {
                    htmlOutput(ns("warningMsgEmpty")),
                    htmlOutput(ns("warningMsgLen")),
                    htmlOutput(ns("warningMsgColName")),
+                   p("The first few rows and columns of your data are shown below. Please click the download button to see all columns and rows."),
                    tableOutput(ns("preview"))
                  )
         )
