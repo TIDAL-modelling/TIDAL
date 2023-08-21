@@ -47,9 +47,9 @@ selectDataServer <- function(id, dataFormatted) {
         req(data())
         # Render UI elements
         tagList(
-          selectInput(ns("ID"), "Participant ID variable:", choices = names(data()), selected = names(select(data(), where(is.numeric)) )[1]),
-          selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[3]),
-          selectInput(ns("age"), "Variable for age at time point (continuous):", choices = names(select(data(), where(is.numeric)) ) , selected = names(select(data(), where(is.numeric)) )[2]),
+          selectInput(ns("ID"), "Participant ID variable:", choices = names(data()), selected = names(data())[1]),
+          selectInput(ns("traj"), "Variable to model trajectory on, eg. depression scores (continuous):", choices = names(data()) , selected = names(data())[4]),
+          selectInput(ns("age"), "Variable for age at time point (continuous):", choices = names(data()) , selected = names(data())[3]),
         tags$div(title = "If your age variable is measured in months check the box to convert it to years.",
                    checkboxInput(ns("toYears"),
                                  tags$span("Convert age from months to years",
