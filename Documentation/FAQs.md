@@ -21,6 +21,12 @@ launchTIDAL()
 </details>
 
 <details>
+    <summary>What format should my data I want to upload be in?</summary>
+
+Comma delimited *.csv file or a Tab delimited *.tsv or *.txt files can be used to upload data. Missing data should be coded as "NA". Column names should ideally have no spaces or special characters in them.
+</details>
+
+<details>
     <summary>When I select columns from my uploaded data, they have strange names</summary>
 
 It's likely that you have uploaded an .xlsx file or another unsupported file format. Please save your data as a Comma delimited *.csv file or a Tab delimited *.tsv or *.txt file and try again.
