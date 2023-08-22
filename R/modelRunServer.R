@@ -61,8 +61,7 @@ modelRunServer <- function(id,
                           REML=F ,
                           data = newModelData(),
                           control=lmerControl(optimizer="bobyqa",
-                                              optCtrl=list(maxfun=2e5)),
-                          weights = NULL),
+                                              optCtrl=list(maxfun=2e5))),
                      silent = TRUE)
           }else{
             try(lmer(formula = formCodeCovars(),
