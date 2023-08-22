@@ -69,7 +69,7 @@ modelRunServer <- function(id,
                      data = newModelData(),
                      control=lmerControl(optimizer="bobyqa",
                                          optCtrl=list(maxfun=2e5)),
-                     weights = weightCol()),
+                     weights = eval(as.symbol(weightCol()))) ,
                 silent = TRUE)
           }
 
