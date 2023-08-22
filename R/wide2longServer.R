@@ -81,7 +81,7 @@ wide2longServer <- function(id) {
                         tags$span("Impute missing age",
                                   tipify(bsButton("pB2", "?", style = "info", size = "extra-small"),
                                          "")),
-                        value = TRUE ))
+                        value = FALSE ))
         )
       })
 
