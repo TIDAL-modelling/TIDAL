@@ -95,14 +95,15 @@ selectDataServer <- function(id, dataFormatted) {
       # edit dataframe so that categorical covariates are factorised and age column is converted to years if ticked
       dataEdit <- reactive({
         if (isTRUE(input$toYears)) {
-          dataEdit <- data() %>% mutate_at(vars(input$age), ~./12) %>%
+          dataEdit <- data() %>%
+            mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) ) %>%
+            mutate_at(vars(input$age), ~./12) %>%
             mutate_at(vars(all_of(input$covarsCat)), factor)
         } else {
           dataEdit <- data() %>%
-            mutate_at(vars(all_of(input$covarsCat)), factor)
+            mutate_at(vars(all_of(input$covarsCat)), factor) %>%
+            mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) )
         }
-        dataEdit <- dataEdit %>%
-          mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) )
       })
 
       covars <- reactive({
