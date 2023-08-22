@@ -20,7 +20,9 @@ modelRunServer <- function(id,
                            formCodeCovars,
                            age,
                            traj,
-                           timePoint
+                           timePoint,
+                           weights,
+                           weightCol
                            ) {
 
   moduleServer(
@@ -53,30 +55,51 @@ modelRunServer <- function(id,
 
         # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
         # Run the mixed model
-        fit <- try(lmer(formula = formCodeCovars(),
-                        REML=F ,
-                        data = newModelData(),
-                        control=lmerControl(optimizer="bobyqa",
-                                            optCtrl=list(maxfun=2e5)) ),
-                   silent = TRUE)
+        fit <-
+          if(weights() == FALSE){
+            try(lmer(formula = formCodeCovars(),
+                          REML=F ,
+                          data = newModelData(),
+                          control=lmerControl(optimizer="bobyqa",
+                                              optCtrl=list(maxfun=2e5)),
+                          weights = NULL),
+                     silent = TRUE)
+          }else{
+            try(lmer(formula = formCodeCovars(),
+                     REML=F ,
+                     data = newModelData(),
+                     control=lmerControl(optimizer="bobyqa",
+                                         optCtrl=list(maxfun=2e5)),
+                     weights = weightCol()),
+                silent = TRUE)
+          }
 
         return(fit)
       })
 
       # Output message
-      warning <- reactive({
+      warning <- eventReactive(button(), {
         if(class(fit()) != "try-error"){
             paste0('
             The following <a href="https://cran.r-project.org/web/packages/lme4/lme4.pdf" style="color:blue" target="_blank">lme4</a> function is used to run the model:
             </br>
             <pre>
-            <code>
-            lmer(formula = ',formCodeCovars(),',
+            <code>',
+            if(weights() == FALSE){
+            paste0('lmer(formula = ',formCodeCovars(),',
                  REML = FALSE ,
                  data = newModelData,
                  control = lmerControl(optimizer="bobyqa",
-                                      optCtrl=list(maxfun=2e5)))
-            </code>
+                                      optCtrl=list(maxfun=2e5)))')
+            }else{
+              paste0('lmer(formula = ',formCodeCovars(),',
+                 REML = FALSE ,
+                 data = newModelData,
+                 control = lmerControl(optimizer="bobyqa",
+                                      optCtrl=list(maxfun=2e5)),
+                     weights = ',weightCol(),')')
+            },
+            '</code>
             </pre>
             Please see more infomation about the &quot;bobyqa&quot; optimiser <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.
             </br>

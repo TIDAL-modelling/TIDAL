@@ -20,6 +20,8 @@ selectDataUI <- function(id, label = "data") {
     uiOutput(ns("uploadFile")),
     uiOutput(ns("additional")),
     uiOutput(ns("randomFX_UI")),
+    uiOutput(ns("weights_UI")),
+    uiOutput(ns("weightCol_UI")),
     uiOutput(ns("button_UI"))
   )
 }
