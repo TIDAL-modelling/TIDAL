@@ -153,10 +153,20 @@ wide2longServer <- function(id) {
 
       # show a preview of the new long dataframe
       output$preview <- renderTable({
-        dataLong() %>%
+        dataPreview <- dataLong() %>%
           select(1:4) %>%
-          mutate(!!input$age := round(as.numeric(!!sym(input$age)),3) ) %>%
-          head(n = 10)
+          mutate(!!input$age := round(as.numeric(!!sym(input$age)),3) )
+
+        headRows <- dataPreview %>%
+                      head(n = 6)
+
+        tailRows <- dataPreview %>%
+                      tail(n = 6)
+
+        preview <- rbind(headRows, rep("...", nrow(tailRows)), tailRows)
+
+        colnames(preview) <- colnames(dataPreview)
+        preview
       })
 
       # -------------------------------

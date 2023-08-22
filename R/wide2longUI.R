@@ -58,7 +58,7 @@ wide2longUI <- function(id, label = "wide2long") {
                    htmlOutput(ns("warningMsgEmpty")),
                    htmlOutput(ns("warningMsgLen")),
                    htmlOutput(ns("warningMsgColName")),
-                   p("The first few rows and columns of your data are shown below. Please click the download button to see all columns and rows."),
+                   p('A preview of your long-formatted data is shown below. Please click the download button to see all columns and rows. Explore this data further on the next page "Data Exploration".'),
                    tableOutput(ns("preview"))
                  )
         )
