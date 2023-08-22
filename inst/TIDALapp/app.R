@@ -227,7 +227,6 @@ server <- function(input, output, session) {
                                            covariateChoice = selectDataServer$covariateChoice,
                                            button = selectDataServer$button,
                                            modelData = selectDataServer$data,
-                                           formCode = selectDataServer$modelForm,
                                            formCodeCovars = selectDataServer$modelFormCovars,
                                            traj = selectDataServer$traj,
                                            age = selectDataServer$age,

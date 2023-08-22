@@ -187,7 +187,6 @@ selectDataServer <- function(id, dataFormatted) {
         list(
           button = reactive({ input$button }),
           data = dataEdit,
-          modelForm = modelForm,
           modelFormCovars = modelFormCovars,
           ID = reactive({ input$ID }),
           traj = reactive({ input$traj }),

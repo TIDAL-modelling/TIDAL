@@ -17,7 +17,6 @@ modelRunServer <- function(id,
                            covariateChoice,
                            button,
                            modelData,
-                           formCode,
                            formCodeCovars,
                            age,
                            traj,
@@ -64,17 +63,24 @@ modelRunServer <- function(id,
         return(fit)
       })
 
-      fitBasic <- eventReactive(button(), {
-        req(formCode())
-        fitBasic <- lmer(formula = formCode(), REML=F , data = newModelData(),
-                         control=lmerControl(optimizer="bobyqa",
-                                             optCtrl=list(maxfun=2e5)))
-      })
-
       # Output message
       warning <- reactive({
         if(class(fit()) != "try-error"){
-            'The lme4 &quot;bobyqa&quot; optimiser was used by default. Please see more info <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.'
+            paste0('
+            The following <a href="https://cran.r-project.org/web/packages/lme4/lme4.pdf" style="color:blue" target="_blank">lme4</a> function is used to run the model:
+            </br>
+            <pre>
+            <code>
+            lmer(formula = ',formCodeCovars(),',
+                 REML = FALSE ,
+                 data = newModelData,
+                 control = lmerControl(optimizer="bobyqa",
+                                      optCtrl=list(maxfun=2e5)))
+            </code>
+            </pre>
+            Please see more infomation about the &quot;bobyqa&quot; optimiser <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.
+            </br>
+            The argument <code>REML = FALSE</code> indicates the model was fitted by maximum likelihood.')
         }else{
           "The model doesn't run. This could be because there is too much missing data or too few time points. Try changing the random slope term."
         }
@@ -129,7 +135,6 @@ modelRunServer <- function(id,
       return(
         list(
           fit = fit,
-          fitBasic = fitBasic,
           data = newModelData,
           warning = warning,
           mainTable = mainTable
