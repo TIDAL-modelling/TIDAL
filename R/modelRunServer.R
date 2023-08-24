@@ -48,6 +48,10 @@ modelRunServer <- function(id,
           mutate(!!sym(age()) := as.numeric(!!sym(age())) - mean( as.numeric(!!sym(age())), na.rm = T ))
       })
 
+      weightsVec <- eventReactive(button(), {
+          pull(newModelData(), !!sym(weightCol()))
+      })
+
       # Run the model
       # only do this when the action button in the side panel is clicked
       fit <- eventReactive(button(), {
@@ -55,21 +59,21 @@ modelRunServer <- function(id,
 
         # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
         # Run the mixed model
-        fit <-
-          if(weights() == FALSE){
-            try(lmer(formula = formCodeCovars(),
+        if(weights() == FALSE){
+          fit <- try(lmer(formula = formCodeCovars(),
                           REML=F ,
                           data = newModelData(),
                           control=lmerControl(optimizer="bobyqa",
                                               optCtrl=list(maxfun=2e5))),
                      silent = TRUE)
-          }else{
-            try(lmer(formula = formCodeCovars(),
+          }else if(weights() == TRUE){
+
+            fit <- try(lmer(formula = formCodeCovars(),
                      REML=F ,
                      data = newModelData(),
                      control=lmerControl(optimizer="bobyqa",
                                          optCtrl=list(maxfun=2e5)),
-                     weights = eval(as.symbol(weightCol()))) ,
+                     weights = weightsVec() ) ,
                 silent = TRUE)
           }
 
@@ -100,11 +104,12 @@ modelRunServer <- function(id,
             },
             '</code>
             </pre>
-            Please see more infomation about the &quot;bobyqa&quot; optimiser <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>.
+            Please see more infomation about the &quot;bobyqa&quot; optimiser <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>. The use of alternative optimisers is not currently supported.
             </br>
             The argument <code>REML = FALSE</code> indicates the model was fitted by maximum likelihood.')
         }else{
-          "The model doesn't run. This could be because there is too much missing data or too few time points. Try changing the random slope term."
+          # "The model doesn't run. This could be because there is too much missing data or too few time points. Try changing the random slope term."
+          paste0(fit())
         }
       })
 
