@@ -26,6 +26,7 @@ library(knitr)
 library(kableExtra)
 library(stringr)
 library(ggplot2)
+library(dplyr)
 
 include_graphics("TIDAL.png")
 ```
@@ -55,9 +56,21 @@ IQR: Interquartile range of `r params$phenotype`
 
 ## Model Results
 
-`r params$modelType` model was run using [lme4](https://cran.r-project.org/web/packages/lme4/index.html) with `r params$formCode`.
+```{r, echo = F}
+# Use dplyr and pipes to perform the stringr transformations
+latex_text <- params$warningMsg %>%
+  str_replace_all("<a href=\"(.*?)\" style=\"color:blue\" target=\"_blank\">(.*?)</a>", "\\\\href{\\1}{\\2}") %>%
+  str_replace_all("<pre>", "\\\\begin{verbatim}") %>%
+  str_replace_all("</pre>", "\\\\end{verbatim}") %>%
+  str_replace_all("<code>", "") %>%
+  str_replace_all("</code>", "") %>%
+  str_replace_all("</br>", "\\\\newline") %>%
+  str_replace_all("&quot;", "\"")
+```
 
-`r strsplit(params$warningMsg, " Please")[[1]][1]` For more information on lme4 optimisers, see [here](https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html). The use of alternative lme4 optimisers is currently not supported.
+```{r , echo = F, results='asis', warning=F}
+cat(paste0("$",latex_text, "$"))
+```
 
 ### Number of observations and groups
 
