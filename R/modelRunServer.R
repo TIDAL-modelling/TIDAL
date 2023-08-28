@@ -48,10 +48,6 @@ modelRunServer <- function(id,
           mutate(!!sym(age()) := as.numeric(!!sym(age())) - mean( as.numeric(!!sym(age())), na.rm = T ))
       })
 
-      weightsVec <- eventReactive(button(), {
-          pull(newModelData(), !!sym(weightCol()))
-      })
-
       # Run the model
       # only do this when the action button in the side panel is clicked
       fit <- eventReactive(button(), {
@@ -68,13 +64,16 @@ modelRunServer <- function(id,
                      silent = TRUE)
           }else if(weights() == TRUE){
 
-            fit <- try(lmer(formula = formCodeCovars(),
+            fit <- try({
+              weightsVec <- pull(newModelData(), !!sym(weightCol()))
+              fit <- lmer(formula = formCodeCovars(),
                      REML=F ,
                      data = newModelData(),
                      control=lmerControl(optimizer="bobyqa",
                                          optCtrl=list(maxfun=2e5)),
-                     weights = weightsVec() ) ,
-                silent = TRUE)
+                     weights = weightsVec )
+              return(fit)
+              },  silent = TRUE)
           }
 
         return(fit)
