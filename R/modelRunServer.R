@@ -20,9 +20,7 @@ modelRunServer <- function(id,
                            formCodeCovars,
                            age,
                            traj,
-                           timePoint,
-                           weights,
-                           weightCol
+                           timePoint
                            ) {
 
   moduleServer(
@@ -55,27 +53,12 @@ modelRunServer <- function(id,
 
         # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
         # Run the mixed model
-        if(weights() == FALSE){
           fit <- try(lmer(formula = formCodeCovars(),
                           REML=F ,
                           data = newModelData(),
                           control=lmerControl(optimizer="bobyqa",
                                               optCtrl=list(maxfun=2e5))),
                      silent = TRUE)
-          }else if(weights() == TRUE){
-
-            fit <- try({
-              weightsVec <- pull(newModelData(), !!sym(weightCol()))
-              fit <- lmer(formula = formCodeCovars(),
-                     REML=F ,
-                     data = newModelData(),
-                     control=lmerControl(optimizer="bobyqa",
-                                         optCtrl=list(maxfun=2e5)),
-                     weights = weightsVec )
-              return(fit)
-              },  silent = TRUE)
-          }
-
         return(fit)
       })
 
@@ -87,28 +70,18 @@ modelRunServer <- function(id,
             </br>
             <pre>
             <code>',
-            if(weights() == FALSE){
             paste0('lmer(formula = ',formCodeCovars(),',
                  REML = FALSE ,
                  data = newModelData,
                  control = lmerControl(optimizer="bobyqa",
-                                      optCtrl=list(maxfun=2e5)))')
-            }else{
-              paste0('lmer(formula = ',formCodeCovars(),',
-                 REML = FALSE ,
-                 data = newModelData,
-                 control = lmerControl(optimizer="bobyqa",
-                                      optCtrl=list(maxfun=2e5)),
-                     weights = ',weightCol(),')')
-            },
+                                      optCtrl=list(maxfun=2e5)))'),
             '</code>
             </pre>
             Please see more infomation about the &quot;bobyqa&quot; optimiser <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>. The use of alternative optimisers is not currently supported.
             </br>
             The argument <code>REML = FALSE</code> indicates the model was fitted by maximum likelihood.')
         }else{
-          # "The model doesn't run. This could be because there is too much missing data or too few time points. Try changing the random slope term."
-          paste0(fit())
+          "The model doesn't run. This could be because there is too much missing data or too few time points. Try changing the random slope term."
         }
       })
 
