@@ -71,7 +71,9 @@ modelRunServer <- function(id,
                      data = newModelData(),
                      control=lmerControl(optimizer="bobyqa",
                                          optCtrl=list(maxfun=2e5)),
-                     weights = weightsVec )
+                     weights = weightsVec ) # THIS DOES NOT WORK,
+              # lmer can't find variables assigned to the weights argument unless it is in the global environment
+              #
               return(fit)
               },  silent = TRUE)
           }
