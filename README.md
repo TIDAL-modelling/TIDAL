@@ -17,7 +17,7 @@ Please install the R package and launch the Shiny app locally if you want to upl
 
 ```{r eval=FALSE}
 # install.packages("remotes")
-remotes::install_github("AmeliaES/TIDAL")
+remotes::install_github("TIDAL-modelling/TIDAL")
 # Note if prompted to update packages you can select option 3/None.
 # Updating all packages (option 1) might take a while to run.
 library("TIDAL")
