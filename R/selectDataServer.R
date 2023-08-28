@@ -1,8 +1,8 @@
 #' Shiny module - Selecting and reading in the dataset
 #'
 #' @import shinyBS
+#' @importFrom data.table fread
 #'
-#' @noRd
 #' @keywords internal
 #' @export
 selectDataServer <- function(id, dataFormatted) {

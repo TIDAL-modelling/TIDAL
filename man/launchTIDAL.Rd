@@ -14,9 +14,10 @@ launchTIDAL(display = "default")
 Opens an interactive Shiny GUI.
 }
 \examples{
-# Launch Shiny app with default display
+\dontrun{# Launch Shiny app with default display
 launchTIDAL()
 
 # Launch Shiny app with browser display
 launchTIDAL(display = "browser")
+}
 }

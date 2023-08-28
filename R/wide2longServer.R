@@ -8,18 +8,13 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
+#' @importFrom data.table fread
 #' @import tidyr
 #' @import stringr
 #' @import shinyBS
 #'
-#' @noRd
 #' @keywords internal
 #' @export
-#'
-#' @examples
-#' wide2longServer("server1")
 wide2longServer <- function(id) {
   # create a module server
   moduleServer(

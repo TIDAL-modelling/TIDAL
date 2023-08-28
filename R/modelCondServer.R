@@ -4,18 +4,14 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
 #' @import multcomp
 #' @import tibble
-#' @import purrr
 #' @import tinytex
 #' @import rmarkdown
-#' @import kableExtra
-#' @import car
+#' @importFrom kableExtra kbl kable_styling landscape
+#' @importFrom car deltaMethod
 #'
-#' @noRd
 #' @keywords internal
 #' @export
 modelCondServer <- function(id,

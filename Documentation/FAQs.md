@@ -11,7 +11,7 @@ You *must* install TIDAL on your computer if you wish to analyse sensitive data.
 
 ```{r eval=FALSE}
 install.packages("remotes")
-remotes::install_github("AmeliaES/TIDAL")
+remotes::install_github("TIDAL-modelling/TIDAL")
 library("TIDAL")
 # Launch the R Shiny app
 launchTIDAL()

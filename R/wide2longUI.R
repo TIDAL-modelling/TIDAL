@@ -4,19 +4,18 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
+#' @importFrom shinyjs useShinyjs
 #' @import tidyr
 #' @import shinyBS
 #'
-#' @noRd
+#' @keywords internal
 #' @export
 wide2longUI <- function(id, label = "wide2long") {
   # `NS(id)` returns a namespace function, which was save as `ns` and will
   # invoke later.
   ns <- NS(id)
 
-  shinyjs::useShinyjs()
+  useShinyjs()
 
   sidebarLayout(
     sidebarPanel(

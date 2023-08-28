@@ -4,13 +4,9 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
-#' @import magrittr
 #' @import stringr
 #'
-#' @noRd
 #' @keywords internal
 #' @export
 singleTrajServer <- function(id,

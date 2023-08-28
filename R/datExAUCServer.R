@@ -4,13 +4,10 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
 #' @import stringr
-#' @import car
+#' @importFrom car deltaMethod
 #'
-#' @noRd
 #' @keywords internal
 #' @export
 datExAUCServer <- function(id,

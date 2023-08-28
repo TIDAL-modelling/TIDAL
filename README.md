@@ -34,9 +34,9 @@ https://tidal.shinyapps.io/tidalapp/
 To use this tool online please do not upload any sensitive data. Only use the [synthetic datasets](data/), described below.
 
 ## Synthetic datasets
-  * [Documentation and description of data](https://github.com/AmeliaES/TIDAL/blob/main/data/README.md)
+  * [Documentation and description of data](https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/data_README.md)
   * To save the dataset click on the link below (right click to open in new tab) and then click `File` -> `Save Page As...` and save as a .csv file.
-       * [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/emot_reg_emot_simulated.csv)
+       * [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/emot_reg_emot_simulated.csv)
 
 
 ## Main Features
@@ -50,7 +50,7 @@ The aim is for this digital tool to facilitate trajectories work and remove barr
 <details>
 <summary><h2>Data Preparation</h2></summary>
 
-Many longitudinal datasets will be written in "wide" format, with each time point's data stored in a separate column. To analyse this data, it must first be convered into "long" format, with one column containing the time point names and one column containing the measurements.
+Many longitudinal datasets will be written in "wide" format, with each time point's data stored in a separate column. To analyse this data, it must first be converted into "long" format, with one column containing the time point names and one column containing the measurements.
 
 This page allows the user to upload a wide format dataset and convert it into long format. The user selects which columns measure time and the phenotype they want to model trajectories on. There is also an option to impute mean age for missing age data in this step. Once converted into long format, there is the option to download the long version dataset as a .csv file.
 
@@ -68,7 +68,7 @@ There is an option at this stage to add extra covariates or confounders to the m
 
 Once a model has been fitted, TIDAL will output the fixed and random effects in the "Model Results" tab. The user can also examine predicted scores for specific ages in the "Scores At Ages" tab and extract Area Under the Curve metrics in the "Area Under Curve" tab. Finally, the user can download a PDF report from the "Download Results" tab.
 
-[![TIDAL Data Exploration walkthrough](/_includes/data-explore.png)](https://youtu.be/aWteXAWPBik?t=239)
+[![TIDAL Data Exploration walk through](/_includes/data-explore.png)](https://youtu.be/aWteXAWPBik?t=239)
 
 </details>
 

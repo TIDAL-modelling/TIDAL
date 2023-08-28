@@ -21,15 +21,17 @@ params:
   tableAUC : NA
 ---
 
-```{r, echo=F, warning=F}
+```{r, echo=F, warning=F, message=F}
 library(knitr)
-library(kableExtra)
 library(stringr)
 library(ggplot2)
 library(dplyr)
+```
 
+```{r, echo=F, warning=F}
 include_graphics("TIDAL.png")
 ```
+
 
 # TIDAL Data Exploration
 
@@ -42,8 +44,8 @@ Descriptive statistics of the variable "`r params$phenotype`" for each time poin
 
 ```{r, echo=F, warning=F}
 
-kbl(params$descTable, digits = 3) %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(params$descTable, digits = 3) %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
 
 ```
 
@@ -91,8 +93,8 @@ params$mainPlot
 Fixed effects can be interpreted as the effects of time/age (and any additional covariates/confounders) on `r params$phenotype`.
 
 ```{r, echo=F}
-kbl(params$fixedTab[,3:ncol(params$fixedTab)], digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(params$fixedTab[,3:ncol(params$fixedTab)], digits = 3)  %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
 ```{r , echo = F, results='asis', warning=F}
@@ -108,8 +110,8 @@ cat(text)
 Random effects can be interpreted as the effects on `r params$phenotype` due to variation between subjects.
 
 ```{r, echo=F}
-kbl(params$randomTab, digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(params$randomTab, digits = 3)  %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
 ```{r , echo = F, results='asis', warning=F}
@@ -133,8 +135,8 @@ params$datExAltPlot
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$datExAltPlot)){
-kbl(t(params$datExAltTable), digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(t(params$datExAltTable), digits = 3)  %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
 }
 ```
 
@@ -154,8 +156,8 @@ params$plotAUC
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$plotAUC)){
-kbl(params$tableAUC, digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(params$tableAUC, digits = 3)  %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
 }
 ```
 

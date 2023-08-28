@@ -10,11 +10,12 @@
 #'
 #' @export
 #' @examples
-#' # Launch Shiny app with default display
+#' \dontrun{# Launch Shiny app with default display
 #' launchTIDAL()
 #'
 #' # Launch Shiny app with browser display
 #' launchTIDAL(display = "browser")
+#' }
 launchTIDAL <- function(display = "default") {
   appDir <- system.file("TIDALapp", package = "TIDAL")
 

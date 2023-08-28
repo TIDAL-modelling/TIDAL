@@ -1,15 +1,18 @@
 Package: TIDAL
 Type: Package
-Title: Tool to assist with modelling longitudinal trajectories
+Title: Tool to Assist with Modelling Longitudinal Trajectories
 Version: 0.1.0
 Author: Amelia Edmondson-Stait
-Maintainer: Amelia Edmondson-Stait <amelia.edmondson-stait@ed.ac.uk>
+Maintainer: Amelia Edmondson-Stait <TIDAL@ed.ac.uk>
 Description: The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. 
 License: GPL-3
-URL: https://github.com/AmeliaES/TIDAL
+URL: https://github.com/TIDAL-modelling/TIDAL
 Encoding: UTF-8
 RoxygenNote: 7.2.3
-Imports: shiny, shinythemes, shinyjs, stringr, purrr, tidyr, dplyr, broom.mixed, lme4, data.table, ggplot2, magrittr, shinyBS, tinytex, rmarkdown, kableExtra, shinycssloaders, multcomp, bslib, car
+Imports: shiny, shinythemes, shinyjs, stringr, tidyr, tibble, dplyr, broom.mixed, lme4, data.table, ggplot2, shinyBS, tinytex, rmarkdown, kableExtra, shinycssloaders, multcomp, car
 LazyData: true
 Depends: 
     R (>= 2.10)
+Suggests: 
+    knitr
+VignetteBuilder: knitr
