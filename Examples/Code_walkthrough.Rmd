@@ -319,6 +319,180 @@ rowname <- paste0("AUC (", traj, ") (95% CIs)")
 rownames(df) <- c("Age Range", rowname)
 df
 ```
+# Interaction Variable
+
+## Choose variable
+```{r}
+# Demo shown for categorical variable
+# Split the trajectory by the sex variable
+condition <- "female"
+
+colSplit <- which(colnames(dataLong) %in% condition)
+
+modelData <- dataLong %>%
+            filter(!is.na(!!sym(condition))) %>%
+            mutate(!!condition := factor( str_replace_all(.[[colSplit]], " |-|/", "_") ) ) 
+  
+
+```
+
+## Model Results
+```{r}
+# Run the model using lmer
+fit <- lmer(formula = "score ~ age + female + age*female + (1 + age | subject)",
+                          REML=F ,
+                          data = modelData,
+                          control=lmerControl(optimizer="bobyqa",
+                                              optCtrl=list(maxfun=2e5)))
+# Summary of the model:
+summary(fit)
+
+# Fixed effects
+cbind(
+            tidy(fit, "fixed"),
+            confint(fit, "beta_", method = "Wald")) %>%
+            mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
+            mutate(p.z = ifelse(p.z < 0.001, "p < 0.001", round(p.z, 3) ))
+
+# Random effects
+randomDF <- as.data.frame(VarCorr(fit),
+                        order = "lower.tri") %>%
+            mutate(across(where(is.numeric), round, 3))
+          colnames(randomDF) <- c("Level", "Variable1", "Variable2", "Variance/Covariance", "SD Variance/Covariance")
+          randomDF
+
+```
+
+
+```{r}
+# add the "predicted" column to this dataset (it's not really a prediction because its the same dataset, it just shows the model)
+
+ageVec <- modelData %>% pull(!!age)
+
+coef <- summary(fit)$coefficients
+
+zero <- ageVec * coef[2,1] + coef[1,1]
+
+rowIndex <- which(str_detect(string = row.names(coef),
+                             pattern = condition) &
+                  str_detect(string = row.names(coef),
+                             pattern = ":", negate = T))
+
+rowIndexInteract1 <- which(str_detect(string = row.names(coef),
+                                              pattern = condition) &
+                                     str_detect(string = row.names(coef),
+                                                pattern = ":") &
+                                     str_detect(string = row.names(coef),
+                                                pattern = "\\^", negate = T))
+
+ n <- length(unique(pull(modelData, !!sym(condition))))
+ 
+ predCovs <- lapply(1:(n-1), function(i){
+
+              coef[1,1] +
+              (ageVec * coef[2,1]) +
+              coef[rowIndex[i],1] +
+              (ageVec * coef[rowIndexInteract1[i],1])
+ })
+
+   
+num <- str_subset(row.names(coef), condition) %>%
+        sub(paste0(".*", condition), "", .) %>%
+        unique()
+
+names(predCovs) <- paste0(condition, "_", num)
+
+modelDataEdit <- cbind(modelData, do.call(cbind, predCovs)) %>%
+            mutate(zero = zero) %>%
+            mutate(!!condition := as.factor(.[[colSplit]]) ) %>%
+            mutate(pred =  eval(parse(text =
+                                        paste0(paste0("ifelse(", condition, " == '", num, "', ", condition, "_",num,",", collapse = " "), "zero",
+                                               paste0(rep(")", length(num)), collapse = ""), collapse = "")
+            )))
+          
+          
+
+head(modelDataEdit, 30)
+
+```
+
+```{r}
+# use glht to calculate 95% CIs
+      
+        ageOrig <- modelDataEdit %>% pull(age_original)
+        ageOrig <- ageOrig[!is.na(ageOrig)]
+        ageCalcs <-  c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
+
+       CI_glht  <- lapply(ageCalcs, function(x){
+
+          n <- length(unique(pull(modelDataEdit, !!sym(condition))))
+
+
+          rowIndex <- which(str_detect(string = row.names(summary(fit)$coefficients),
+                                       pattern = condition) &
+                              str_detect(string = row.names(summary(fit)$coefficients),
+                                         pattern = ":", negate = T))
+
+          rowNames <- rownames(summary(fit)$coefficients)
+
+          ageInput <- round(x - mean(ageOrig), 3)
+
+              equations <- sapply(1:(n-1), function(i){
+                paste0(rowNames[1], " + \`", rowNames[2], "\`*", ageInput, " + \`", rowNames[rowIndex[i]] , "\` + \`", rowNames[2], ":", rowNames[rowIndex[i]],"\`*",ageInput , " == 0")
+              })
+          res <- multcomp::glht(fit, linfct = c( paste0(rowNames[1], " + \`", rowNames[2], "\`*", ageInput, " == 0"), equations) )
+          
+          # Tidy results dataframe and rename rows/columns
+          res <- tidy(confint(res))
+
+          rowname <- paste0("Score (", traj, ")")
+          
+          levelNames <- as.character(levels(as.factor(pull(modelDataEdit, !!sym(condition)))))
+
+            res <-  res %>%
+              mutate(condition = levelNames)
+          
+            })
+
+        ageOrig <- modelDataEdit %>% pull(age_original)
+        ageOrig <- ageOrig[!is.na(ageOrig)]
+        ageCalcs <-  c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
+        levelNames <- as.character(levels(as.factor(pull(modelDataEdit, !!sym(condition)))))
+
+        estimate <- do.call(rbind, CI_glht) %>%
+          mutate(age = rep(ageCalcs, each = length(levelNames)) ) 
+
+```
+
+
+## Plot
+```{r}
+ggplot() +
+              geom_line(data = modelDataEdit, aes(x= age_original ,  y = pred, color = !!sym(condition) ) , na.rm=T) +
+              geom_ribbon(data = estimate ,
+                          aes(x= age , ymin = conf.low, ymax = conf.high, fill = condition), alpha = 0.2, na.rm = T, show.legend = FALSE) +
+              scale_color_manual(values = c("orange", "blue")) +
+              scale_fill_manual(values = c("orange", "blue")) +
+              geom_point(data = df.plot,aes(x=Age, y=Phenotype))+
+              geom_line(data = df.plot,aes(x=Age, y=Phenotype)) +
+              geom_errorbar(data = df.plot, aes(x=Age, y=Phenotype, ymin = lower, ymax = upper)) +
+              theme(legend.text = element_text(color = "black"))+
+              ylab(paste0("Score (", traj, ")")) +
+              xlab("Age")
+```
+
+
+## Scores at ages
+```{r}
+
+
+```
+
+## Area under the curve
+```{r}
+
+```
+
 
 ## {-}
 
