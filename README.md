@@ -131,8 +131,5 @@ Please contact us at TIDAL@ed.ac.uk
 <img width="100" alt="Wellcome Trust Logo" src="inst/TIDALapp/www/wellcome-logo-black.jpg">
 </p>
 
-
-
-
-
-  
+## Disclaimer
+This package is provided solely for educational and informational purposes. Users understand and agree that any data uploaded and utilised with this package is done at their own risk. Users are solely responsible for the accuracy, legality, and ethical considerations of the data they upload. Additionally, users are responsible for the interpretation of results obtained through the use of this package. The creators and maintainers of this package shall not be held liable for any consequences arising from the use, interpretation, or implications of the package or the data uploaded.
