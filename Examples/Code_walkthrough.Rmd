@@ -1,0 +1,326 @@
+---
+title: "TIDAL Code"
+output: html_document
+---
+
+```{r setup, echo = FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyr)
+library(lme4)
+library(ggplot2)
+library(broom.mixed)
+library(tibble)
+library(stringr)
+library(car)
+library(multcomp)
+```
+
+# Introduction {.tabset}
+This script is to demonstrate some of the code that happens in the background of the application, using the simulated dataset and a simple linear model.
+
+## Data Formatting
+
+### Upload data in wide format and convert to long format
+```{r}
+# Load in wide format dataframe
+dataWide <- read.csv("../data/emot_reg_emot_simulated.csv")
+
+# Gather sdq_t columns into long format (this is a questionnaire score at each time point)
+dataScore <- dataWide %>%
+                gather(score_cat_test_col, score, all_of(c("sdq_t1", "sdq_t2", "sdq_t3", "sdq_t4", "sdq_t5"))) 
+
+# Gather age_t columns into long format (this is age at each time point)
+dataLong <- dataWide %>%
+              gather(time_point, age, all_of(c("age_t1", "age_t2", "age_t3", "age_t4", "age_t5")))
+
+# Merge them into one dataframe
+dataLong[,"score"] <- dataScore[,"score"]
+
+# Have a look at the dataframe
+head(dataLong)
+
+```
+## Data Exploration {.tabset}
+
+### Choose variables for modelling
+```{r}
+# This is similar to the drop down selections on the Data Exploration page.
+ID <- "subject"
+traj <- "score"
+age <- "age"
+modelType <- "Linear"
+timePoint <- "time_point"
+```
+
+```{r}
+# Mean center age (this helps the model fit)
+dataLong <- dataLong %>%
+          mutate(age_original = as.numeric(!!sym(age)) ) %>%
+          mutate(!!sym(age) := as.numeric(!!sym(age)) - mean( as.numeric(!!sym(age)), na.rm = T ))
+```
+
+
+### Descriptive Statistics
+```{r}
+# Table:
+dataLong %>%
+          group_by(across( !!timePoint )) %>%
+          summarise(N = sum(!is.na( !!sym(traj) )),
+                    mean = mean(!!sym(traj), na.rm = T),
+                    SD = sd(!!sym(traj), na.rm = T),
+                    median = median(!!sym(traj), na.rm = T),
+                    IQR = IQR(!!sym(traj), na.rm = T)
+          )
+
+# Plot
+df.plot <- dataLong %>%
+          group_by(across( !!timePoint )) %>%
+          summarise(Age = mean(age_original, na.rm = T),
+                    Phenotype = mean(!!sym(traj), na.rm = T),
+                    SD = sd(!!sym(traj), na.rm = T),
+                    n = sum(!is.na( !!sym(traj) ))) %>%
+          mutate(upper = Phenotype + ( qnorm(0.975)*SD/sqrt(n) ),
+                 lower = Phenotype - ( qnorm(0.975)*SD/sqrt(n) ))
+
+ggplot(df.plot,aes(x=Age, y=Phenotype)) +
+  geom_point()+
+  geom_line() +
+  geom_errorbar(aes(ymin = lower, ymax = upper))+
+  ylab(paste0("Score (", traj, ")")) +
+  xlab("Age")
+```
+
+### Model Results
+
+#### Run the model using lme4
+```{r}
+# Run the model using lmer
+fit <- lmer(formula = "score ~ age + (1 + age | subject)",
+                          REML=F ,
+                          data = dataLong,
+                          control=lmerControl(optimizer="bobyqa",
+                                              optCtrl=list(maxfun=2e5)))
+# Summary of the model:
+summary(fit)
+```
+
+#### N observations and groups
+```{r}
+paste0("The number of observations (measurements) is ",
+               format(summary(fit)$devcomp$dims[[1]], big.mark=",", scientific=FALSE),
+               " and the number of groups (people) is ",
+               format(summary(fit)$ngrps[[1]], big.mark=",", scientific=FALSE) ,
+               ".")
+```
+
+#### Fixed effects
+```{r}
+cbind(
+  tidy(fit, "fixed"),
+  confint(fit, "beta_", method = "Wald")) %>%
+  mutate(p.z = 2 * (1 - pnorm(abs(statistic)))) %>%
+  mutate(p.z = ifelse(p.z <= 0, "p < 0.001", round(p.z, 3)))
+```
+
+#### Random effects
+```{r}
+randomDF <- as.data.frame(VarCorr(fit),
+              order = "lower.tri") %>%
+              mutate(across(where(is.numeric), round, 3))
+colnames(randomDF) <- c("Level", "Variable1", "Variable2", "Variance/Covariance", "SD Variance/Covariance")
+randomDF
+```
+
+#### Deviance
+```{r}
+# This is the model fit, you can compare this to similar models.
+deviance(fit)
+```
+
+### Plot
+```{r}
+# Add the "prediction"/model col to dataframe (adjustedScore)
+# The alternative is to use the "predict" function, but this didn't work when users wanted to add categorical covariates.
+# We had to calculate it manually instead. Below is just an example of how you do this for a linear model with no covariates.
+
+ageVec <- dataLong %>% pull(!!age)
+
+coef <- summary(fit)$coefficients
+
+# Calculate the model mean/prediciton. This is age multiplied by the slope plus the intercept.
+adjustedScore <- ageVec * coef[2,1] + coef[1,1]
+
+# Add this as a new column to the dataframe
+modelDataEdit <- dataLong %>%
+                  mutate(pred = adjustedScore)
+
+# Add 95% CIs for these estimates using glht
+ageOrig <- dataLong %>% pull(age_original)
+ageOrig <- ageOrig[!is.na(ageOrig)]
+
+# Get a vector of the ages we want to calculate 95% CIs for (instead of doing all the ages in the column)
+ageCalcs <- c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
+
+# Go through each age and calculate the 95% CI
+score_glht <- lapply(ageCalcs, function(x){
+
+    # Get the row names of the coefficients to put in the glht function (this is Intercept and age)
+    rowNames <- rownames(summary(fit)$coefficients)
+    
+    # Round age to 3 decimal places
+    ageInput <- round(x - mean(ageOrig), 3)
+
+    # Use glht to get 95% CIs
+    # Essentially we are doing the intercept + slope * age == 0 as it is a linear model
+    res <- multcomp::glht(fit, linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " == 0")) )
+
+    # Tidy up the dataframe
+    res <- tidy(confint(res))
+    rowname <- paste0("Score (", traj, ")")
+    res <-  res %>%
+              mutate(contrast = paste0(rowname, " (95% CIs)")) %>%
+              column_to_rownames(var = "contrast") %>%
+              mutate(across(where(is.numeric), round, 2))
+          
+    return(res)
+})
+
+# Put everything into one dataframe
+estimate <- do.call(rbind, score_glht) %>%
+                      mutate(age = ageCalcs)
+
+# Plot the mean trajectory and it's 95% CIs and the underlying descriptive data:
+ggplot() +
+          geom_line(data = modelDataEdit, aes(x= age_original ,  y = pred), color = "#1D86C7", linewidth = 1.5, na.rm=T) +
+          geom_ribbon(data = estimate, aes(x= age , ymin = conf.low, ymax = conf.high), fill = "#1D86C7", alpha = 0.2, na.rm = T) +
+          geom_point(data = df.plot,aes(x=Age, y=Phenotype))+
+          geom_line(data = df.plot,aes(x=Age, y=Phenotype)) +
+          geom_errorbar(data = df.plot, aes(x=Age, y=Phenotype, ymin = lower, ymax = upper)) +
+          ylab(paste0("Score (", traj, ")")) +
+          xlab("Age")
+```
+
+### Scores at ages
+```{r}
+# Choose some ages to calculate (these are equivalent to the checkboxes on the app)
+ageInput <- c(4, 7, 12)
+
+# Go through each age and let's calculate the score at that age using glht (similar to getting 95% CIs as above)
+score <- lapply(as.numeric(ageInput), function(x){
+
+          rowNames <- rownames(summary(fit)$coefficients)
+
+          ageInputRound <- round(x - mean(ageOrig), 3)
+        
+          # Essentially we are doing the intercept + slope * age == 0 as it is a linear model
+          res <- multcomp::glht(fit, linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInputRound, " == 0")) )
+
+          res <- tidy(confint(res))
+
+          rowname <- paste0("Score (", traj, ")")
+
+          res <-  res %>%
+            mutate(contrast = paste0(rowname, " (95% CIs)")) %>%
+            column_to_rownames(var = "contrast")
+})
+
+# Tidy it up into one dataframe
+estimate <- lapply(score, function(df) {
+   df %>%
+     dplyr::select(estimate)
+ })  %>% do.call(cbind, .)
+
+colnames(estimate) <- ageInput
+estimate <- estimate %>%
+          gather(age, score, 1:ncol(estimate)) %>%
+          mutate(age = as.numeric(age))
+
+# Put the CIs into separate dataframes ready for plotting
+conf.low <- lapply(score, function(df) {df %>% dplyr::select(conf.low)}) %>% do.call(cbind, .)
+colnames(conf.low) <- ageInput
+conf.low  <- conf.low %>%
+          gather(age, conf.low, 1:ncol(conf.low)) %>%
+          mutate(age = as.numeric(age))
+
+conf.high <- lapply(score, function(df) {df %>% dplyr::select(conf.high)}) %>% do.call(cbind, .)
+colnames(conf.high) <- ageInput
+conf.high  <- conf.high %>%
+          gather(age, conf.high, 1:ncol(conf.high)) %>%
+          mutate(age = as.numeric(age))%>%
+          dplyr::select(-age)
+
+conf <- cbind(conf.low, conf.high, "age")
+
+ggplot() +
+  geom_line(data = modelDataEdit, aes(x= age_original ,  y = pred  ) , na.rm=T) +
+  theme(legend.text = element_text(color = "black")) +
+  geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high), width = 0.5) +
+  geom_point(data = estimate, aes(x = age, y = score), col = "#1D86C7", size = 5) +
+  ylab(paste0("Score (", traj, ")")) +
+  xlab("Age")
+
+# Tidy up the estimate and 95% CIs to display nicely to the user
+estimateCI <- lapply(score, function(df) {
+  df %>%
+    mutate(estimateCI = paste0(round(estimate,3) , " (", round(conf.low,3) , " - ", round(conf.high,3) , ")")) %>%
+    dplyr::select(estimateCI)
+})  %>% do.call(cbind, .)
+colnames(estimateCI) <- ageInput
+estimateCI        
+```
+
+### Area under the curve
+```{r}
+# Choose 2 ages to calculate AUC for (this is the slider on the app)
+AUCages <- c(4,10)
+
+# Calculate the AUC for the ages the user has chosen
+coef <- summary(fit)$coefficients
+
+ageOrig <- modelDataEdit %>%
+              pull(age_original)
+ageOrig <- ageOrig[!is.na(ageOrig)]
+# Minus mean age so the age is on the same scale as that used in the model
+age1 <- AUCages[1] - mean(ageOrig)
+age2 <- AUCages[2] - mean(ageOrig)
+
+# Remove any characters that means the deltaMethod function wont work
+rowNames <- rownames(coef) %>%
+              str_remove_all("I|\\(|\\^|\\)")
+
+# Use the delta method to calculate AUC 
+# AUC is calculate by doing age2 (the larger age) * intercept + slope * age2^2/2 minus age1 (the younger age) * intercept + slope * age2^2/2. This is for a linear model.
+AUC <- car::deltaMethod(fit, c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2))") ) , parameterNames = rowNames)
+
+# Format the results
+AUC <- paste0( round(AUC$Estimate, 2), " (", round(AUC$`2.5 %`,2), " - ", round(AUC$`97.5 %`,2), ")")
+
+# Plot the results
+ggplot() +
+          geom_ribbon(data = modelDataEdit,
+                      aes(x = age_original, ymax = pred, ymin = 0),
+                      alpha = 0.1, show.legend = FALSE, fill = "#1D86C7") +
+          geom_line(data = modelDataEdit, aes(x= age_original ,  y = pred ) , na.rm=T)+
+          coord_cartesian(xlim = c(AUCages[1], AUCages[2])) +
+          scale_colour_discrete(na.translate = F) +
+          theme(legend.text = element_text(color = "black")) +
+          ylab(paste0("Score (", traj, ")")) +
+          xlab("Age") +
+          scale_x_continuous(breaks = seq(round(min(modelDataEdit$age_original, na.rm =T)), round(max(modelDataEdit$age_original, na.rm =T)), by = 1),
+                             expand = c(0, 0)) +
+          scale_y_continuous(expand = c(0, 0))
+
+# Format the results to display to the user
+df <- t(data.frame(paste0(AUCages[1], " - ", AUCages[2]),
+                     AUC))
+
+rowname <- paste0("AUC (", traj, ") (95% CIs)")
+rownames(df) <- c("Age Range", rowname)
+df
+```
+
+## {-}
+
+# {-}
+
