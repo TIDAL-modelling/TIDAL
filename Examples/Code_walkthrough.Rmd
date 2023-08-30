@@ -319,9 +319,9 @@ rowname <- paste0("AUC (", traj, ") (95% CIs)")
 rownames(df) <- c("Age Range", rowname)
 df
 ```
-# Interaction Variable
+## Interaction Variable {.tabset}
 
-## Choose variable
+### Choose variable
 ```{r}
 # Demo shown for categorical variable
 # Split the trajectory by the sex variable
@@ -336,7 +336,7 @@ modelData <- dataLong %>%
 
 ```
 
-## Model Results
+### Model Results
 ```{r}
 # Run the model using lmer
 fit <- lmer(formula = "score ~ age + female + age*female + (1 + age | subject)",
@@ -416,6 +416,8 @@ head(modelDataEdit, 30)
 
 ```
 
+### Plot
+
 ```{r}
 # use glht to calculate 95% CIs
       
@@ -464,8 +466,6 @@ head(modelDataEdit, 30)
 
 ```
 
-
-## Plot
 ```{r}
 ggplot() +
               geom_line(data = modelDataEdit, aes(x= age_original ,  y = pred, color = !!sym(condition) ) , na.rm=T) +
@@ -482,14 +482,237 @@ ggplot() +
 ```
 
 
-## Scores at ages
+### Scores at ages
 ```{r}
+# Select ages to calculate scores for (same as the checkboxes on the app)
+ageInputScore <- c(4, 9, 14)
+
+# use glht to calculate scores at ages
+
+ageOrig <- modelDataEdit %>% pull(age_original)
+ageOrig <- ageOrig[!is.na(ageOrig)]
+
+score_glht <- lapply(as.numeric(ageInputScore), function(x){
 
 
+          n <- length(unique(pull(modelDataEdit, !!sym(condition))))
+
+
+          rowIndex <- which(str_detect(string = row.names(summary(fit)$coefficients),
+                                       pattern = condition) &
+                              str_detect(string = row.names(summary(fit)$coefficients),
+                                         pattern = ":", negate = T))
+
+          rowNames <- rownames(summary(fit)$coefficients)
+
+          ageInput <- round(x - mean(ageOrig), 3)
+
+          equations <- sapply(1:(n-1), function(i){
+                paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[rowIndex[i]] , " + ", rowNames[2], ":", rowNames[rowIndex[i]],"*",ageInput , " == 0")
+              })
+            res <- multcomp::glht(fit, linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " == 0"), equations) )
+ 
+          # Tidy results dataframe and rename rows/columns
+          res <- tidy(confint(res))
+
+          rowname <- paste0("Score (", traj, ")")
+
+          levelNames <- as.character(levels(as.factor(pull(modelDataEdit, !!sym(condition)))))
+
+          res <-  res %>%
+            mutate(contrast = paste0(rowname, " [", condition, ", level = ", levelNames, " ] (95% CIs)")) %>%
+            column_to_rownames(var = "contrast")
+})
+
+# Plot the scores at the given age        
+estimate <- lapply(score_glht, function(df) {
+            df %>%
+              dplyr::select(estimate)
+          })  %>% do.call(cbind, .)
+
+colnames(estimate) <- ageInputScore
+
+estimate <- estimate %>%
+              gather(age, score, 1:ncol(estimate)) %>%
+              mutate(age = as.numeric(age))
+
+conf.low <- lapply(score_glht, function(df) {df %>% dplyr::select(conf.low)}) %>% do.call(cbind, .)
+colnames(conf.low) <- ageInputScore
+conf.low  <- conf.low %>%
+              gather(age, conf.low, 1:ncol(conf.low)) %>%
+              mutate(age = as.numeric(age))
+
+conf.high <- lapply(score_glht, function(df) {df %>% dplyr::select(conf.high)}) %>% do.call(cbind, .)
+colnames(conf.high) <- ageInputScore
+conf.high  <- conf.high %>%
+              gather(age, conf.high, 1:ncol(conf.high)) %>%
+              mutate(age = as.numeric(age))%>%
+              dplyr::select(-age)
+
+conf <- cbind(conf.low, conf.high, "age")
+
+# Plot
+ggplot() +
+   geom_line(data = modelDataEdit, aes(x= age_original ,  y = pred, color = !!sym(condition) ) , na.rm=T) +
+   theme(legend.text = element_text(color = "black")) +
+   geom_errorbar(data = conf, aes(x = age, ymin = conf.low, ymax = conf.high), width = 0.5) +
+   geom_point(data = estimate, aes(x = age, y = score), col = "#1D86C7", size = 5) +
+   ylab(paste0("Score (", traj, ")")) +
+   xlab("Age")
+
+
+# Table
+estimateCI <- lapply(score_glht, function(df) {
+            df %>%
+              mutate(estimateCI = paste0(round(estimate,3) , " (", round(conf.low,3) , " - ", round(conf.high,3) , ")")) %>%
+              dplyr::select(estimateCI)
+          })  %>% do.call(cbind, .)
+colnames(estimateCI) <- ageInputScore
+estimateCI
+
+
+# Difference in scores at ages (with 95% CIs)
+levelsScores <- c(0,1)
+differenceScores <- lapply(as.numeric(ageInputScore), function(x){
+            ageInput <- round(x - mean(ageOrig), 3)
+
+            coef <- summary(fit)$coefficients
+
+            rowIndex <- which(str_detect(string = row.names(coef),
+                                         pattern = condition) &
+                                str_detect(string = row.names(coef),
+                                           pattern = ":", negate = T))
+
+            rowNames <- rownames(coef) %>%
+              str_remove_all("I|\\(|\\^|\\)|\\:")
+
+            levelNames <- paste0(condition,levelsScores) %>%
+              str_remove_all("I|\\(|\\^|\\)|\\:")
+
+            levelNames1 <- rowNames[str_detect(rowNames, paste0(levelNames, collapse = "|"))]
+
+            res <- deltaMethod(fit, c(paste0(
+                  "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, ") - (",rowNames[1], " + ", rowNames[2], "*", ageInput, ")"
+                )), parameterNames = rowNames )
+
+            dif <- paste0( round(res$Estimate, 3), " (", round(res$`2.5 %`,3), " - ", round(res$`97.5 %`,3), ")")
+            res <- data.frame(age = dif)
+return(res)
+})   
+
+difTab <- do.call(cbind, differenceScores)
+colnames(difTab) <- ageInputScore
+rownames(difTab) <- paste0("Difference between ",levelsScores[1]," and ", levelsScores[2]," (95% CI)")
+difTab
+                
 ```
 
-## Area under the curve
+### Area under the curve
 ```{r}
+# Select ages to calculate AUC for (same as the slider bar on the app)
+AUCages <- c(4,10)
+
+coef <- summary(fit)$coefficients
+
+ageOrig <- modelDataEdit %>%
+          pull(age_original)
+ageOrig <- ageOrig[!is.na(ageOrig)]
+age1 <- AUCages[1] - mean(ageOrig)
+age2 <- AUCages[2] - mean(ageOrig)
+
+rowNames <- rownames(coef) %>%
+          str_remove_all("I|\\(|\\^|\\)|\\:")
+
+AUC <- deltaMethod(fit, c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2))") ) , parameterNames = rowNames)
+
+AUC <- paste0( round(AUC$Estimate, 2), " (", round(AUC$`2.5 %`,2), " - ", round(AUC$`97.5 %`,2), ")")
+        
+rowIndex <- which(str_detect(string = row.names(summary(fit)$coefficients),
+                                   pattern = condition) &
+                          str_detect(string = row.names(summary(fit)$coefficients),
+                                     pattern = ":", negate = T))
+
+rowIndexInteract1 <- which(str_detect(string = row.names(summary(fit)$coefficients),
+                                            pattern = condition) &
+                                   str_detect(string = row.names(summary(fit)$coefficients),
+                                              pattern = ":") &
+                                   str_detect(string = row.names(summary(fit)$coefficients),
+                                              pattern = "\\^", negate = T))
+      
+n <- length(unique(pull(modelDataEdit, !!sym(condition))))
+
+AUCCovs <- lapply(1:(n-1), function(i){
+         
+            AUC <- deltaMethod(fit,
+                               c( paste0(
+                                 "(((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) + ((",rowNames[rowIndex[i]],")*(",age2,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age2,")^2/2) ) -
+                                   (((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[rowIndex[i]],")*(",age1,")) + ((",rowNames[rowIndexInteract1[i]],")*(",age1,")^2/2) )"
+                               ) )
+                               , parameterNames = rowNames )
+
+            AUC <- paste0( round(AUC$Estimate, 2), " (", round(AUC$`2.5 %`,2), " - ", round(AUC$`97.5 %`,2), ")")
+            AUC
+        })
+        
+AUC_delta <- list(AUC = AUC, AUCCovs = AUCCovs)
+       
+# Plot
+ggplot(data = modelDataEdit) +
+            geom_ribbon(data = modelDataEdit,
+                        aes(x = age_original, ymax = pred, ymin = 0, fill = !!sym(condition)),
+                        alpha = 0.1, show.legend = FALSE) +
+            coord_cartesian(xlim = c(AUCages[1], AUCages[2])) +
+            geom_line(aes(x = age_original, y = pred, color = !!sym(condition)), na.rm = TRUE) +
+            theme(legend.text = element_text(color = "black")) +
+            ylab(paste0("Score (", traj, ")")) +
+            xlab("Age") +
+            scale_x_continuous(breaks = seq(round(min(modelDataEdit$age_original, na.rm =T)), round(max(modelDataEdit$age_original, na.rm =T)), by = 1),
+                               expand = c(0, 0))+
+            scale_y_continuous(expand = c(0, 0))
+
+
+# Table
+df <- t(
+            cbind(
+              data.frame(paste0(AUCages[1], " - ", AUCages[2]),
+                         AUC_delta$AUC),
+              do.call(cbind, AUC_delta$AUCCovs)
+            )
+)
+
+rowname <- paste0("AUC (", traj, ")")
+levelNames <- as.character(levels(as.factor(pull(modelDataEdit, condition))))
+rownames(df) <- c("Age Range", paste0(rowname, " [", condition, ", level = ", levelNames, " ] (95% CIs)") )
+df
+```
+
+
+```{r}
+# -------
+# Difference in AUC
+levelsAUC <- c(0,1)
+
+levelNames <- paste0(condition,levelsAUC) %>%
+          str_remove_all("I|\\(|\\^|\\)|\\:")
+
+coef <- summary(fit)$coefficients
+
+ageOrig <- modelDataEdit %>%
+          pull(age_original)
+ageOrig <- ageOrig[!is.na(ageOrig)]
+age1 <- AUCages[1] - mean(ageOrig)
+age2 <- AUCages[2] - mean(ageOrig)
+
+rowNames <- rownames(coef) %>%
+          str_remove_all("I|\\(|\\^|\\)|\\:")
+
+levelNames1 <- rowNames[str_detect(rowNames, paste0(levelNames, collapse = "|"))]
+
+res <- deltaMethod(fit, c( paste0(" (( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2)   + ( (",levelNames1[1],")*(",age2,") ) + ((",levelNames1[2],")*(",age2,")^2/2) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2)   + ( (",levelNames1[1],")*(",age1,") ) + ((",levelNames1[2],")*(",age1,")^2/2) )) - (( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2)     )) ") ) ,parameterNames = rowNames)
+    
+dif <- paste0( round(res$Estimate, 2), " 95% CI: (", round(res$`2.5 %`,2), " - ", round(res$`97.5 %`,2), ")")
+statement <- paste0("The difference between the two factor levels (for the age ranges ", AUCages[1], " - ", AUCages[2] ,") is ", dif ,".")
+statement
 
 ```
 
