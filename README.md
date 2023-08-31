@@ -105,9 +105,9 @@ This page allows the user to view trajectories for specific individuals. The use
 
 ## Links
 
-[FAQs and troubleshooting](Documentation/FAQs.md)
+[FAQs and troubleshooting](https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/FAQs.md)
 
-[Statistics guide](Documentation/StatsGuide.md)
+[Statistics guide](https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/StatsGuide.md)
 
 ## Bugs and Feature Requests
 Please raise an issue if you find a bug or have a feature request using the templates provided.
