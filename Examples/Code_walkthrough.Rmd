@@ -144,8 +144,10 @@ deviance(fit)
 # The alternative is to use the "predict" function, but this didn't work when users wanted to add categorical covariates.
 # We had to calculate it manually instead. Below is just an example of how you do this for a linear model with no covariates.
 
+# Pull out the mean centered age column
 ageVec <- dataLong %>% pull(!!age)
 
+# Get the coefficients from the model
 coef <- summary(fit)$coefficients
 
 # Calculate the model mean/prediciton. This is age multiplied by the slope plus the intercept.
@@ -209,13 +211,16 @@ ageInput <- c(4, 7, 12)
 # Go through each age and let's calculate the score at that age using glht (similar to getting 95% CIs as above)
 score <- lapply(as.numeric(ageInput), function(x){
 
+          # Get the row names that correspond to the coefficients, ie. Intercept, Age (slope)
           rowNames <- rownames(summary(fit)$coefficients)
 
+          # Round age and mean center it so it's on the correct scale
           ageInputRound <- round(x - mean(ageOrig), 3)
         
           # Essentially we are doing the intercept + slope * age == 0 as it is a linear model
           res <- multcomp::glht(fit, linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInputRound, " == 0")) )
 
+          # Tidy up the data frame by reformatting it and labelling it sensibly
           res <- tidy(confint(res))
 
           rowname <- paste0("Score (", traj, ")")
@@ -278,9 +283,11 @@ AUCages <- c(4,10)
 # Calculate the AUC for the ages the user has chosen
 coef <- summary(fit)$coefficients
 
+# Pull out the age column from the dataframe
 ageOrig <- modelDataEdit %>%
               pull(age_original)
 ageOrig <- ageOrig[!is.na(ageOrig)]
+
 # Minus mean age so the age is on the same scale as that used in the model
 age1 <- AUCages[1] - mean(ageOrig)
 age2 <- AUCages[2] - mean(ageOrig)
@@ -327,8 +334,10 @@ df
 # Split the trajectory by the sex variable
 condition <- "female"
 
+# Get the index for the column we want to split the trajectory on
 colSplit <- which(colnames(dataLong) %in% condition)
 
+# Make sure this column is a factor and replace some characters that may cause a problem with an underscore
 modelData <- dataLong %>%
             filter(!is.na(!!sym(condition))) %>%
             mutate(!!condition := factor( str_replace_all(.[[colSplit]], " |-|/", "_") ) ) 
@@ -367,17 +376,23 @@ randomDF <- as.data.frame(VarCorr(fit),
 ```{r}
 # add the "predicted" column to this dataset (it's not really a prediction because its the same dataset, it just shows the model)
 
+# Pull out the age column
 ageVec <- modelData %>% pull(!!age)
 
+# Get the coefficients of the model
 coef <- summary(fit)$coefficients
+
+# Get the predicted column (note we did this manually in case covariates were added). If covariates were added then essentially this predicted "zero" variable is when the covariates are set to zero.
 
 zero <- ageVec * coef[2,1] + coef[1,1]
 
+# Get the row index from the coefficients table that correspond to the condition we are splitting on
 rowIndex <- which(str_detect(string = row.names(coef),
                              pattern = condition) &
                   str_detect(string = row.names(coef),
                              pattern = ":", negate = T))
 
+# Same as above but for the interaction term
 rowIndexInteract1 <- which(str_detect(string = row.names(coef),
                                               pattern = condition) &
                                      str_detect(string = row.names(coef),
@@ -385,8 +400,10 @@ rowIndexInteract1 <- which(str_detect(string = row.names(coef),
                                      str_detect(string = row.names(coef),
                                                 pattern = "\\^", negate = T))
 
+# How many levels does out condition have, eg. 2 if options are only male or female in this example
  n <- length(unique(pull(modelData, !!sym(condition))))
  
+ # Calculate the prediction for the other level, ie. when the covariate is not set to zero
  predCovs <- lapply(1:(n-1), function(i){
 
               coef[1,1] +
@@ -395,13 +412,15 @@ rowIndexInteract1 <- which(str_detect(string = row.names(coef),
               (ageVec * coef[rowIndexInteract1[i],1])
  })
 
-   
+# Name of level, in this case female is coded as 0 or 1
 num <- str_subset(row.names(coef), condition) %>%
         sub(paste0(".*", condition), "", .) %>%
         unique()
 
+# Name the list by the the level it corresponds to
 names(predCovs) <- paste0(condition, "_", num)
 
+# Add these as new columns to the dataset and make a pred column which gives the correct predicted value for the corresponding condition level, ie. the female predicted value if the participant is female.
 modelDataEdit <- cbind(modelData, do.call(cbind, predCovs)) %>%
             mutate(zero = zero) %>%
             mutate(!!condition := as.factor(.[[colSplit]]) ) %>%
@@ -412,24 +431,29 @@ modelDataEdit <- cbind(modelData, do.call(cbind, predCovs)) %>%
           
           
 
-head(modelDataEdit, 30)
-
 ```
 
 ### Plot
 
 ```{r}
 # use glht to calculate 95% CIs
-      
-        ageOrig <- modelDataEdit %>% pull(age_original)
-        ageOrig <- ageOrig[!is.na(ageOrig)]
-        ageCalcs <-  c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
 
-       CI_glht  <- lapply(ageCalcs, function(x){
+# Pull out the age column      
+ageOrig <- modelDataEdit %>% pull(age_original)
+ageOrig <- ageOrig[!is.na(ageOrig)]
 
+# Determine which ages we want to calculate 95% CI for
+# Don't need to do it for every participant as age when age is fairly similar, instead do it as a sequence of 0.5 for every unit in age.
+# This speeds up the calculation time
+ageCalcs <-  c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
+
+# Go through each age and calculate 95% CI
+CI_glht  <- lapply(ageCalcs, function(x){
+
+          # Get number of levels in condition
           n <- length(unique(pull(modelDataEdit, !!sym(condition))))
 
-
+          # Get corresponding rows for condition in coefficients table
           rowIndex <- which(str_detect(string = row.names(summary(fit)$coefficients),
                                        pattern = condition) &
                               str_detect(string = row.names(summary(fit)$coefficients),
@@ -439,7 +463,7 @@ head(modelDataEdit, 30)
 
           ageInput <- round(x - mean(ageOrig), 3)
 
-              equations <- sapply(1:(n-1), function(i){
+          equations <- sapply(1:(n-1), function(i){
                 paste0(rowNames[1], " + \`", rowNames[2], "\`*", ageInput, " + \`", rowNames[rowIndex[i]] , "\` + \`", rowNames[2], ":", rowNames[rowIndex[i]],"\`*",ageInput , " == 0")
               })
           res <- multcomp::glht(fit, linfct = c( paste0(rowNames[1], " + \`", rowNames[2], "\`*", ageInput, " == 0"), equations) )
@@ -456,12 +480,12 @@ head(modelDataEdit, 30)
           
             })
 
-        ageOrig <- modelDataEdit %>% pull(age_original)
-        ageOrig <- ageOrig[!is.na(ageOrig)]
-        ageCalcs <-  c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
-        levelNames <- as.character(levels(as.factor(pull(modelDataEdit, !!sym(condition)))))
+ageOrig <- modelDataEdit %>% pull(age_original)
+ageOrig <- ageOrig[!is.na(ageOrig)]
+ageCalcs <-  c(min(ageOrig), seq(round(min(ageOrig), 1), round(max(ageOrig), 1), 0.5), max(ageOrig) )
+levelNames <- as.character(levels(as.factor(pull(modelDataEdit, !!sym(condition)))))
 
-        estimate <- do.call(rbind, CI_glht) %>%
+estimate <- do.call(rbind, CI_glht) %>%
           mutate(age = rep(ageCalcs, each = length(levelNames)) ) 
 
 ```
