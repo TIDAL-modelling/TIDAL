@@ -8,7 +8,8 @@
 #' @import stringr
 #'
 #' @keywords internal
-#' @export
+#' @name modelResultsServer
+utils::globalVariables(c("upper", "statistic", "p.z"))
 modelResultsServer <- function(id,
                            modelFit,
                            warningMsg,

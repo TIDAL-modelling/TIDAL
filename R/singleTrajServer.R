@@ -6,9 +6,12 @@
 #' @import ggplot2
 #' @import tidyr
 #' @import stringr
+#' @import utils
+#' @importFrom stats IQR confint deviance fitted median pnorm qnorm sd
 #'
 #' @keywords internal
-#' @export
+#' @name singleTrajServer
+utils::globalVariables(c(".", "pred"))
 singleTrajServer <- function(id,
                              subject,
                              age,

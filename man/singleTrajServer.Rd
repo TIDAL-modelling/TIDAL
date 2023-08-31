@@ -3,9 +3,6 @@
 \name{singleTrajServer}
 \alias{singleTrajServer}
 \title{Server for individual trajectories}
-\usage{
-singleTrajServer(id, subject, age, traj, modelData, modelFit, modelType, cov)
-}
 \description{
 Server for individual trajectories
 }

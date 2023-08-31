@@ -12,9 +12,13 @@
 #' @import tidyr
 #' @import stringr
 #' @import shinyBS
+#' @importFrom stats IQR confint deviance fitted median pnorm qnorm sd
+#' @import utils
+#' @importFrom rlang :=
 #'
 #' @keywords internal
-#' @export
+#' @name wide2longServer
+utils::globalVariables(c("dep_cat_test_col"))
 wide2longServer <- function(id) {
   # create a module server
   moduleServer(

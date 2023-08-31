@@ -6,9 +6,11 @@
 #' @import ggplot2
 #' @import tidyr
 #' @import stringr
+#' @importFrom rlang :=
 #'
 #' @keywords internal
-#' @export
+#' @name modelRunServer
+utils::globalVariables(c("Phenotype", "SD", "Age", "lower", "upper"))
 modelRunServer <- function(id,
                            covariateChoice,
                            button,

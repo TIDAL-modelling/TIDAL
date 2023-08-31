@@ -5,10 +5,13 @@
 #' @import dplyr
 #' @import ggplot2
 #' @import tidyr
+#' @importFrom stats IQR confint deviance fitted median pnorm qnorm sd
+#' @import utils
 #' @importFrom multcomp glht
 #'
 #' @keywords internal
-#' @export
+#' @name modelPlotServer
+utils::globalVariables(c("Phenotype", "SD", "pred", "conf.low", "conf.high", "Age", "lower", "upper"))
 modelPlotServer <- function(id,
                             modelData,
                             modelFit,

@@ -3,18 +3,6 @@
 \name{modelPlotServer}
 \alias{modelPlotServer}
 \title{Model plot - data exploration page}
-\usage{
-modelPlotServer(
-  id,
-  modelData,
-  modelFit,
-  age,
-  traj,
-  timePoint,
-  modelType,
-  button
-)
-}
 \description{
 Model plot - data exploration page
 }

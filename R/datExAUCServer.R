@@ -9,7 +9,8 @@
 #' @importFrom car deltaMethod
 #'
 #' @keywords internal
-#' @export
+#' @name datExAUCServer
+utils::globalVariables(c("age_original", "pred"))
 datExAUCServer <- function(id,
                            modelDataEdit,
                            modelFit,

@@ -7,7 +7,8 @@
 #' @import tidyr
 #'
 #' @keywords internal
-#' @export
+#' @name importantAge
+utils::globalVariables(c("term", "estimate", "pred"))
 importantAgeServer <- function(id,
                                modelDataEdit,
                                modelType,

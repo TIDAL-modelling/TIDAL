@@ -3,9 +3,6 @@
 \name{datExAltServer}
 \alias{datExAltServer}
 \title{Display score at an age for the data exploration page}
-\usage{
-datExAltServer(id, modelDataEdit, modelFit, modelType, traj)
-}
 \description{
 Display score at an age for the data exploration page
 }

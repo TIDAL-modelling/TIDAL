@@ -3,9 +3,6 @@
 \name{datExAUCServer}
 \alias{datExAUCServer}
 \title{AUC for the data exploration page}
-\usage{
-datExAUCServer(id, modelDataEdit, modelFit, modelType, traj, button)
-}
 \description{
 AUC for the data exploration page
 }

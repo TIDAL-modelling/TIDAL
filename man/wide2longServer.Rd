@@ -3,9 +3,6 @@
 \name{wide2longServer}
 \alias{wide2longServer}
 \title{This function takes a wide format dataset and converts it to a long format dataset.}
-\usage{
-wide2longServer(id)
-}
 \arguments{
 \item{id}{The id of the module server}
 }

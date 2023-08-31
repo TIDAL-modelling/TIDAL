@@ -3,19 +3,6 @@
 \name{modelResultsServer}
 \alias{modelResultsServer}
 \title{Run model - data exploration page}
-\usage{
-modelResultsServer(
-  id,
-  modelFit,
-  warningMsg,
-  modelData,
-  modelType,
-  randomFX,
-  age,
-  traj,
-  covars
-)
-}
 \description{
 Run model - data exploration page
 }

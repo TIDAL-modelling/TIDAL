@@ -3,18 +3,6 @@
 \name{modelCondServer}
 \alias{modelCondServer}
 \title{split model by variable}
-\usage{
-modelCondServer(
-  id,
-  modelData,
-  formCodeCovars,
-  dfPlot,
-  traj,
-  age,
-  timePoint,
-  modelType
-)
-}
 \description{
 split model by variable
 }

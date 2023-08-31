@@ -9,11 +9,15 @@
 #' @import tibble
 #' @import tinytex
 #' @import rmarkdown
+#' @importFrom stats IQR confint deviance fitted median pnorm qnorm sd
+#' @import utils
 #' @importFrom kableExtra kbl kable_styling landscape
 #' @importFrom car deltaMethod
+#' @importFrom rlang :=
 #'
 #' @keywords internal
-#' @export
+#' @name modelCondServer
+utils::globalVariables(c(".", "statistic", "p.z", "pred", "condition", "Age", "Phenotype", "lower", "upper"))
 modelCondServer <- function(id,
                             modelData,
                             formCodeCovars,

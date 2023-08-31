@@ -6,9 +6,12 @@
 #' @import ggplot2
 #' @import tidyr
 #' @import stringr
+#' @importFrom stats confint
+#' @import utils
 #'
 #' @keywords internal
-#' @export
+#' @name datExAltServer
+utils::globalVariables(c(".", "age", "pred"))
 datExAltServer <- function(id,
                            modelDataEdit,
                            modelFit,

@@ -3,18 +3,6 @@
 \name{modelRunServer}
 \alias{modelRunServer}
 \title{Run model - data exploration page}
-\usage{
-modelRunServer(
-  id,
-  covariateChoice,
-  button,
-  modelData,
-  formCodeCovars,
-  age,
-  traj,
-  timePoint
-)
-}
 \description{
 Run model - data exploration page
 }
