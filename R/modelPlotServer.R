@@ -175,7 +175,7 @@ modelPlotServer <- function(id,
 
       # plot the mean trajectory against the model
       output$mainPlot <- renderPlot(
-        if(!inherits(fit(), "try-error")){
+        if(!inherits(modelFit(), "try-error")){
         mainPlot()
         }
       )
