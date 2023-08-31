@@ -1,6 +1,6 @@
 Package: TIDAL
 Type: Package
-Title: Tool to Assist with Modelling Longitudinal Trajectories
+Title: Tool to Implement Developmental Analyses of Longitudinal data
 Version: 0.1.0
 Author: Amelia Edmondson-Stait
 Maintainer: Amelia Edmondson-Stait <TIDAL@ed.ac.uk>
