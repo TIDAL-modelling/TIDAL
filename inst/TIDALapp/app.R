@@ -102,6 +102,7 @@ welcome_page <- tabPanel(
     # p("Captures within-individual variability in depressive symptoms over time and compare how this varies by different forms of interventions or combinations of interventions.")
     HTML('<left><img src="wellcome-logo-black.jpg" width="100"></left>'),
     p("Funded by The Wellcome Trust and Social Finance, Grant Ref: 226686/Z/22/Z."),
+    p("This package is provided solely for educational and informational purposes. Users understand and agree that any data uploaded and utilised with this package is done at their own risk. Users are solely responsible for the accuracy, legality, and ethical considerations of the data they upload. Additionally, users are responsible for the interpretation of results obtained through the use of this package. The creators and maintainers of this package shall not be held liable for any consequences arising from the use, interpretation, or implications of the package or the data uploaded.")
   )
 )
 
