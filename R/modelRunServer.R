@@ -62,7 +62,7 @@ modelRunServer <- function(id,
 
       # Output message
       warning <- eventReactive(button(), {
-        if(class(fit()) != "try-error"){
+        if(!inherits(fit(), "try-error")){
             paste0('
             The following <a href="https://cran.r-project.org/web/packages/lme4/lme4.pdf" style="color:blue" target="_blank">lme4</a> function is used to run the model:
             </br>

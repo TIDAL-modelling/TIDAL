@@ -28,7 +28,7 @@ modelResultsServer <- function(id,
       # ------------------------------------------
       # paste the formula text
       modelFormRender <- reactive({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
         paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(modelFit())$call)[2])
         }else{
           paste0("")
@@ -53,7 +53,7 @@ modelResultsServer <- function(id,
       })
 
       output$ageMean <- renderText({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
         statement()
         }
       })
@@ -88,7 +88,7 @@ modelResultsServer <- function(id,
       })
 
       output$modelStatsFixed <- renderTable({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
         fixedTab()
         }
       }, digits = 3)
@@ -152,7 +152,7 @@ modelResultsServer <- function(id,
       })
 
       output$interFixed <- renderText({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
           interpretation()
         }
       })
@@ -173,7 +173,7 @@ modelResultsServer <- function(id,
       })
 
       output$modelStatsRandom <- renderTable({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
         randomTab()
         }
       }, digits = 3)
@@ -239,7 +239,7 @@ modelResultsServer <- function(id,
       })
 
       output$interRandom  <- renderText({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
           interpretationRand()
         }
       })
