@@ -231,7 +231,9 @@ server <- function(input, output, session) {
                                            formCodeCovars = selectDataServer$modelFormCovars,
                                            traj = selectDataServer$traj,
                                            age = selectDataServer$age,
-                                           timePoint = selectDataServer$timePoint)
+                                           timePoint = selectDataServer$timePoint,
+                                           weights = selectDataServer$weights,
+                                           weightCol  = selectDataServer$weightCol)
   modelResultsServer <- TIDAL:::modelResultsServer("modelResults",
                                                    modelFit = modelRunServer$fit,
                                                    warningMsg = modelRunServer$warning,

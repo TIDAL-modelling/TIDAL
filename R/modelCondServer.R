@@ -40,9 +40,9 @@ modelCondServer <- function(id,
       vars <- reactive({
         req(modelData())
         if(input$varType == "cat"){
-          colnames(modelData())[apply(modelData(), 2, function(x) length(unique(x))) < 40]
+          str_subset(colnames(modelData())[apply(modelData(), 2, function(x) length(unique(x))) < 40], "COPY_OF_WEIGHT_COLUMN_USED_IN_LMER", negate = TRUE)
         }else if(input$varType == "cont"){
-          colnames(modelData())[!apply(modelData(), 2, function(x) length(unique(x))) <= 2]
+          str_subset(colnames(modelData())[!apply(modelData(), 2, function(x) length(unique(x))) <= 2], "COPY_OF_WEIGHT_COLUMN_USED_IN_LMER", negate = TRUE)
         }else{
           colnames(modelData())
         }

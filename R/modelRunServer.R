@@ -18,7 +18,9 @@ modelRunServer <- function(id,
                            formCodeCovars,
                            age,
                            traj,
-                           timePoint
+                           timePoint,
+                           weights,
+                           weightCol
                            ) {
 
   moduleServer(
@@ -47,7 +49,7 @@ modelRunServer <- function(id,
           modelData() %>%
             mutate(age_original = as.numeric(!!sym(age())) ) %>%
             mutate(!!sym(age()) := as.numeric(!!sym(age())) - mean( as.numeric(!!sym(age())), na.rm = T )) %>%
-            mutate(WEIGHT_COL_VERY_WEIRD_LONG_NAME_SO_ITS_HOPEFULLY_UNIQUE = as.numeric(!!sym(weightCol())))
+            mutate(COPY_OF_WEIGHT_COLUMN_USED_IN_LMER = as.numeric(!!sym(weightCol())))
         }
       })
 
@@ -73,10 +75,11 @@ modelRunServer <- function(id,
                         data = newModelData(),
                         control=lmerControl(optimizer="bobyqa",
                                             optCtrl=list(maxfun=2e5)),
-                        weights = WEIGHT_COL_VERY_WEIRD_LONG_NAME_SO_ITS_HOPEFULLY_UNIQUE )
-            return(fit)
+                        weights = COPY_OF_WEIGHT_COLUMN_USED_IN_LMER )
           },  silent = TRUE)
         }
+        return(fit)
+      })
 
 
       # Output message
