@@ -2,3 +2,9 @@
 ^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+Documentation
+Examples
+LICENSE.txt
+includes
+^cran-comments\.md$
+

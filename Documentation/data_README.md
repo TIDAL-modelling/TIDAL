@@ -1,7 +1,7 @@
 ## Synthetic datasets
 To save the dataset click on the link below (right click to open in new tab) and then click `File` -> `Save Page As...`.
 
-### [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/AmeliaES/TIDAL/main/data/emot_reg_emot_simulated.csv)
+### [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/emot_reg_emot_simulated.csv)
   * Emotional regulation in childhood and emotional symptoms scores, measured by the Strengths & Difficulties Questionnaires (SDQ),  across 5 time points between childhood and adolescence (ages 3 to 14).
   * This dataset contains ~13000 people, who have been simulated using the R package [synthpop](https://cran.r-project.org/web/packages/synthpop/index.html) from an original dataset [Millennium Cohort Study (MCS)](https://cls.ucl.ac.uk/cls-studies/millennium-cohort-study/) participants. This synthetic dataset does not contain any real participants.
   * There are 3 emotion dysregulation variables one could use to split trajectories by: 

@@ -4,15 +4,12 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
-#' @import magrittr
 #' @import stringr
 #'
-#' @noRd
 #' @keywords internal
-#' @export
+#' @name modelResultsServer
+utils::globalVariables(c("upper", "statistic", "p.z"))
 modelResultsServer <- function(id,
                            modelFit,
                            warningMsg,
@@ -31,7 +28,7 @@ modelResultsServer <- function(id,
       # ------------------------------------------
       # paste the formula text
       modelFormRender <- reactive({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
         paste0("<b>Model Formula:</b> ",  gsub(".*formula = (.+) , data =.*", "\\1", summary(modelFit())$call)[2])
         }else{
           paste0("")
@@ -56,7 +53,7 @@ modelResultsServer <- function(id,
       })
 
       output$ageMean <- renderText({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
         statement()
         }
       })
@@ -91,7 +88,7 @@ modelResultsServer <- function(id,
       })
 
       output$modelStatsFixed <- renderTable({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
         fixedTab()
         }
       }, digits = 3)
@@ -150,12 +147,12 @@ modelResultsServer <- function(id,
 
         # Text:
         paste0(
-          'The score at the intercept is ', intercept, '. The intercept here has been shifted to the mean age of all the assessments which is ', ageMeanVal, '. You could interpret this as the score at the intercept of ', ageVar,' ', ageMeanVal,' is ', intercept, '.<br/><br/> Every unit increase in ',ageVar,' is associated with ', direction ,' of ', trajVar ,' by ', slope,'. ', ifelse(modelType() ==  "Quadratic", paste0('As you have specified a quadratic model, every unit increase in ', ageVar ,'^2 is also associated with ', direction2 ,' of ', trajVar,' by ',slope2,'. However, it can be difficult to interpret these two estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),paste0('')),ifelse(modelType() == "Cubic",paste0('As you have specified a cubic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,'. However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),paste0('')), ifelse(modelType() == "Quartic",paste0('As you have specified a quartic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,' and every unit increase in ',ageVar,'^4 is associated with ', direction4 ,' in ',trajVar,' by ',slope4, ' However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the ‘Plot’ and ‘Scores At Ages’ tabs for more information.'),paste0('')),'<br/>
+          'The score at the intercept is ', intercept, '. The intercept here has been shifted to the mean age of all the assessments which is ', ageMeanVal, '. You could interpret this as the score at the intercept of ', ageVar,' ', ageMeanVal,' is ', intercept, '.<br/><br/> Every unit increase in ',ageVar,' is associated with ', direction ,' of ', trajVar ,' by ', slope,'. ', ifelse(modelType() ==  "Quadratic", paste0('As you have specified a quadratic model, every unit increase in ', ageVar ,'^2 is also associated with ', direction2 ,' of ', trajVar,' by ',slope2,'. However, it can be difficult to interpret these two estimates in isolation, so we would recommend exploring your trajectories with the "Plot" and "Scores At Ages" tabs for more information.'),paste0('')),ifelse(modelType() == "Cubic",paste0('As you have specified a cubic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,'. However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the "Plot" and "Scores At Ages" tabs for more information.'),paste0('')), ifelse(modelType() == "Quartic",paste0('As you have specified a quartic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', slope2 ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',slope3,' and every unit increase in ',ageVar,'^4 is associated with ', direction4 ,' in ',trajVar,' by ',slope4, ' However, it can be difficult to interpret these three estimates in isolation, so we would recommend exploring your trajectories with the "Plot" and "Scores At Ages" tabs for more information.'),paste0('')),'<br/>
         <br/>',ifelse(length(covars()) > 0,paste0('These estimates are adjusted for the following confounders/covariates: ', confounders ,'.<br/><br/>In addition, the following confounders/covariates: ', confounderLevels ,' are associated with an increase or decrease of ', trajVar ,' by ',confounderEst,' respectively.<br/><br/>Please note, this section does not estimate group specific trajectories. See the Interaction Variable tab for group specific interactions and trajectories.<br/><br/>'), paste0('')), 'The model fit (deviance) is ', modelDeviance, ', you can compare this value to other similar models to determine which model has a better fit.<br/><br/>')
       })
 
       output$interFixed <- renderText({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
           interpretation()
         }
       })
@@ -176,7 +173,7 @@ modelResultsServer <- function(id,
       })
 
       output$modelStatsRandom <- renderTable({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
         randomTab()
         }
       }, digits = 3)
@@ -242,7 +239,7 @@ modelResultsServer <- function(id,
       })
 
       output$interRandom  <- renderText({
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
           interpretationRand()
         }
       })

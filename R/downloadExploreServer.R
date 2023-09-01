@@ -4,15 +4,11 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
-#' @import purrr
 #' @import tinytex
 #' @import rmarkdown
-#' @import kableExtra
+#' @importFrom kableExtra kbl kable_styling
 #'
-#' @noRd
 #' @keywords internal
 #' @export
 downloadExploreServer <- function(id,

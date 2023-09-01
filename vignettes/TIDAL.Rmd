@@ -1,0 +1,54 @@
+---
+title: "TIDAL R Package Vignette"
+author: "Amelia Edmondson-Stait"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{TIDAL R Package Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds.
+
+# Installation
+
+You can install the package from CRAN using the following R code:
+
+```{r installation}
+# install.packages("TIDAL")
+```
+
+# Loading the Package
+```{r}
+# library(TIDAL)
+```
+
+# Example Useage
+
+To run the R Shiny application from your local environment:
+
+```{r}
+# Open an interactive Shiny GUI:
+# launchTIDAL()
+
+# The argument "display" is a character vector and is either "default" or "browser". Default is "default".
+# "default" opens the Shiny app in a pop-out window in RStudio, while "browser" opens it in a web browser.
+
+# Launch Shiny app in a pop-out window in RStudio
+# launchTIDAL(display = "default")
+
+# Launch Shiny app with browser display
+# launchTIDAL(display = "browser")
+
+```
+
+
+

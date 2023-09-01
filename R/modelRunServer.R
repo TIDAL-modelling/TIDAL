@@ -4,15 +4,13 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
-#' @import magrittr
 #' @import stringr
+#' @importFrom rlang :=
 #'
-#' @noRd
 #' @keywords internal
-#' @export
+#' @name modelRunServer
+utils::globalVariables(c("Phenotype", "SD", "Age", "lower", "upper"))
 modelRunServer <- function(id,
                            covariateChoice,
                            button,
@@ -20,9 +18,7 @@ modelRunServer <- function(id,
                            formCodeCovars,
                            age,
                            traj,
-                           timePoint,
-                           weights,
-                           weightCol
+                           timePoint
                            ) {
 
   moduleServer(
@@ -43,9 +39,16 @@ modelRunServer <- function(id,
       newModelData <- eventReactive(button(), {
         req(age())
         req(modelData())
+        if(weights() == FALSE){
         modelData() %>%
           mutate(age_original = as.numeric(!!sym(age())) ) %>%
           mutate(!!sym(age()) := as.numeric(!!sym(age())) - mean( as.numeric(!!sym(age())), na.rm = T ))
+        }else if(weights() == TRUE){
+          modelData() %>%
+            mutate(age_original = as.numeric(!!sym(age())) ) %>%
+            mutate(!!sym(age()) := as.numeric(!!sym(age())) - mean( as.numeric(!!sym(age())), na.rm = T )) %>%
+            mutate(WEIGHT_COL_VERY_WEIRD_LONG_NAME_SO_ITS_HOPEFULLY_UNIQUE = as.numeric(!!sym(weightCol())))
+        }
       })
 
       # Run the model
@@ -62,57 +65,52 @@ modelRunServer <- function(id,
                           control=lmerControl(optimizer="bobyqa",
                                               optCtrl=list(maxfun=2e5))),
                      silent = TRUE)
-          }else if(weights() == TRUE){
+        }else if(weights() == TRUE){
 
-            fit <- try({
-              weightsVec <- pull(newModelData(), !!sym(weightCol()))
-              fit <- lmer(formula = formCodeCovars(),
-                     REML=F ,
-                     data = newModelData(),
-                     control=lmerControl(optimizer="bobyqa",
-                                         optCtrl=list(maxfun=2e5)),
-                     weights = weightsVec ) # THIS DOES NOT WORK,
-              # lmer can't find variables assigned to the weights argument unless it is in the global environment
-              #
-              return(fit)
-              },  silent = TRUE)
-          }
+          fit <- try({
+            fit <- lmer(formula = formCodeCovars(),
+                        REML=F ,
+                        data = newModelData(),
+                        control=lmerControl(optimizer="bobyqa",
+                                            optCtrl=list(maxfun=2e5)),
+                        weights = WEIGHT_COL_VERY_WEIRD_LONG_NAME_SO_ITS_HOPEFULLY_UNIQUE )
+            return(fit)
+          },  silent = TRUE)
+        }
 
-        return(fit)
-      })
 
       # Output message
-      warning <- eventReactive(button(), {
-        if(class(fit()) != "try-error"){
+        # Output message
+        warning <- eventReactive(button(), {
+          if(class(fit()) != "try-error"){
             paste0('
             The following <a href="https://cran.r-project.org/web/packages/lme4/lme4.pdf" style="color:blue" target="_blank">lme4</a> function is used to run the model:
             </br>
             <pre>
             <code>',
-            if(weights() == FALSE){
-            paste0('lmer(formula = ',formCodeCovars(),',
+                   if(weights() == FALSE){
+                     paste0('lmer(formula = ',formCodeCovars(),',
                  REML = FALSE ,
                  data = newModelData,
                  control = lmerControl(optimizer="bobyqa",
                                       optCtrl=list(maxfun=2e5)))')
-            }else{
-              paste0('lmer(formula = ',formCodeCovars(),',
+                   }else{
+                     paste0('lmer(formula = ',formCodeCovars(),',
                  REML = FALSE ,
                  data = newModelData,
                  control = lmerControl(optimizer="bobyqa",
                                       optCtrl=list(maxfun=2e5)),
                      weights = ',weightCol(),')')
-            },
-            '</code>
+                   },
+                   '</code>
             </pre>
             Please see more infomation about the &quot;bobyqa&quot; optimiser <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>. The use of alternative optimisers is not currently supported.
             </br>
             The argument <code>REML = FALSE</code> indicates the model was fitted by maximum likelihood.')
-        }else{
-          # "The model doesn't run. This could be because there is too much missing data or too few time points. Try changing the random slope term."
-          paste0(fit())
-        }
-      })
+          }else{
+            "The model doesn't run. This could be because there is too much missing data or too few time points. Try changing the random slope term."
+          }
+        })
 
 
       # ------------------------------------------

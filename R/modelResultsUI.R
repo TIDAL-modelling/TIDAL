@@ -4,12 +4,9 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
 #' @import shinycssloaders
 #'
-#' @noRd
 #' @keywords internal
 #' @export
 modelResultsUI <- function(id, label = "Model") {

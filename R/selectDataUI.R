@@ -4,11 +4,8 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
 #'
-#' @noRd
 #' @keywords internal
 #' @export
 selectDataUI <- function(id, label = "data") {
@@ -20,8 +17,6 @@ selectDataUI <- function(id, label = "data") {
     uiOutput(ns("uploadFile")),
     uiOutput(ns("additional")),
     uiOutput(ns("randomFX_UI")),
-    uiOutput(ns("weights_UI")),
-    uiOutput(ns("weightCol_UI")),
     uiOutput(ns("button_UI"))
   )
 }

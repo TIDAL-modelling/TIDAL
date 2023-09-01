@@ -4,20 +4,20 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
 #' @import multcomp
 #' @import tibble
-#' @import purrr
 #' @import tinytex
 #' @import rmarkdown
-#' @import kableExtra
-#' @import car
+#' @importFrom stats IQR confint deviance fitted median pnorm qnorm sd
+#' @import utils
+#' @importFrom kableExtra kbl kable_styling landscape
+#' @importFrom car deltaMethod
+#' @importFrom rlang :=
 #'
-#' @noRd
 #' @keywords internal
-#' @export
+#' @name modelCondServer
+utils::globalVariables(c(".", "statistic", "p.z", "pred", "condition", "Age", "Phenotype", "lower", "upper"))
 modelCondServer <- function(id,
                             modelData,
                             formCodeCovars,

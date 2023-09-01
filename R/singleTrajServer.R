@@ -4,15 +4,14 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
-#' @import magrittr
 #' @import stringr
+#' @import utils
+#' @importFrom stats IQR confint deviance fitted median pnorm qnorm sd
 #'
-#' @noRd
 #' @keywords internal
-#' @export
+#' @name singleTrajServer
+utils::globalVariables(c(".", "pred"))
 singleTrajServer <- function(id,
                              subject,
                              age,

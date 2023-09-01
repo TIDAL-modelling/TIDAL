@@ -23,9 +23,8 @@ params:
 ---
   
   
-``` {r, echo=F, warning=F}
+``` {r, echo=F, warning=F, message = F}
 library(knitr)
-library(kableExtra)
 library(ggplot2)
 
 include_graphics("TIDAL.png")
@@ -56,16 +55,16 @@ params$condPlot
 ## Fixed effects
 
 ```{r, echo=F}
-kbl(params$condFixed[,3:ncol(params$condFixed)], digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(params$condFixed[,3:ncol(params$condFixed)], digits = 3)  %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
 
 ## Random effects
 
 ```{r, echo=F}
-kbl(params$condRandom[,3:ncol(params$condRandom)], digits = 3)  %>%
-  kable_styling(latex_options = "hold_position")
+kableExtra::kbl(params$condRandom[,3:ncol(params$condRandom)], digits = 3)  %>%
+  kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
 
@@ -87,8 +86,8 @@ if(is.ggplot(params$plotScore)){
   tablescore = t(params$tableScore)
   kable(tablescore, digits = 3,  "latex")  %>%
     # column_spec(2:ncol(tablescore), width = c("10em")) %>%
-    kable_styling(latex_options = c("hold_position", "scale_down")) %>%
-    landscape() 
+    kableExtra::kable_styling(latex_options = c("hold_position", "scale_down")) %>%
+    kableExtra::landscape() 
   
 }
 ```
@@ -98,7 +97,7 @@ if(is.ggplot(params$plotScore)){
 if(!is.na(params$difTab)){
   difTab = t(params$difTab)
   kable(difTab, digits = 3,  "latex")  %>%
-    kable_styling(latex_options = c("hold_position"))
+    kableExtra::kable_styling(latex_options = c("hold_position"))
 }
 ```
 
@@ -118,8 +117,8 @@ if(is.ggplot(params$AUCplot)){
 
 ```{r, echo=F, warning=F}
 if(is.ggplot(params$AUCplot)){
-  kbl(params$AUCtable, digits = 3)  %>%
-    kable_styling(latex_options = "hold_position")
+  kableExtra::kbl(params$AUCtable, digits = 3)  %>%
+    kableExtra::kable_styling(latex_options = "hold_position")
 }
 ```
 

@@ -4,13 +4,11 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
 #'
-#' @noRd
 #' @keywords internal
-#' @export
+#' @name importantAge
+utils::globalVariables(c("term", "estimate", "pred"))
 importantAgeServer <- function(id,
                                modelDataEdit,
                                modelType,

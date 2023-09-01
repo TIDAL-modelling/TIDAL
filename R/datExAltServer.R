@@ -4,15 +4,14 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
-#' @import magrittr
 #' @import stringr
+#' @importFrom stats confint
+#' @import utils
 #'
-#' @noRd
 #' @keywords internal
-#' @export
+#' @name datExAltServer
+utils::globalVariables(c(".", "age", "pred"))
 datExAltServer <- function(id,
                            modelDataEdit,
                            modelFit,

@@ -4,14 +4,14 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
-#' @import purrr
+#' @importFrom stats IQR confint deviance fitted median pnorm qnorm sd
+#' @import utils
+#' @importFrom multcomp glht
 #'
-#' @noRd
 #' @keywords internal
-#' @export
+#' @name modelPlotServer
+utils::globalVariables(c("Phenotype", "SD", "pred", "conf.low", "conf.high", "Age", "lower", "upper"))
 modelPlotServer <- function(id,
                             modelData,
                             modelFit,
@@ -175,7 +175,7 @@ modelPlotServer <- function(id,
 
       # plot the mean trajectory against the model
       output$mainPlot <- renderPlot(
-        if(class(modelFit()) != "try-error"){
+        if(!inherits(modelFit(), "try-error")){
         mainPlot()
         }
       )

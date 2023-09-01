@@ -1,8 +1,8 @@
 #' Shiny module - Selecting and reading in the dataset
 #'
 #' @import shinyBS
+#' @importFrom data.table fread
 #'
-#' @noRd
 #' @keywords internal
 #' @export
 selectDataServer <- function(id, dataFormatted) {
@@ -82,25 +82,6 @@ selectDataServer <- function(id, dataFormatted) {
       output$randomFX_UI <- renderUI({
         req(data())
         selectInput(ns("randomFX"), "Choose random slope terms:", choices = randomFX_choices(), multiple = FALSE, selected = randomFX_choices()[length(randomFX_choices())])
-      })
-
-      output$weights_UI <- renderUI({
-        req(data())
-        tagList(
-        tags$div(title = "If you want to include survey weights check the box and select the column name for the survey weight variable below.",
-                 checkboxInput(ns("weights"),
-                               tags$span("Include survey weights",
-                                         tipify(bsButton("pB2", "?", style = "info", size = "extra-small"),
-                                                "")),
-                               value = FALSE ))
-        )
-      })
-
-      output$weightCol_UI <- renderUI({
-        req(data())
-        if(input$weights == TRUE){
-          selectInput(ns("weightCol"), "Variable for survey weights:", choices = names(data()))
-        }
       })
 
       output$button_UI <- renderUI({
@@ -211,8 +192,6 @@ selectDataServer <- function(id, dataFormatted) {
           timePoint = reactive({ input$timePoint }),
           modelType = reactive({ input$modelType }),
           randomFX = reactive({ input$randomFX }),
-          weights = reactive({ input$weights }),
-          weightCol = reactive({ input$weightCol }),
           covariateChoice = covariateChoice,
           covars = covars
         )

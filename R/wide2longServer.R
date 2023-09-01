@@ -8,18 +8,17 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
+#' @importFrom data.table fread
 #' @import tidyr
 #' @import stringr
 #' @import shinyBS
+#' @importFrom stats IQR confint deviance fitted median pnorm qnorm sd
+#' @import utils
+#' @importFrom rlang :=
 #'
-#' @noRd
 #' @keywords internal
-#' @export
-#'
-#' @examples
-#' wide2longServer("server1")
+#' @name wide2longServer
+utils::globalVariables(c("dep_cat_test_col"))
 wide2longServer <- function(id) {
   # create a module server
   moduleServer(

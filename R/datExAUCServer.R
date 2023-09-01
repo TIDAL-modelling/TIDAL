@@ -4,15 +4,13 @@
 #' @import lme4
 #' @import dplyr
 #' @import ggplot2
-#' @import data.table
-#' @import shinyjs
 #' @import tidyr
 #' @import stringr
-#' @import car
+#' @importFrom car deltaMethod
 #'
-#' @noRd
 #' @keywords internal
-#' @export
+#' @name datExAUCServer
+utils::globalVariables(c("age_original", "pred"))
 datExAUCServer <- function(id,
                            modelDataEdit,
                            modelFit,
@@ -126,7 +124,7 @@ datExAUCServer <- function(id,
     })
 
     output$AUCplot <- renderPlot({
-      if(class(modelFit()) != "try-error"){
+      if(!inherits(modelFit(), "try-error")){
       plotAUC()
       }
     })
@@ -148,7 +146,7 @@ datExAUCServer <- function(id,
 
 
     output$AUCtable <- renderTable({
-      if(class(modelFit()) != "try-error"){
+      if(!inherits(modelFit(), "try-error")){
       tableAUC()
       }
     }, colnames = FALSE, rownames = TRUE)
