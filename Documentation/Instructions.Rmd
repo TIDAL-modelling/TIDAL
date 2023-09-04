@@ -1,10 +1,16 @@
 ---
 title: "Instructions for TIDAL"
-output: pdf_document
+output:
+  pdf_document:
+    fig_caption: no      
+    fig_crop: no  
+    includes:  
+      in_header: preamble.tex
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+getwd()
 ```
 
 # Introduction
@@ -36,25 +42,56 @@ To use this tool online please do not upload any sensitive data. Only use the sy
 
 # Synthetic datasets
 
-A synthetic dataset is available called "emot_reg_emot_simulated.csv" this is also embedded within the app. Details about this synthetic dataset can be found on GitHub [here](https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/data_README.md).
+A synthetic dataset is available called "emot_reg_emot_simulated.csv" this is also embedded within the app. Details about this synthetic dataset can be found on GitHub in the `/data` subfolder [here](https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/data_README.md).
 
 # Interacting with the app
 
 ## Overview page
 
-The first page of the app looks like this:
+When you launch the app the first page of the app looks like this:
 
-<insert screenshot here>
+![overview](Instructions_figures/Overview.png)
 
 Please read through this all this information before preceding with the following pages.
 
 ## Data Preparation page
 
+![DataPrep1](Instructions_figures/Data_Prep1.png)
+![DataPrep2](Instructions_figures/Data_Prep2.png)
+
 ## Data Exploration page
+
+![DataEx1](Instructions_figures/Data_Ex1.png)
+![DataEx2](Instructions_figures/Data_Ex2.png)
+![DataEx3](Instructions_figures/Data_Ex3.png)
+![DataEx4](Instructions_figures/Data_Ex4.png)
+
+![DataEx5](Instructions_figures/Data_Ex5.png)
+
+![DataEx6](Instructions_figures/Data_Ex6.png)
+
+![DataEx7](Instructions_figures/Data_Ex7.png)
+
+![DataEx8](Instructions_figures/Data_Ex8.png)
 
 ## Interaction Variable page
 
+![IntVar1](Instructions_figures/Int_Var1.png)
+
+![IntVar2](Instructions_figures/Int_Var2.png)
+
+![IntVar3](Instructions_figures/Int_Var3.png)
+
+![IntVar4](Instructions_figures/Int_Var4.png)
+
+![IntVar5](Instructions_figures/Int_Var5.png)
+
 ## Individual Trajectories page
+
+![IndTraj1](Instructions_figures/Ind_Traj1.png)
+![IndTraj2](Instructions_figures/Ind_Traj2.png)
+![IndTraj3](Instructions_figures/Ind_Traj3.png)
+![IndTraj4](Instructions_figures/Ind_Traj4.png)
 
 
 
