@@ -10,6 +10,7 @@ params:
   condPlot : NA
   condModelForm : NA
   condFixed : NA
+  interpretation: NA
   condRandom : NA
   modelDataEdit : NA
   plotScore : NA
@@ -26,6 +27,8 @@ params:
 ``` {r, echo=F, warning=F, message = F}
 library(knitr)
 library(ggplot2)
+library(dplyr)
+library(stringr)
 
 include_graphics("TIDAL.png")
 ```
@@ -59,6 +62,10 @@ kableExtra::kbl(params$condFixed[,3:ncol(params$condFixed)], digits = 3)  %>%
   kableExtra::kable_styling(latex_options = "hold_position")
 ```
 
+```{r , echo = F, results='asis', warning=F}
+text <- str_replace_all(params$interpretation, "<br/>", "\n")
+cat(text)
+```
 
 ## Random effects
 
