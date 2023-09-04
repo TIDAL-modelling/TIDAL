@@ -292,6 +292,7 @@ server <- function(input, output, session) {
                                              dfPlot = modelPlotServer$df.plot,
                                              traj = selectDataServer$traj,
                                              age = selectDataServer$age,
+                                             covars = selectDataServer$covars,
                                              timePoint = selectDataServer$timePoint,
                                              modelType = selectDataServer$modelType)
 

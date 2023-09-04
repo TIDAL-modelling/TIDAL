@@ -24,6 +24,7 @@ modelCondServer <- function(id,
                             dfPlot,
                             traj,
                             age,
+                            covars,
                             timePoint,
                             modelType) {
 
@@ -360,29 +361,95 @@ modelCondServer <- function(id,
       interpretation <- eventReactive(fit(), {
         req(modelDataEdit())
 
-        if(input$varType == "cat"){
+        # Intercept:
+        intercept <- round(modelStatsFixed()$estimate[1], 2)
 
-          if(modelType() == "Linear"){
-            paste0('')
-          } else if(modelType() == "Quadratic"){
-            paste0('')
-          } else if(modelType() == "Cubic"){
-            paste0('')
-          } else if(modelType() == "Quartic"){
-            paste0('')
-          }
+        # Age variable name:
+        ageVar <- age()
 
-        }else if(input$varType == "cont"){
-          if(modelType() == "Linear"){
-            paste0('')
-          } else if(modelType() == "Quadratic"){
-            paste0('')
-          } else if(modelType() == "Cubic"){
-            paste0('')
-          } else if(modelType() == "Quartic"){
-            paste0('')
-          }
+        # # y-axis name:
+        trajVar <- traj()
+
+        # Mean age:
+        ageMeanVal <- modelDataEdit() %>%
+          pull(age_original) %>%
+          mean(na.rm = T) %>%
+          round(2)
+
+        # Slope:
+        slope <- round(modelStatsFixed()$estimate[2], 2)
+
+        if(modelType() %in% c("Quadratic", "Cubic", "Quartic") ){
+          slope2 <- round(modelStatsFixed()$estimate[3], 2)
+          direction2 <- ifelse(slope2 >= 0 , "an increase", "a decrease")
         }
+        if(modelType() %in% c("Cubic", "Quartic")){
+          slope3 <- round(modelStatsFixed()$estimate[4], 2)
+          direction3 <- ifelse(slope3 >= 0 , "an increase", "a decrease")
+        }
+        if(modelType() == "Quartic"){
+          slope4 <- round(modelStatsFixed()$estimate[5], 2)
+          direction4 <- ifelse(slope4 >= 0 , "an increase", "a decrease")
+        }
+
+
+        # Direction
+        direction <- ifelse(slope >= 0 , "an increase", "a decrease")
+
+        # Confounders:
+        confounders <- paste0(covars(), collapse = ", ")
+
+        # Confounder level names and estimates
+        if(length(covars()) > 0){
+          i <- which(str_detect(modelStatsFixed()$term, paste0(covars(), collapse = "|")))
+          confounderLevels <- paste0(modelStatsFixed()$term[i] , collapse = ", ")
+          confounderEst <- paste0(round(modelStatsFixed()$estimate[i],2) , collapse = ", ")
+        }
+
+        if (input$varType == "cat") {
+          lowestLevel <- paste0(input$condition, as.character(levels(pull(modelDataEdit(), !!sym(input$condition))))[1])
+
+          # Common message
+          commonMessage <- paste0(
+            'The interaction variable you have chosen has been factorised with the lowest level "', lowestLevel, '" being the reference or baseline category. ',
+            'For "', lowestLevel, '", the score at the intercept is ', intercept, '. The intercept here has been shifted to the mean age of all the assessments which is ', ageMeanVal, '. ',
+            'You could interpret this as the score at the intercept for "', lowestLevel, '" at ', ageMeanVal, ' is ', intercept, '. <br/><br/> ',
+            'For "', lowestLevel, '", every unit increase in ', ageVar, ' is associated with ', direction, ' of ', trajVar, ' by ', slope, '. <br/><br/> '
+          )
+
+          # Model-specific messages
+          modelMessages <- list(
+            "Linear" = paste0('To estimate the effect of different trajectories, you can add the intercept and ', ageVar, ' estimates to the corresponding interactions and ', ageVar, ':interactions to get group specific trajectories.'),
+          "Quadratic" = 'Some text to add here specific to the quadratic model.',
+            "Quadratic" = 'Some text to add here specific to the quadratic model.',
+            "Cubic" = 'Some text to add here specific to the cubic model.',
+            "Quartic" = 'Some text to add here specific to the quartic model.'
+          )
+
+        } else if (input$varType == "cont") {
+          commonMessage <- paste0(
+            'The interaction variable you have chosen has been standardised to have a mean of 0 and a standard deviation of 1. ',
+            'The intercept and ', ageVar, ' estimates are when the interaction has been set to 0. ',
+            'You could interpret this as the score at the intercept is ', intercept, '. ',
+            'The intercept here has been shifted to the mean age of all the assessments, which is ', ageMeanVal, '. ',
+            'You could interpret this as the score at the intercept (when your interaction is set to 0) at ', ageMeanVal, ' is ', intercept, '.<br/><br/> ',
+            'Every unit increase in ', ageVar, ' is associated with ', direction, ' of ', trajVar, ' by ', slope, '.<br/><br/> '
+          )
+
+          modelMessages <- list(
+            "Linear" = 'To estimate the effect of your interaction on the trajectory, you can add the intercept and ', ageVar, ' estimates to the corresponding interactions and ', ageVar, ':interactions to get group specific trajectories.',
+            "Quadratic" = 'Some text to add here specific to the quadratic model.',
+            "Cubic" = 'Some text to add here specific to the cubic model.',
+            "Quartic" = 'Some text to add here specific to the quartic model.'
+          )
+        }
+
+        # Determine the model-specific message
+        modelSpecificMessage <- modelMessages[[modelType()]]
+
+        finalMessage <- paste0(commonMessage, modelSpecificMessage, '<br/><br/>', ifelse(length(covars()) > 0, paste0('These estimates are adjusted for the following confounders/covariates: ', confounders, '.<br/><br/>', 'In addition, the following confounders/covariates: ', confounderLevels, ' are associated with an increase or decrease of ', trajVar, ' by ', confounderEst, ' respectively.<br/><br/>'), ''), 'Further information on how to interpret these results can be found on the TIDAL GitHub training videos section. Please also see the "Plot" tab for visualisation of these results.<br/><br/>')
+
+
       })
 
       output$modelIntFixed <- renderText({
