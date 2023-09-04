@@ -1,0 +1,60 @@
+---
+title: "Instructions for TIDAL"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. It helps guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people.
+
+# Installation and useage
+
+## Locally
+
+Please install the R package and launch the Shiny app locally if you want to upload sensitive data. If using R Studio it's recommended to restart your R session before installing.
+
+```
+# install.packages("remotes")
+remotes::install_github("TIDAL-modelling/TIDAL")
+# Note if prompted to update packages you can select option 3/None.
+# Updating all packages (option 1) might take a while to run.
+library("TIDAL")
+# Launch the R Shiny app
+launchTIDAL()
+# To get documentation for launchTIDAL()
+?launchTIDAL
+```
+
+## Online
+https://tidal.shinyapps.io/tidalapp/
+
+To use this tool online please do not upload any sensitive data. Only use the synthetic datasets, described below.
+
+# Synthetic datasets
+
+A synthetic dataset is available called "emot_reg_emot_simulated.csv" this is also embedded within the app. Details about this synthetic dataset can be found on GitHub [here](https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/data_README.md).
+
+# Interacting with the app
+
+## Overview page
+
+The first page of the app looks like this:
+
+<insert screenshot here>
+
+Please read through this all this information before preceding with the following pages.
+
+## Data Preparation page
+
+## Data Exploration page
+
+## Interaction Variable page
+
+## Individual Trajectories page
+
+
+
