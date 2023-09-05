@@ -36,6 +36,6 @@ To save the dataset click on the link below (right click to open in new tab) and
     * When er_total_t2 is between 7 to 10 er_t2_bin is 1
   * **er_bin**
     * 0 = No emotional regulation (ER) problems at er_t1_bin & No ER problems at er_t2_bin
-    * 1 = Yes ER problems at er_t1_bin & No ER problems at er_t2_bin
-    * 2 = No ER problems at er_t1_bin & Yes ER problems at er_t2_bin 
+    * 1 = No ER problems at er_t1_bin & Yes ER problems at er_t2_bin
+    * 2 = Yes ER problems at er_t1_bin & No ER problems at er_t2_bin 
     * 3 = Yes ER problems at er_t1_bin & Yes ER problems at er_t2_bin
