@@ -1,0 +1,160 @@
+---
+title: "Instructions for TIDAL"
+output:
+  pdf_document:
+    fig_caption: no      
+    fig_crop: no  
+    includes:  
+      in_header: preamble.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+getwd()
+```
+
+# Introduction
+
+The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. It helps guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people.
+
+# Installation and useage
+
+## Locally
+
+Please install the R package and launch the Shiny app locally if you want to upload sensitive data. If using R Studio it's recommended to restart your R session before installing.
+
+```
+# install.packages("remotes")
+remotes::install_github("TIDAL-modelling/TIDAL")
+# Note if prompted to update packages you can select option 3/None.
+# Updating all packages (option 1) might take a while to run.
+library("TIDAL")
+# Launch the R Shiny app
+launchTIDAL()
+# To get documentation for launchTIDAL()
+?launchTIDAL
+```
+
+## Online
+https://tidal.shinyapps.io/tidalapp/
+
+To use this tool online please do not upload any sensitive data. Only use the synthetic datasets, described below.
+
+# Synthetic datasets
+
+A synthetic dataset is available called "emot_reg_emot_simulated.csv" this is also embedded within the app. Details about this synthetic dataset can be found on GitHub in the `/data` subfolder [here](https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/data_README.md).
+
+# Interacting with the app
+
+## Overview page
+
+When you launch the app the first page of the app looks like this:
+
+![overview](Instructions_figures/Overview.png)
+
+
+Please read through this all this information before preceding with the following pages.
+
+## Data Preparation page
+
+* Click on the Data Preparation tab. This page is for converting data from a wide format into a long format, which is typically needed for longitudinal analysis. If you already have data in long format then proceed to Data Exploration. However, if you have wide format data or would like to explore the synthetic dataset we have provided embedded with in the app then please continue below.
+
+* Firstly, please read the instrcutions in the Instructions tab on this page. Either upload your own data (in .csv or .tsv format) or click on "Use demo synthetic data". 
+
+* In this demo we will use the synthetic data.
+
+![DataPrep1](Instructions_figures/Data_Prep1.png)
+
+* Select columns for age at each time point. In the synthetic data sets we have 5 time points called "age_t1", "age_t2", "age_t3", "age_t4" and "age_t5". This is the age of the individual at each time point/assessment. Select these columns from the drop down menu as shown in the figure below.
+
+* Then select columns for the questionnaire responses at each time point. In the synthetic data sets we have responses at 5 time points for the Strengths and Difficulties Questionnaire (SDQ). These 5 time points are called "sdq_t1", "sdq_t2", "sdq_t3", "sdq_t4", "sdq_t5". Select these columns from the drop down menu as shown in the figure below.
+
+* There are the options to change the column names for age, time point and the new column made for the variable to model trajectories on. 
+
+* There is also the option to impute missing age with the mean age.
+
+* Click on the Output tab to view a preview of the long format dataset, as shown in the figure below. Any warning messages will also be displayed in this Output tab.
+
+* A download button will appear when you have the option to download this data as a .csv in long format. Otherwise you can continue to the next page.
+
+
+![DataPrep2](Instructions_figures/Data_Prep2.png)
+
+## Data Exploration page
+
+* Click on Data Exploration tab and read the Instructions. Then click on the Output tab.
+
+
+![DataEx1](Instructions_figures/Data_Ex1.png)
+* Either upload a long format dataset (which you saved as a .csv from the previous page) or select "Data formatted on the previous page" on the drop down menu.
+
+* In this example we will use the "Data formatted on the previous page"
+
+![DataEx2](Instructions_figures/Data_Ex2.png)
+
+* Select the correct columns from your dataset for "Participant ID", "Variable to model trajectory on", "Variable for age at time point", "Model Type" - either Linear, Quadratic, Cubic or Quartic and "random slope terms". There's also the option to convert age from months to years, add covariates or include survey weights. When you have selected these choiced click "Run Model".
+
+* The Descriptive Statistics tab below shows some summary statistics about your data and a plot.
+
+![DataEx3](Instructions_figures/Data_Ex3.png)
+
+* Model Results tab returns the the code that was run, the fixed and random effects and some text for interpreting those results.
+
+![DataEx4](Instructions_figures/Data_Ex4.png)
+
+* The Plot tab shows the model trajectory plotted with the option of overlaying the plot of descriptive data.
+
+![DataEx5](Instructions_figures/Data_Ex5.png)
+
+* The Scores At Ages tab allows you to explore the trajectory in more ways. By showing the calculated estimates of the quesionnaire score for a given age. Click on the check boxes to select which ages you want to calculate scores for.
+
+![DataEx6](Instructions_figures/Data_Ex6.png)
+
+* The Area Under Curve (AUC) tab allows you to look at the proportion of time spent with that trait you are modelling. There is a slider bar to select which ages you want to calculate AUC for and the calculated estimates of this is displayed in a table below the plot.
+
+![DataEx7](Instructions_figures/Data_Ex7.png)
+
+* Finally, you can click on Download Results if you wish to download a pdf report of this. Note that you may have to have LaTeX installed if running this locally.
+
+![DataEx8](Instructions_figures/Data_Ex8.png)
+
+## Interaction Variable page
+
+* When you have your base model and have completed the Data Exploration you can click on the Interaction Variable tab. Using the model made on the previous page explore some variables which may influence the trajectory. Select from a list of variables (ie. column names) of the dataset to explore the trajectory by. If you have included variables as covariates in the previous page a warning message will occur if you try and explore the trajectory further by this variable.
+
+* In the example below we will walk through exploring a Categorical variable to split by, but the same approach can be applied with a Continuous variable.
+
+![IntVar1](Instructions_figures/Int_Var1.png)
+
+* When you have selected a variable click Run Model and view the results in the Output tab. Similar to the Data Exploration page there are tabs to interact with in the same way including: Plot, Scores At Age, Area Under Curve and Download Results, as seen in the figures below.
+
+
+![IntVar2](Instructions_figures/Int_Var2.png)
+
+![IntVar3](Instructions_figures/Int_Var3.png)
+
+![IntVar4](Instructions_figures/Int_Var4.png)
+
+![IntVar5](Instructions_figures/Int_Var5.png)
+
+## Individual Trajectories page
+
+* Using the model specified in the Data Exploration page, we can have a look at individuals trajectories. Please click on the Analysis tab to look at this.
+
+
+![IndTraj1](Instructions_figures/Ind_Traj1.png)
+
+* From the drop down option box you can either look at a Random Sample of individuals and select the number of random individuals from the slider.
+
+![IndTraj2](Instructions_figures/Ind_Traj2.png)
+
+* Or you can select a specific set of individuals if you know their IDs. This will be a value in the column you specified as the Participant ID.
+
+![IndTraj3](Instructions_figures/Ind_Traj3.png)
+
+* Or you can look at A Specific Variable and choose a variable of interest and the level from that variable.
+
+![IndTraj4](Instructions_figures/Ind_Traj4.png)
+
+
+
