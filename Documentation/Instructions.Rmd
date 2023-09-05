@@ -52,18 +52,22 @@ When you launch the app the first page of the app looks like this:
 
 ![overview](Instructions_figures/Overview.png)
 
+
 Please read through this all this information before preceding with the following pages.
 
 ## Data Preparation page
 
 ![DataPrep1](Instructions_figures/Data_Prep1.png)
+
 ![DataPrep2](Instructions_figures/Data_Prep2.png)
 
 ## Data Exploration page
 
 ![DataEx1](Instructions_figures/Data_Ex1.png)
+
 ![DataEx2](Instructions_figures/Data_Ex2.png)
 ![DataEx3](Instructions_figures/Data_Ex3.png)
+
 ![DataEx4](Instructions_figures/Data_Ex4.png)
 
 ![DataEx5](Instructions_figures/Data_Ex5.png)
@@ -89,8 +93,11 @@ Please read through this all this information before preceding with the followin
 ## Individual Trajectories page
 
 ![IndTraj1](Instructions_figures/Ind_Traj1.png)
+
 ![IndTraj2](Instructions_figures/Ind_Traj2.png)
+
 ![IndTraj3](Instructions_figures/Ind_Traj3.png)
+
 ![IndTraj4](Instructions_figures/Ind_Traj4.png)
 
 
