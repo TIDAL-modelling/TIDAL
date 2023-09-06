@@ -114,7 +114,7 @@ Please read through this all this information before preceding with the followin
 
 ![DataEx7](Instructions_figures/Data_Ex7.png)
 
-* Finally, you can click on Download Results if you wish to download a pdf report of this. Note that you may have to have LaTeX installed if running this locally.
+* Finally, you can click on Download Results if you wish to download a pdf report of this. Note that you may have to have LaTeX installed if running this locally. An example of this .pdf report is found on GitHub at [https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/Data_Exploration.pdf](https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/Data_Exploration.pdf)
 
 ![DataEx8](Instructions_figures/Data_Ex8.png)
 
@@ -126,7 +126,7 @@ Please read through this all this information before preceding with the followin
 
 ![IntVar1](Instructions_figures/Int_Var1.png)
 
-* When you have selected a variable click Run Model and view the results in the Output tab. Similar to the Data Exploration page there are tabs to interact with in the same way including: Plot, Scores At Age, Area Under Curve and Download Results, as seen in the figures below.
+* When you have selected a variable click Run Model and view the results in the Output tab. Similar to the Data Exploration page there are tabs to interact with in the same way including: Plot, Scores At Age, Area Under Curve and Download Results, as seen in the figures below. An example of a download report is available on GitHub at [https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/Interaction_Variable.pdf](https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/Interaction_Variable.pdf).
 
 
 ![IntVar2](Instructions_figures/Int_Var2.png)
