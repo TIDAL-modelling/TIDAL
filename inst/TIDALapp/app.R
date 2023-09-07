@@ -83,11 +83,11 @@ welcome_page <- tabPanel(
     ),
     tags$div(
       HTML('<strong style="color:red">Please only use synthetic data if using the application online. Details of this data is available on the
-                        <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue" target="_blank">
+                        <a href="https://github.com/TIDAL-modelling/TIDAL#synthetic-datasets" style="color:blue" target="_blank">
                         TIDAL GitHub repository</a>
                         .</strong>')
     ),
-    p('To use this tool please read the "Instructions" tab on each page to guide you through the process. In brief the main aims of each page:'),
+    HTML('To use this tool please read the "Instructions" tab on each page to guide you through the process. There is also an instruction manual on the GitHub repository <a href="https://github.com/TIDAL-modelling/TIDAL/blob/main/Documentation/Instructions.pdf" style="color:blue" target="_blank">here</a>. In brief the main aims of each page:'),
     h4("Data Preparation"),
     p("This allows the user to upload a wide format of their longitudinal dataset. Select which columns measure time and the phenotype they want to model trajectories on. Converts the dataframe to long format. Allows the user to download the long format dataset."),
     h4("Data Exploration"),
@@ -125,7 +125,7 @@ overview_page <-   tabPanel(
                  h2("Initial data exploration"),
                  tags$div(
                    HTML('<strong style="color:red">Please only upload synthetic datasets available on the
-                        <a href="https://github.com/AmeliaES/TIDAL#synthetic-datasets" style="color:blue" target="_blank">
+                        <a href="https://github.com/TIDAL-modelling/TIDAL#synthetic-datasets" style="color:blue" target="_blank">
                         TIDAL GitHub repository</a>
                         if using the application online.</strong>')
                  ),
