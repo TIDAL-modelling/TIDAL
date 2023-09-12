@@ -34,10 +34,13 @@ https://tidal.shinyapps.io/tidalapp/
 To use this tool online please do not upload any sensitive data. Only use the [synthetic datasets](data/), described below.
 
 ## Synthetic datasets
-  * [Documentation and description of data](https://github.com/TIDAL-modelling/TIDAL/blob/main/data/README.md)
+  * [Documentation and description of simulated data](https://github.com/TIDAL-modelling/TIDAL/blob/main/data/README.md)
   * To save the dataset click on the link below (right click to open in new tab) and then click `File` -> `Save Page As...` and save as a .csv file.
        * [emot_reg_emot_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/emot_reg_emot_simulated.csv)
-
+       * [ad_use_dep_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/ad_use_dep_simulated.csv)
+       * [fp_anx_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/fp_anx_simulated.csv)
+       * [sleep_probs_mh_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/sleep_probs_mh_simulated.csv)
+       * [height_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/height_simulated.csv)
 
 ## Main Features
 
