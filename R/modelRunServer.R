@@ -48,8 +48,7 @@ modelRunServer <- function(id,
         }else if(weights() == TRUE){
           modelData() %>%
             mutate(age_original = as.numeric(!!sym(age())) ) %>%
-            mutate(!!sym(age()) := as.numeric(!!sym(age())) - mean( as.numeric(!!sym(age())), na.rm = T )) %>%
-            mutate(COPY_OF_WEIGHT_COLUMN_USED_IN_LMER = as.numeric(!!sym(weightCol())))
+            mutate(!!sym(age()) := as.numeric(!!sym(age())) - mean( as.numeric(!!sym(age())), na.rm = T ))
         }
       })
 
@@ -61,7 +60,7 @@ modelRunServer <- function(id,
         # Sometimes lmer doesn't run, eg. if there are too few time points and/or too much missing data
         # Run the mixed model
         if(weights() == FALSE){
-          fit <- try(lmer(formula = formCodeCovars(),
+          fit <- try(lmer(formula = as.formula(formCodeCovars()),
                           REML=F ,
                           data = newModelData(),
                           control=lmerControl(optimizer="bobyqa",
@@ -70,12 +69,12 @@ modelRunServer <- function(id,
         }else if(weights() == TRUE){
 
           fit <- try({
-            fit <- lmer(formula = formCodeCovars(),
+            fit <- lmer(formula = as.formula(formCodeCovars()),
                         REML=F ,
                         data = newModelData(),
                         control=lmerControl(optimizer="bobyqa",
                                             optCtrl=list(maxfun=2e5)),
-                        weights = COPY_OF_WEIGHT_COLUMN_USED_IN_LMER )
+                        weights = newModelData()[[weightCol()]] )
           },  silent = TRUE)
         }
         return(fit)
