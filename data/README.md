@@ -67,7 +67,7 @@ All datsets below have been simulated from their original data resources using t
     * Type: Categorical
 
 ### [fp_anx_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/fp_anx_simulated.csv)
-  * Pre-pandemic financial problems and subsequent measures of anxiety symptoms across COVID-19, measured by the Generalised Anxiety Disorder 7 scale (GAD-7),  across 5 time points between in early adulthood (ages 28 to 30).
+  * Pre-pandemic financial problems and subsequent measures of anxiety symptoms across COVID-19, measured by the Generalised Anxiety Disorder 7 scale (GAD-7),  across 5 time points in early adulthood (ages 28 to 30).
   * This dataset contains ~4100 people, based upon data from the [Avon Longitudinal Study of Parents and Children (ALSPAC)](https://https://www.bristol.ac.uk/alspac/) participants.
   * You could use this dataset to explore the impact of pre-pandemic financial problems on later anxiety trajectories across COVID-19. You could use the fin_probs variable `fin_probs` to see how trajectories differ, and even see how these trajectories might look after adjusting for by pre-pandemic levels of anxiety `anx_pp`. 
   * There is 1 finacial problems variable one could use to split trajectories by: 
@@ -93,7 +93,7 @@ All datsets below have been simulated from their original data resources using t
     * Type: Numeric
    
 ### [sleep_probs_mh_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/sleep_probs_mh_simulated.csv)
-  * Sleep problems in childhood and subsequent measures of depressive symptoms, measured by the Short Mood and Feelings Questionnaire (SMFQ), and the Strengths & Difficulties Questionnaires Emotional Subscale (SDQ-E) across 4 time points between in childhood and adolescence (ages 9 to 16).
+  * Sleep problems in childhood and subsequent measures of depressive symptoms, measured by the Short Mood and Feelings Questionnaire (SMFQ), and the Strengths & Difficulties Questionnaires Emotional Subscale (SDQ-E) across 4 time points in childhood and adolescence (ages 9 to 16).
   * This dataset contains ~8900 people, based upon data from the [Avon Longitudinal Study of Parents and Children (ALSPAC)](https://https://www.bristol.ac.uk/alspac/) participants.
   * You could use this dataset to examine the impact of childhood sleep problems on later mental health trajectories using either the MFQ or SDQ data as outcomes. For example you could see how MFQ trajectories differ by `sleep_bin` and even adjust for baseline SDQ scores `emot_t1` and vice versa.
   * There is 1 sleep problems variable one could use to split trajectories by: 
@@ -120,7 +120,7 @@ All datsets below have been simulated from their original data resources using t
     * Type: Categorical
    
 ### [sleep_probs_mh_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/sleep_probs_mh_simulated.csv)
-  * Sleep problems in childhood and subsequent measures of depressive symptoms, measured by the Short Mood and Feelings Questionnaire (SMFQ), and the Strengths & Difficulties Questionnaires Emotional Subscale (SDQ-E) across 4 time points between in childhood and adolescence (ages 9 to 16).
+  * Sleep problems in childhood and subsequent measures of depressive symptoms, measured by the Short Mood and Feelings Questionnaire (SMFQ), and the Strengths & Difficulties Questionnaires Emotional Subscale (SDQ-E) across 4 time points in childhood and adolescence (ages 9 to 16).
   * This dataset contains ~8900 people, based upon data from the [Avon Longitudinal Study of Parents and Children (ALSPAC)](https://https://www.bristol.ac.uk/alspac/) participants.
   * You could use this dataset to examine the impact of childhood sleep problems on later mental health trajectories using either the MFQ or SDQ data as outcomes. For example you could see how MFQ trajectories differ by `sleep_bin` and even adjust for baseline SDQ scores `emot_t1` and vice versa.
   * There is 1 sleep problems variable one could use to split trajectories by: 
@@ -145,3 +145,56 @@ All datsets below have been simulated from their original data resources using t
   * **sleep_bin**
     * Sleep problems in childhood are coded as 1. No sleep problems in childhood are coded as 0. 
     * Type: Categorical
+    
+### [sleep_probs_mh_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/sleep_probs_mh_simulated.csv)
+  * Sleep problems in childhood and subsequent measures of depressive symptoms, measured by the Short Mood and Feelings Questionnaire (SMFQ), and the Strengths & Difficulties Questionnaires Emotional Subscale (SDQ-E) across 4 time points between childhood and adolescence (ages 9 to 16).
+  * This dataset contains ~8900 people, based upon data from the [Avon Longitudinal Study of Parents and Children (ALSPAC)](https://https://www.bristol.ac.uk/alspac/) participants.
+  * You could use this dataset to examine the impact of childhood sleep problems on later mental health trajectories using either the MFQ or SDQ data as outcomes. For example you could see how MFQ trajectories differ by `sleep_bin` and even adjust for baseline SDQ scores `emot_t1` and vice versa.
+  * There is 1 sleep problems variable one could use to split trajectories by: 
+     *  `sleep_bin`
+  * Alternatively, there are two mental health variables one could use to split trajectories by: 
+     *  `mfq_t1` if looking at SDQ trajetcories
+     *  `emot` if looking at SMFQ trajetcories
+
+#### Variables as columns:
+  * **Subject**
+     * ID of simulated participant. 
+     * Type: Character 
+  * **mfq_t1, mfq_t2, mfq_t3, mfq_t4**
+     * Short Mood and Feelings Questionnaire (SMFQ) scores from 0 to 26 at 4 time points. 
+     * Type: Numeric
+  * **emot_t1, emot_t2, emot_t3, emot_t4**
+     * Strengths & Difficulties Questionnaires Emotional Subscale (SDQ-E) scores from 0 to 10 at 4 time points. 
+     * Type: Numeric
+  * **age_t1, age_t2, age_t3, age_t4**
+     * Age at corresponding time points for the SMFQ/SDQ variable (years)
+     * Type: Numeric
+  * **sleep_bin**
+    * Sleep problems in childhood are coded as 1. No sleep problems in childhood are coded as 0. 
+    * Type: Categorical
+
+### [height_simulated.csv](https://raw.githubusercontent.com/TIDAL-modelling/TIDAL/main/data/height_simulated.csv)
+  * Sex and genetic differences in height trajetcories, measured across 8 time points across childhood and adolescence (ages 7 to 18).
+  * This dataset contains ~15000 people, based upon data from the [Avon Longitudinal Study of Parents and Children (ALSPAC)](https://https://www.bristol.ac.uk/alspac/) participants.
+  * You could use this dataset to examine sex differences in height trajetcories using the `female` for sex. Alternatively, you could explore how higher or lower polygenic risk score for height `hei_k_5e08_std` are associated with different height trajectories, adjusting for sex `female`.
+  * There is 1 sex variable one could use to split trajectories by: 
+     *  `female`
+  * Alternatively, there is one geneic risk variable one could use to split trajectories by: 
+     *  `hei_k_5e08_std`
+
+#### Variables as columns:
+  * **Subject**
+     * ID of simulated participant. 
+     * Type: Character 
+  * **height_t1, height_t2, height_t3, height_t4, height_t5, height_t6, height_t7, height_t8**
+     * Height at each occasions (measured in cm)
+     * Type: Numeric
+  * **age_t1, age_t2, age_t3, age_t4, age_t5, age_t6, age_t7, age_t8**
+     * Age at corresponding time points for the height variable (years)
+     * Type: Numeric
+  * **Female**
+    * female is coded as 1. Male is coded as 0. 
+    * Type: Categorical
+  * **hei_k_5e08_std**
+    * Polylgenic risk score for height where higher scores = greater genetic liability to height and lower scores = lower genetic liability for height. 
+    * Type: Numeric
