@@ -40,6 +40,7 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                        textOutput(ns("warningCov")),
                        htmlOutput(ns("form")),
                        br(),
+                       htmlOutput(ns("warning")),
                        textOutput(ns("zScore")),
                        h4("Fixed Effects"),
                        withSpinner(tableOutput(ns("modelStatsFixed")), proxy.height = "100px"),

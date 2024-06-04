@@ -69,6 +69,7 @@ modelCondServer <- function(id,
         }
       })
 
+
       # ---------------------------------------
       # z-scale continuous variable
       # either factorise or make numeric the input$condition depending on the input$varType option
@@ -139,6 +140,66 @@ modelCondServer <- function(id,
         }
         return(fit)
       })
+
+      # ---------------------------------------
+      # add code chunk for formula
+      warningMsg <- eventReactive(input$button, {
+        if(class(fit()) != "try-error"){
+
+          if(modelType() == "Linear"){
+            formula = paste0(formCodeCovars(),
+                                         "+ ", input$condition,
+                                         " + ", age(), "*", input$condition
+            )
+          } else if(modelType() == "Quadratic"){
+            formula = paste0(formCodeCovars(),
+                                         "+ ", input$condition,
+                                         " + ", age(), "*", input$condition,
+                                         " + I(", age(), "^2)*", input$condition
+            )
+          } else if(modelType() == "Cubic"){
+            formula = paste0(formCodeCovars(),
+                                         "+ ", input$condition,
+                                         " + ", age(), "*", input$condition,
+                                         " + I(", age(), "^2)*", input$condition,
+                                         " + I(", age(), "^3)*", input$condition
+            )
+          } else if(modelType() == "Quartic"){
+            formula = paste0(formCodeCovars(),
+                                         "+ ", input$condition,
+                                         " + ", age(), "*", input$condition,
+                                         " + I(", age(), "^2)*", input$condition,
+                                         " + I(", age(), "^3)*", input$condition,
+                                         " + I(", age(), "^4)*", input$condition
+            )
+          }
+
+          paste0('
+            The following <a href="https://cran.r-project.org/web/packages/lme4/lme4.pdf" style="color:blue" target="_blank">lme4</a> function is used to run the model:
+            </br>
+            <pre>
+            <code>',
+                   paste0('lmer(formula = ',formula,',
+                 REML = FALSE ,
+                 data = newModelData,
+                 control = lmerControl(optimizer="bobyqa",
+                                      optCtrl=list(maxfun=2e5)))'),
+                 '</code>
+            </pre>
+            Please see more infomation about the &quot;bobyqa&quot; optimiser <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>. The use of alternative optimisers is not currently supported.
+            </br>
+            The argument <code>REML = FALSE</code> indicates the model was fitted by maximum likelihood.
+            Please note the lme4 weights argument is not yet an option on this page.')
+        }else{
+          "The model doesn't run. This could be because there is too much missing data or too few time points."
+        }
+      })
+
+      # Warning text
+      output$warning <- renderText({
+        warningMsg()
+      })
+
 
       # ---------------------------------------
       # Add columns to the data frame
