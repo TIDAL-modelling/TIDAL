@@ -294,7 +294,8 @@ server <- function(input, output, session) {
                                              age = selectDataServer$age,
                                              covars = selectDataServer$covars,
                                              timePoint = selectDataServer$timePoint,
-                                             modelType = selectDataServer$modelType)
+                                             modelType = selectDataServer$modelType,
+                                             randomFX = selectDataServer$randomFX)
 
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",
                                                subject = selectDataServer$ID,

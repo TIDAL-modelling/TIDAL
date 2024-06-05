@@ -26,7 +26,8 @@ modelCondServer <- function(id,
                             age,
                             covars,
                             timePoint,
-                            modelType) {
+                            modelType,
+                            randomFX) {
 
   moduleServer(
     id,
@@ -423,7 +424,7 @@ modelCondServer <- function(id,
         req(modelDataEdit())
 
         # Intercept:
-        intercept <- round(modelStatsFixed()$estimate[1], 2)
+        intercept <- round(modelStatsFixed()$estimate[1], 3)
 
         # Age variable name:
         ageVar <- age()
@@ -438,18 +439,18 @@ modelCondServer <- function(id,
           round(2)
 
         # Slope:
-        slope <- round(modelStatsFixed()$estimate[2], 2)
+        slope <- round(modelStatsFixed()$estimate[2], 3)
 
         if(modelType() %in% c("Quadratic", "Cubic", "Quartic") ){
-          slope2 <- round(modelStatsFixed()$estimate[3], 2)
+          slope2 <- round(modelStatsFixed()$estimate[3], 3)
           direction2 <- ifelse(slope2 >= 0 , "an increase", "a decrease")
         }
         if(modelType() %in% c("Cubic", "Quartic")){
-          slope3 <- round(modelStatsFixed()$estimate[4], 2)
+          slope3 <- round(modelStatsFixed()$estimate[4], 3)
           direction3 <- ifelse(slope3 >= 0 , "an increase", "a decrease")
         }
         if(modelType() == "Quartic"){
-          slope4 <- round(modelStatsFixed()$estimate[5], 2)
+          slope4 <- round(modelStatsFixed()$estimate[5], 3)
           direction4 <- ifelse(slope4 >= 0 , "an increase", "a decrease")
         }
 
@@ -475,16 +476,19 @@ modelCondServer <- function(id,
             'The interaction variable you have chosen has been factorised with the lowest level "', lowestLevel, '" being the reference or baseline category. ',
             'For "', lowestLevel, '", the score at the intercept is ', intercept, '. The intercept here has been shifted to the mean age of all the assessments which is ', ageMeanVal, '. ',
             'You could interpret this as the score at the intercept for "', lowestLevel, '" at ', ageMeanVal, ' is ', intercept, '. <br/><br/> ',
-            'For "', lowestLevel, '", every unit increase in ', ageVar, ' is associated with ', direction, ' of ', trajVar, ' by ', slope, '. <br/><br/> '
+            'For "', lowestLevel, '", every unit increase in ', ageVar, ' is associated with ', direction, ' of ', trajVar, ' by ', abs(slope), '. <br/><br/> '
           )
 
           # Model-specific messages
           modelMessages <- list(
             "Linear" = paste0('To estimate the effect of different trajectories, you can add the intercept and ', ageVar, ' estimates to the corresponding interactions and ', ageVar, ':interactions to get group specific trajectories.'),
-          "Quadratic" = 'Some text to add here specific to the quadratic model.',
-            "Quadratic" = 'Some text to add here specific to the quadratic model.',
-            "Cubic" = 'Some text to add here specific to the cubic model.',
-            "Quartic" = 'Some text to add here specific to the quartic model.'
+
+            "Quadratic" = paste0(''),
+
+            "Cubic" = paste0(''),
+
+            "Quartic" = paste0('')
+
           )
 
         } else if (input$varType == "cont") {
@@ -494,14 +498,18 @@ modelCondServer <- function(id,
             'You could interpret this as the score at the intercept is ', intercept, '. ',
             'The intercept here has been shifted to the mean age of all the assessments, which is ', ageMeanVal, '. ',
             'You could interpret this as the score at the intercept (when your interaction is set to 0) at ', ageMeanVal, ' is ', intercept, '.<br/><br/> ',
-            'Every unit increase in ', ageVar, ' is associated with ', direction, ' of ', trajVar, ' by ', slope, '.<br/><br/> '
+            'Every unit increase in ', ageVar, ' is associated with ', direction, ' of ', trajVar, ' by ', abs(slope), '.<br/><br/> '
           )
 
           modelMessages <- list(
             "Linear" = 'To estimate the effect of your interaction on the trajectory, you can add the intercept and ', ageVar, ' estimates to the corresponding interactions and ', ageVar, ':interactions to get group specific trajectories.',
-            "Quadratic" = 'Some text to add here specific to the quadratic model.',
-            "Cubic" = 'Some text to add here specific to the cubic model.',
-            "Quartic" = 'Some text to add here specific to the quartic model.'
+
+            "Quadratic" = paste0(''),
+
+            "Cubic" = paste0(''),
+
+            "Quartic" = paste0('')
+
           )
         }
 
@@ -533,6 +541,71 @@ modelCondServer <- function(id,
       output$modelStatsRandom <- renderTable({
         modelStatsRandom()
         }, digits = 3)
+
+      # ------------------------------------------
+      # Interpretation of random effects
+      interpretationRand <- eventReactive(fit(), {
+        req(modelData())
+
+        # age/time
+        ageName <- age()
+
+        # Intercept variance
+        intVar <- modelStatsRandom()[1,4]
+
+        # Covariance between intercept and age/time covariance
+        intAgeVar <- modelStatsRandom()[2,4]
+
+        if(modelType() ==  "Linear"){
+          # age/time variance
+          ageVar <- modelStatsRandom()[3,4]
+
+          # residual variance
+          resVar <- modelStatsRandom()[nrow(modelStatsRandom()),4]
+
+          # Text:
+          if(randomFX() == "No random slope"){
+            paste0(
+              'The intercept variance (how much variability there is between individuals for their intercepts) for your model is ', intVar ,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }else if(randomFX() == "Linear"){
+            paste0(
+              'The intercept variance (how much variability there is between individuals for their intercepts) for your model is ', intVar ,'. The covariance between the intercept and ', ageName ,' is ', intAgeVar ,'. The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }
+        }else if (modelType() %in%  c("Quadratic", "Cubic", "Quartic")){
+          # age/time variance
+          intAgeVar2 <- modelStatsRandom()[3,4]
+
+          # age/time variance
+          ageVar <- modelStatsRandom()[4,4]
+
+          # age/time covariance
+          ageAge2CoVar <- modelStatsRandom()[5,4]
+
+          # age/time ^2 variance
+          age2Var <- modelStatsRandom()[6,4]
+
+          # residual variance
+          resVar <- modelStatsRandom()[nrow(modelStatsRandom()),4]
+
+          if(randomFX() == "No random slope"){
+            paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }else if(randomFX() == "Linear"){
+            # age/time variance
+            ageVar <- modelStatsRandom()[3,4]
+            paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'. The covariance between the intercept and ',ageName,' is ',intAgeVar,'.<br/><br/>The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }else if(randomFX() == "Linear and Quadratic"){
+            # age/time variance
+            ageVar <- modelStatsRandom()[4,4]
+            paste0('The intercept variance how much variability there is between individuals for their intercepts) for your model is ', intVar,'. The covariance between the intercept and ',ageName,' is ',intAgeVar,'. The covariance between the intercept and ',ageName,'^2 is ',intAgeVar2,'.<br/><br/>The ',ageName,' variance (how much variability there is between individuals for their ',ageName,') is ',ageVar,'. The covariance between ',ageName,' and ',ageName,'^2 is ',ageAge2CoVar,'. The ',ageName,'^2 variance (how much variability there is between individuals for their ',ageName,'^2) is ',age2Var,'.<br/><br/>The residual variance (how much variability there is within individuals) from your model is ',resVar,'.<br/><br/>')
+          }
+        }
+      })
+
+      output$interRandom  <- renderText({
+        if(!inherits(fit(), "try-error")){
+          interpretationRand()
+        }
+      })
 
       # ---------------------------------------
       # Paste the model formula for the user to see (don't want it to appear straight away - could improve this)

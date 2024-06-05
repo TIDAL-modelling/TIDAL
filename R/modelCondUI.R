@@ -46,7 +46,8 @@ modelCondUI <- function(id, label = "Model Condition Run") {
                        withSpinner(tableOutput(ns("modelStatsFixed")), proxy.height = "100px"),
                        withSpinner(tableOutput(ns("modelIntFixed")), proxy.height = "100px"),
                        h4("Random Effects"),
-                       withSpinner(tableOutput(ns("modelStatsRandom")), proxy.height = "100px")
+                       withSpinner(tableOutput(ns("modelStatsRandom")), proxy.height = "100px"),
+                       withSpinner(htmlOutput(ns("interRandom")), proxy.height = "100px")
                      )
             ),
             tabPanel("Plot",

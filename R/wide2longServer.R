@@ -71,7 +71,7 @@ wide2longServer <- function(id) {
         tagList(
           selectInput(ns("subjectCol"), "Select column for participant ID:", choices = vars()),
           selectInput(ns("ageCols"), "Select columns for age at each time point:", choices = vars(), multiple = TRUE),
-          selectInput(ns("depCols"), "Select columns for the variable to model trajectories\non at each time point eg. depression scores:", choices = vars(), multiple = TRUE),
+          selectInput(ns("depCols"), "Select columns for the variable to model trajectories\non at each time point eg. depression scores/height/income:", choices = vars(), multiple = TRUE),
           textInput(ns("age"), "Name of new column for age:", value = "age"),
           textInput(ns("time_point"), "Name of new column for time point:", value = "time_point"),
           textInput(ns("dep"), "Name of new column for variable to model trajectories on:", value = "score"),
