@@ -474,21 +474,10 @@ modelCondServer <- function(id,
           # Common message
           commonMessage <- paste0(
             'The interaction variable you have chosen has been factorised with the lowest level "', lowestLevel, '" being the reference or baseline category. ',
-            'For "', lowestLevel, '", the score at the intercept is ', intercept, '. The intercept here has been shifted to the mean age of all the assessments which is ', ageMeanVal, '. ',
+            'For the level "', lowestLevel, '", the score at the intercept is ', intercept, '. The intercept here has been shifted to the mean age of all the assessments which is ', ageMeanVal, '. ',
             'You could interpret this as the score at the intercept for "', lowestLevel, '" at ', ageMeanVal, ' is ', intercept, '. <br/><br/> ',
-            'For "', lowestLevel, '", every unit increase in ', ageVar, ' is associated with ', direction, ' of ', trajVar, ' by ', abs(slope), '. <br/><br/> '
-          )
-
-          # Model-specific messages
-          modelMessages <- list(
-            "Linear" = paste0('To estimate the effect of different trajectories, you can add the intercept and ', ageVar, ' estimates to the corresponding interactions and ', ageVar, ':interactions to get group specific trajectories.'),
-
-            "Quadratic" = paste0(''),
-
-            "Cubic" = paste0(''),
-
-            "Quartic" = paste0('')
-
+            '',
+            'For the level "', lowestLevel, '", every unit increase in ', ageVar, ' is associated with ', direction, ' of "', trajVar, '" by ', abs(slope), '. <br/><br/> '
           )
 
         } else if (input$varType == "cont") {
@@ -498,25 +487,24 @@ modelCondServer <- function(id,
             'You could interpret this as the score at the intercept is ', intercept, '. ',
             'The intercept here has been shifted to the mean age of all the assessments, which is ', ageMeanVal, '. ',
             'You could interpret this as the score at the intercept (when your interaction is set to 0) at ', ageMeanVal, ' is ', intercept, '.<br/><br/> ',
-            'Every unit increase in ', ageVar, ' is associated with ', direction, ' of ', trajVar, ' by ', abs(slope), '.<br/><br/> '
+            'Every unit increase in ', ageVar, ' is associated with ', direction, ' of "', trajVar, '" by ', abs(slope), '.<br/><br/> '
           )
 
-          modelMessages <- list(
-            "Linear" = 'To estimate the effect of your interaction on the trajectory, you can add the intercept and ', ageVar, ' estimates to the corresponding interactions and ', ageVar, ':interactions to get group specific trajectories.',
-
-            "Quadratic" = paste0(''),
-
-            "Cubic" = paste0(''),
-
-            "Quartic" = paste0('')
-
-          )
         }
 
         # Determine the model-specific message
-        modelSpecificMessage <- modelMessages[[modelType()]]
+        if(modelType() ==  "Linear")
+          modelSpecificMessage <-  paste0('To estimate the effect of different trajectory groups, you can add the intercept and ', ageVar, ' estimates to the corresponding interactions and ', ageVar, ':interactions to get group specific trajectories.')
 
-        finalMessage <- paste0(commonMessage, modelSpecificMessage, '<br/><br/>', ifelse(length(covars()) > 0, paste0('These estimates are adjusted for the following confounders/covariates: ', confounders, '.<br/><br/>', 'In addition, the following confounders/covariates: ', confounderLevels, ' are associated with an increase or decrease of ', trajVar, ' by ', confounderEst, ' respectively.<br/><br/>'), ''), 'Further information on how to interpret these results can be found on the TIDAL GitHub training videos section. Please also see the "Plot" tab for visualisation of these results.<br/><br/>')
+        else if(modelType() ==  "Quadratic"){
+          modelSpecificMessage <- paste0('As you have specified a quadratic model, every unit increase in ', ageVar ,'^2 is also associated with ', direction2 ,' of ', trajVar,' by ',abs(slope2),'. To estimate the effect of different trajectory groups, you can add the intercept, ', ageVar, ' and ', ageVar ,'^2 estimates to the corresponding interactions, ', ageVar, ':interactions and ',ageVar, '^2:interactions to get group specific trajectories.<br/> However, it can be difficult to interpret these estimates in isolation, so we would recommend exploring your trajectories with the "Plot" and "Scores At Ages" tabs for more information.')
+        }else if(modelType() ==  "Cubic"){
+          modelSpecificMessage <- paste0('As you have specified a cubic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', abs(slope2) ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',abs(slope3),'. To estimate the effect of different trajectory groups, you can add the intercept, ', ageVar, ', ', ageVar ,'^2 and ', ageVar ,'^3 estimates to the corresponding interactions, ', ageVar, ':interactions, ',ageVar, '^2:interactions and ',ageVar, '^3:interactions to get group specific trajectories.<br/>However, it can be difficult to interpret these estimates in isolation, so we would recommend exploring your trajectories with the "Plot" and "Scores At Ages" tabs for more information.')
+        }else if (modelType() ==  "Quartic"){
+          modelSpecificMessage <-  paste0('As you have specified a quartic model, every unit increase in ',ageVar,'^2 is also associated with ', direction2 ,' of ', trajVar ,' by ', abs(slope2) ,'. Furthermore, every unit increase in ',ageVar,'^3 is also associated with ', direction3 ,' of ', trajVar,' by ',abs(slope3),' and every unit increase in ',ageVar,'^4 is associated with ', direction4 ,' in ',trajVar,' by ',abs(slope4), '. To estimate the effect of different trajectory groups, you can add the intercept, ', ageVar, ', ', ageVar ,'^2, ', ageVar ,'^3 and ', ageVar ,'^4 estimates to the corresponding interactions, ', ageVar, ':interactions, ',ageVar, '^2:interactions, ',ageVar, '^3:interactions and ',ageVar, '^4:interactions to get group specific trajectories.<br/> However, it can be difficult to interpret these estimates in isolation, so we would recommend exploring your trajectories with the "Plot" and "Scores At Ages" tabs for more information.')
+        }
+
+        finalMessage <- paste0(commonMessage, modelSpecificMessage, '<br/><br/>An example of interpreting multiple grouped trajectories is given on the TIDAL GitHub training section (in the Examples folder). Further information on how to interpret these results can be found on the TIDAL GitHub training videos section. Please also see the "Plot" tab for visualisation of these results. <br/><br/>', ifelse(length(covars()) > 0, paste0('These estimates are adjusted for the following confounders/covariates: ', confounders, '.<br/><br/>', 'In addition, the following confounders/covariates: ', confounderLevels, ' are associated with an increase or decrease of ', trajVar, ' by ', confounderEst, ' respectively.<br/><br/>'), ''), '<br/><br/>')
 
 
       })

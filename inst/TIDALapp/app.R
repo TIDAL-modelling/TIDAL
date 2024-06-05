@@ -5,7 +5,7 @@ library(ggplot2)
 library(bslib)
 
 # Increase maximum file size that can be uploaded
-options(shiny.maxRequestSize = 100*1024^2)
+options(shiny.maxRequestSize = 400*1024^2)
 
 # Set default ggplot colour palette to colourblind-friendly Okabe Ito (2008)
 options(ggplot2.discrete.colour= c("#E69F00","#56B4E9","#009E73","#F5C710",

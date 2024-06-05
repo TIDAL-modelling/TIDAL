@@ -16,7 +16,7 @@ modelRunUI <- function(id, label = "Model") {
 
   tagList(
     htmlOutput(ns("covChoiceWarning")),
-    p("Descriptive statistics of your variable of interest, eg. depression, for each time point."),
+    p("Descriptive statistics of your variable of interest, eg. depression scores/height/income, for each time point."),
     tableOutput(ns("desc")),
     p('Plot the mean scores of your variable of interest by the time/age variable.
        Have a look to see what type of model you think best fits your data. Use the "Plot" tab to overlay the model on top.'),
