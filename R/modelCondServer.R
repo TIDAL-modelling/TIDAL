@@ -1703,6 +1703,40 @@ modelCondServer <- function(id,
         statement <- paste0("The difference between the two factor levels (for the age ranges ", input$AUCages[1], " - ", input$AUCages[2] ,") is ", dif ,".")
 
         return(statement)
+        }else if(input$varType == "cont"){
+          levelNames <- paste0(input$condition) %>%
+            str_remove_all("I|\\(|\\^|\\)|\\:")
+
+          coef <- summary(fit())$coefficients
+
+          ageOrig <- modelDataEdit() %>%
+            pull(age_original)
+          ageOrig <- ageOrig[!is.na(ageOrig)]
+          age1 <- input$AUCages[1] - mean(ageOrig)
+          age2 <- input$AUCages[2] - mean(ageOrig)
+
+          rowNames <- rownames(coef) %>%
+            str_remove_all("I|\\(|\\^|\\)|\\:")
+
+          levelNames1 <- rowNames[str_detect(rowNames, paste0(levelNames, collapse = "|"))]
+
+          if(modelType() == "Linear"){
+            res <- deltaMethod(fit(), c( paste0(" (( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2)   + ( (",levelNames1[1],")*(",age2,") ) + ((",levelNames1[2],")*(",age2,")^2/2) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2)   + ( (",levelNames1[1],")*(",age1,") ) + ((",levelNames1[2],")*(",age1,")^2/2) ))  - ( ( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2)   - ( (",levelNames1[1],")*(",age2,") ) - ((",levelNames1[2],")*(",age2,")^2/2) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2)   - ( (",levelNames1[1],")*(",age1,") ) - ((",levelNames1[2],")*(",age1,")^2/2) ) ) ") ) ,parameterNames = rowNames)
+          }else if(modelType() == "Quadratic"){
+            res <- deltaMethod(fit(), c( paste0(" (( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2)  + ((",rowNames[3],")*(",age2,")^3/3)   + ( (",levelNames1[1],")*(",age2,") ) + ((",levelNames1[2],")*(",age2,")^2/2) + ((",levelNames1[3],")*(",age2,")^3/3) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3)  + ( (",levelNames1[1],")*(",age1,") ) + ((",levelNames1[2],")*(",age1,")^2/2) + ((",levelNames1[3],")*(",age1,")^3/3) )) -  (( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2)  + ((",rowNames[3],")*(",age2,")^3/3)   - ( (",levelNames1[1],")*(",age2,") ) - ((",levelNames1[2],")*(",age2,")^2/2) - ((",levelNames1[3],")*(",age2,")^3/3) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3)  - ( (",levelNames1[1],")*(",age1,") ) - ((",levelNames1[2],")*(",age1,")^2/2) - ((",levelNames1[3],")*(",age1,")^3/3) )) ") ) ,parameterNames = rowNames)
+
+          }else if(modelType() == "Cubic"){
+            res <- deltaMethod(fit(), c( paste0(" (( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2)  + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4)   + ( (",levelNames1[1],")*(",age2,") ) + ((",levelNames1[2],")*(",age2,")^2/2) + ((",levelNames1[3],")*(",age2,")^3/3) + ((",levelNames1[4],")*(",age2,")^4/4) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3)  + ((",rowNames[4],")*(",age1,")^4/4)  + ( (",levelNames1[1],")*(",age1,") ) + ((",levelNames1[2],")*(",age1,")^2/2) + ((",levelNames1[3],")*(",age1,")^3/3) + ((",levelNames1[4],")*(",age1,")^4/4) )) - (( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2)  + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4) - ( (",levelNames1[1],")*(",age2,") ) - ((",levelNames1[2],")*(",age2,")^2/2) - ((",levelNames1[3],")*(",age2,")^3/3) - ((",levelNames1[4],")*(",age2,")^4/4) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3)  + ((",rowNames[4],")*(",age1,")^4/4)  - ( (",levelNames1[1],")*(",age1,") ) - ((",levelNames1[2],")*(",age1,")^2/2) - ((",levelNames1[3],")*(",age1,")^3/3) - ((",levelNames1[4],")*(",age1,")^4/4) )) ") ) ,parameterNames = rowNames)
+
+          }else if(modelType() == "Quartic"){
+
+            res <- deltaMethod(fit(), c( paste0(" (( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2)  + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4) + ((",rowNames[5],")*(",age2,")^5/5)   + ( (",levelNames1[1],")*(",age2,") ) + ((",levelNames1[2],")*(",age2,")^2/2) + ((",levelNames1[3],")*(",age2,")^3/3) + ((",levelNames1[4],")*(",age2,")^4/4)  + ((",levelNames1[5],")*(",age2,")^5/5) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3)  + ((",rowNames[4],")*(",age1,")^4/4) + ((",rowNames[5],")*(",age1,")^5/5)  + ( (",levelNames1[1],")*(",age1,") ) + ((",levelNames1[2],")*(",age1,")^2/2) + ((",levelNames1[3],")*(",age1,")^3/3) + ((",levelNames1[4],")*(",age1,")^4/4) + ((",levelNames1[5],")*(",age1,")^5/5) )) - (( ((",age2,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age2,")^2/2)  + ((",rowNames[3],")*(",age2,")^3/3) + ((",rowNames[4],")*(",age2,")^4/4) + ((",rowNames[5],")*(",age2,")^5/5)   - ( (",levelNames1[1],")*(",age2,") ) - ((",levelNames1[2],")*(",age2,")^2/2) - ((",levelNames1[3],")*(",age2,")^3/3) - ((",levelNames1[4],")*(",age2,")^4/4)  - ((",levelNames1[5],")*(",age2,")^5/5) ) - ( ((",age1,")*(",rowNames[1],")) + ((",rowNames[2],")*(",age1,")^2/2) + ((",rowNames[3],")*(",age1,")^3/3)  + ((",rowNames[4],")*(",age1,")^4/4) + ((",rowNames[5],")*(",age1,")^5/5)  -( (",levelNames1[1],")*(",age1,") ) - ((",levelNames1[2],")*(",age1,")^2/2) - ((",levelNames1[3],")*(",age1,")^3/3) - ((",levelNames1[4],")*(",age1,")^4/4) - ((",levelNames1[5],")*(",age1,")^5/5) )) ") ) ,parameterNames = rowNames)
+
+          }
+
+          dif <- paste0( round(res$Estimate, 2), " 95% CI: (", round(res$`2.5 %`,2), " - ", round(res$`97.5 %`,2), ")")
+          statement <- paste0("The difference between the +1 SD and -1 SD (for the age ranges ", input$AUCages[1], " - ", input$AUCages[2] ,") is ", dif ,".")
+          return(statement)
         }else{
           return(paste0(NA))
         }
@@ -1710,7 +1744,7 @@ modelCondServer <- function(id,
       })
 
       output$AUCdifText <- renderText({
-        if(input$varType == "cat" & length(input$levelsAUC == 2)){
+        if(input$varType == "cat" & length(input$levelsAUC == 2) | input$varType == "cont"){
         difference()
         }else{
         " "
