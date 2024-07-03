@@ -1566,6 +1566,7 @@ modelCondServer <- function(id,
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = plus, color = "+ 1 SD" ) , na.rm=T)+
             geom_line(data = modelDataEdit(), aes(x= age_original ,  y = minus, color = "- 1 SD" ) , na.rm=T)+
             coord_cartesian(xlim = c(input$AUCages[1], input$AUCages[2])) +
+            labs(color = "") +
             theme(legend.text = element_text(color = "black")) +
             ylab(paste0("Score (", traj(), ")")) +
             xlab("Age") +

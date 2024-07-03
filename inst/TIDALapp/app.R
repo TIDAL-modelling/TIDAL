@@ -74,12 +74,12 @@ welcome_page <- tabPanel(
     theme = bs_theme(version = version_default(), bootswatch = "cerulean"),
     HTML('<center><img src="TIDAL.png" width="550"></center>'),
     h1("Tool to Implement Developmental Analyses of Longitudinal Data"),
-    p("The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture clinically meaningful features from mental health trajectories for specific individuals and/or specific groups of people."),
+    p("The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. The following pages guide trajectory modelling and capture meaningful features from trajectories for specific individuals and/or specific groups of people."),
     p("These features will include:"),
     tags$ul(
-      tags$li("How mental health is changing over specific periods of time."),
-      tags$li("When mental health is improving or worsening at the fastest rate (points of acceleration)."),
-      tags$li("How variable mental health responses are over time within individuals (stability).")
+      tags$li("How traits change over specific periods of time."),
+      tags$li("When traits are improving or worsening at the fastest rate (points of acceleration)."),
+      tags$li("How variable traits are over time within individuals (stability).")
     ),
     tags$div(
       HTML('<strong style="color:red">Please only use synthetic data if using the application online. Details of this data is available on the
