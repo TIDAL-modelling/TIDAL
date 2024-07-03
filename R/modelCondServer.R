@@ -1235,6 +1235,57 @@ modelCondServer <- function(id,
             return(res)
           })
           return(statements)
+        }else if(input$varType == "cont"){
+          # Calculate difference in scores between +1 SD and -1SD
+          ageOrig <- modelDataEdit() %>% pull(age_original)
+          ageOrig <- ageOrig[!is.na(ageOrig)]
+
+          statements <- lapply(as.numeric(input$ageInputScore), function(x){
+            ageInput <- round(x - mean(ageOrig), 3)
+            ageInput2 <- ageInput^2
+            ageInput3 <- ageInput^3
+            ageInput4 <- ageInput^4
+
+            coef <- summary(fit())$coefficients
+
+            rowIndex <- which(str_detect(string = row.names(coef),
+                                         pattern = input$condition) &
+                                str_detect(string = row.names(coef),
+                                           pattern = ":", negate = T))
+
+            rowNames <- rownames(coef) %>%
+              str_remove_all("I|\\(|\\^|\\)|\\:")
+
+            levelNames <- paste0(input$condition) %>%
+              str_remove_all("I|\\(|\\^|\\)|\\:")
+
+            levelNames1 <- rowNames[str_detect(rowNames, paste0(levelNames, collapse = "|"))]
+
+          if(modelType() == "Linear"){
+            res <- deltaMethod(fit(), c(paste0(
+              "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, ") -
+    (",  rowNames[1], " + ", rowNames[2], "*", ageInput, " - ", levelNames1[1], " - ", levelNames1[2], "*", ageInput  , ")"
+            )), parameterNames = rowNames )
+          }else if(modelType() == "Quadratic"){
+            res <- deltaMethod(fit(), c(paste0(
+              "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, " + ", levelNames1[3], "*", ageInput2,  ") - (", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " - ", levelNames1[1], " - ", levelNames1[2], "*", ageInput, " - ", levelNames1[3], "*", ageInput2,  ")"
+            )), parameterNames = rowNames )
+
+          }else if(modelType() == "Cubic"){
+            res <- deltaMethod(fit(), c(paste0(
+              "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, " + ", levelNames1[3], "*", ageInput2, " + ", levelNames1[4], "*", ageInput3,  ") -  (", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " - ", levelNames1[1], " - ", levelNames1[2], "*", ageInput, " - ", levelNames1[3], "*", ageInput2, " - ", levelNames1[4], "*", ageInput3,  ")"
+            )), parameterNames = rowNames )
+
+          }else if(modelType() == "Quartic"){
+            res <- deltaMethod(fit(), c(paste0(
+              "(", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", rowNames[5], "*", ageInput4, " + ", levelNames1[1], " + ", levelNames1[2], "*", ageInput, " + ", levelNames1[3], "*", ageInput2, " + ", levelNames1[4], "*", ageInput3, " + ", levelNames1[5], "*", ageInput4,  ") - (", rowNames[1], " + ", rowNames[2], "*", ageInput, " + ", rowNames[3], "*", ageInput2, " + ", rowNames[4], "*", ageInput3, " + ", rowNames[5], "*", ageInput4, " - ", levelNames1[1], " - ", levelNames1[2], "*", ageInput, " - ", levelNames1[3], "*", ageInput2, " - ", levelNames1[4], "*", ageInput3, " - ", levelNames1[5], "*", ageInput4,   ")"
+            )), parameterNames = rowNames )
+          }
+          dif <- paste0( round(res$Estimate, 3), " (", round(res$`2.5 %`,3), " - ", round(res$`97.5 %`,3), ")")
+          res <- data.frame(age = dif)
+          return(res)
+          }) # end of lapply for creating statements
+          return(statements)
         }else{
           return(NULL)
         }
@@ -1246,13 +1297,18 @@ modelCondServer <- function(id,
         colnames(difTab) <- input$ageInputScore
         rownames(difTab) <- paste0("Difference between ",input$levelsScores[1]," and ", input$levelsScores[2]," (95% CI)")
         difTab
+        }else if(input$varType == "cont"){
+          difTab <- do.call(cbind, differenceScores())
+          colnames(difTab) <- input$ageInputScore
+          rownames(difTab) <- paste0("Difference between +1 SD and  -1 SD (95% CI)")
+          difTab
         }else{
           data.frame(NA)
         }
       })
 
       output$scoresDif <- renderTable({
-        if(input$varType == "cat" & length(input$levelsScores == 2)){
+        if(input$varType == "cat" & length(input$levelsScores == 2) | input$varType == "cont"){
         difTab()
         }
       }, rownames = TRUE)
