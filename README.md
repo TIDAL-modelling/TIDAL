@@ -8,7 +8,7 @@ TIDAL is an R Shiny application for data wrangling, analysing, visualising and i
 
 Please go to [https://tidal-modelling.github.io/](https://tidal-modelling.github.io/) for documentation on TIDAL.
 
-## How to use TIDAL
+## Quick start
 
 **TIDAL is available to use in different formats:**
 * [an online apllication](https://tidal-modelling.github.io/docs/installation/Online) accessed at [https://tidal.shinyapps.io/tidalapp/](https://tidal.shinyapps.io/tidalapp/)
