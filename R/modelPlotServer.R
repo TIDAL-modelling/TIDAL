@@ -8,6 +8,7 @@
 #' @importFrom stats IQR confint deviance fitted median pnorm qnorm sd
 #' @import utils
 #' @importFrom multcomp glht
+#' @importFrom car deltaMethod
 #'
 #' @keywords internal
 #' @name modelPlotServer
@@ -82,43 +83,40 @@ modelPlotServer <- function(id,
           # --------------------
           # Change for model type
           if(modelType() == "Linear"){
-            res <- multcomp::glht(modelFit(), linfct = c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput, " == 0")) )
+            res <- deltaMethod(modelFit(), c( paste0(rowNames[1], " + ", rowNames[2], "*", ageInput)) )
           }else if(modelType() == "Quadratic"){
 
 
-            res <- glht(modelFit(), linfct = c( paste0(rowNames[1], " + ",
+            res <- deltaMethod(modelFit(), c( paste0(rowNames[1], " + ",
                                                        rowNames[2], "*", ageInput," + \`",
-                                                       rowNames[3], "\`*", ageInput2,
-                                                       " == 0")) )
+                                                       rowNames[3], "\`*", ageInput2)) )
           } else if(modelType() == "Cubic"){
 
 
-            res <- glht(modelFit(), linfct = c( paste0(rowNames[1], " + ",
+            res <- deltaMethod(modelFit(), c( paste0(rowNames[1], " + ",
                                                        rowNames[2], "*", ageInput," + \`",
                                                        rowNames[3], "\`*", ageInput2,  " + \`",
-                                                       rowNames[4], "\`*", ageInput3,
-                                                       " == 0") ) )
+                                                       rowNames[4], "\`*", ageInput3) ) )
 
           } else if(modelType() == "Quartic"){
 
 
-            res <- glht(modelFit(), linfct = c( paste0(rowNames[1], " + ",
+            res <- deltaMethod(modelFit(), c( paste0(rowNames[1], " + ",
                                                        rowNames[2], "*", ageInput," + \`",
                                                        rowNames[3], "\`*", ageInput2,  " + \`",
                                                        rowNames[4], "\`*", ageInput3,  " + \`",
-                                                       rowNames[5], "\`*", ageInput4,
-                                                       " == 0") ))
+                                                       rowNames[5], "\`*", ageInput4) ))
           }
 
           # --------------------
-          res <- tidy(confint(res))
-
           rowname <- paste0("Score (", traj(), ")")
 
-          res <-  res %>%
-            mutate(contrast = paste0(rowname, " (95% CIs)")) %>%
-            column_to_rownames(var = "contrast") %>%
+          res <- data.frame(estimate = res$Estimate,
+                            conf.low = res$`2.5 %`,
+                            conf.high = res$`97.5 %`) %>%
             mutate(across(where(is.numeric), round, 2))
+          rownames(res) <- paste0(rowname, " (95% CIs)")
+          res
 
           return( res )
         })
