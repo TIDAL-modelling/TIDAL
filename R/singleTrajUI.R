@@ -28,7 +28,9 @@ singleTrajUI <- function(id, label = "Model") {
     mainPanel(
       tagList(
         textOutput(ns("textIDs")),
-        withSpinner(plotOutput(ns("trajPlot")), proxy.height = "100px")
+        withSpinner(plotOutput(ns("trajPlot")), proxy.height = "100px"),
+        p("Original data:"),
+        withSpinner(plotOutput(ns("trajPlot_original")), proxy.height = "100px")
       )
     )
   )

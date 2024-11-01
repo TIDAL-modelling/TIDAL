@@ -178,6 +178,24 @@ singleTrajServer <- function(id,
           plot()
       })
 
+      # -----------------------------------------------
+      # Plot the individual trajectories of the original data:
+      plot_original <- reactive({
+        req(IDs())
+
+        ggplot() +
+          geom_line(data = modelDataEdit(), aes(x= age_original,  y = pred), na.rm=T) +
+          geom_line(data = filter(modelDataEdit(), !!sym(subject()) %in% IDs())  ,
+                    aes(x=age_original,  y = !!sym(traj()), color = as.factor(!!sym(subject()))), na.rm=T, linetype="dashed")+
+          ylab(paste0("Score (", traj(), ")")) +
+          xlab("Age") +
+          guides(color=guide_legend(title=" "))
+      })
+
+      output$trajPlot_original <-  renderPlot({
+        plot_original()
+      })
+
     }
   )
 }
