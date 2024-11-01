@@ -1366,7 +1366,7 @@ modelCondServer <- function(id,
           } else if(modelType() == "Quartic"){
             deltaMethod(fit(), c( paste0("(((", age2, ")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age2, ")^2/2) + ((", rowNames[3], ")*(", age2, ")^3/3) + ((", rowNames[4], ")*(", age2, ")^4/4) + ((", rowNames[5], ")*(", age2, ")^5/5)) - (((", age1,")*(", rowNames[1], ")) + ((", rowNames[2], ")*(", age1, ")^2/2) + ((", rowNames[3], ")*(", age1, ")^3/3) + ((", rowNames[4], ")*(", age1, ")^4/4) + ((", rowNames[5], ")*(", age1, ")^5/5))") ), parameterNames = rowNames )
           }
-        AUC <- paste0( round(AUC$Estimate, 2), " (", round(AUC$`2.5 %`,2), " - ", round(AUC$`97.5 %`,2), ")")
+        AUC <- paste0( abs(round(AUC$Estimate, 2)), " (", abs(round(AUC$`2.5 %`,2)), " - ", abs(round(AUC$`97.5 %`,2)), ")")
 
 
       rowIndex <- which(str_detect(string = row.names(summary(fit())$coefficients),
@@ -1443,7 +1443,7 @@ modelCondServer <- function(id,
                                , parameterNames = rowNames )
 
           }
-          AUC <- paste0( round(AUC$Estimate, 2), " (", round(AUC$`2.5 %`,2), " - ", round(AUC$`97.5 %`,2), ")")
+          AUC <- paste0( abs(round(AUC$Estimate, 2)), " (", abs(round(AUC$`2.5 %`,2)), " - ", abs(round(AUC$`97.5 %`,2)), ")")
         })
         return( list(AUC = AUC, AUCCovs = AUCCovs) )
 
@@ -1467,8 +1467,8 @@ modelCondServer <- function(id,
                                 ) )
                                 , parameterNames = rowNames )
 
-            c(paste0( round(plus$Estimate, 2), " (", round(plus$`2.5 %`,2), " - ", round(plus$`97.5 %`,2), ")"),
-              paste0( round(minus$Estimate, 2), " (", round(minus$`2.5 %`,2), " - ", round(minus$`97.5 %`,2), ")"))
+            c(paste0( abs(round(plus$Estimate, 2)), " (", abs(round(plus$`2.5 %`,2)), " - ", abs(round(plus$`97.5 %`,2)), ")"),
+              paste0( abs(round(minus$Estimate, 2)), " (", abs(round(minus$`2.5 %`,2)), " - ", abs(round(minus$`97.5 %`,2)), ")"))
 
           } else if(modelType() == "Quadratic"){
 
@@ -1486,8 +1486,8 @@ modelCondServer <- function(id,
                                  ) )
                                  , parameterNames = rowNames )
 
-            c(paste0( round(plus$Estimate, 2), " (", round(plus$`2.5 %`,2), " - ", round(plus$`97.5 %`,2), ")"),
-              paste0( round(minus$Estimate, 2), " (", round(minus$`2.5 %`,2), " - ", round(minus$`97.5 %`,2), ")"))
+            c(paste0( abs(round(plus$Estimate, 2)), " (", abs(round(plus$`2.5 %`,2)), " - ", abs(round(plus$`97.5 %`,2)), ")"),
+              paste0( abs(round(minus$Estimate, 2)), " (", abs(round(minus$`2.5 %`,2)), " - ", abs(round(minus$`97.5 %`,2)), ")"))
 
           } else if(modelType() == "Cubic"){
 
@@ -1505,8 +1505,8 @@ modelCondServer <- function(id,
                                  ) )
                                  , parameterNames = rowNames )
 
-            c(paste0( round(plus$Estimate, 2), " (", round(plus$`2.5 %`,2), " - ", round(plus$`97.5 %`,2), ")"),
-              paste0( round(minus$Estimate, 2), " (", round(minus$`2.5 %`,2), " - ", round(minus$`97.5 %`,2), ")"))
+            c(paste0( abs(round(plus$Estimate, 2)), " (", abs(round(plus$`2.5 %`,2)), " - ", abs(round(plus$`97.5 %`,2)), ")"),
+              paste0( abs(round(minus$Estimate, 2)), " (", abs(round(minus$`2.5 %`,2)), " - ", abs(round(minus$`97.5 %`,2)), ")"))
 
           } else if(modelType() == "Quartic"){
 
@@ -1524,8 +1524,8 @@ modelCondServer <- function(id,
                                  ) )
                                  , parameterNames = rowNames )
 
-            c(paste0( round(plus$Estimate, 2), " (", round(plus$`2.5 %`,2), " - ", round(plus$`97.5 %`,2), ")"),
-              paste0( round(minus$Estimate, 2), " (", round(minus$`2.5 %`,2), " - ", round(minus$`97.5 %`,2), ")"))
+            c(paste0( abs(round(plus$Estimate, 2)), " (", abs(round(plus$`2.5 %`,2)), " - ", abs(round(plus$`97.5 %`,2)), ")"),
+              paste0( abs(round(minus$Estimate, 2)), " (", abs(round(minus$`2.5 %`,2)), " - ", abs(round(minus$`97.5 %`,2)), ")"))
 
           }
         return(list(AUCCont = AUC, AUC_SD = AUC_SD))
@@ -1699,7 +1699,7 @@ modelCondServer <- function(id,
 
         }
         }
-        dif <- paste0( round(res$Estimate, 2), " 95% CI: (", round(res$`2.5 %`,2), " - ", round(res$`97.5 %`,2), ")")
+        dif <- paste0( abs(round(res$Estimate, 2)), " 95% CI: (", abs(round(res$`2.5 %`,2)), " - ", abs(round(res$`97.5 %`,2)), ")")
         statement <- paste0("The difference between the two factor levels (for the age ranges ", input$AUCages[1], " - ", input$AUCages[2] ,") is ", dif ,".")
 
         return(statement)
@@ -1734,7 +1734,7 @@ modelCondServer <- function(id,
 
           }
 
-          dif <- paste0( round(res$Estimate, 2), " 95% CI: (", round(res$`2.5 %`,2), " - ", round(res$`97.5 %`,2), ")")
+          dif <- paste0( abs(round(res$Estimate, 2)), " 95% CI: (", abs(round(res$`2.5 %`,2)), " - ", abs(round(res$`97.5 %`,2)), ")")
           statement <- paste0("The difference between the +1 SD and -1 SD (for the age ranges ", input$AUCages[1], " - ", input$AUCages[2] ,") is ", dif ,".")
           return(statement)
         }else{
