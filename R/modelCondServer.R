@@ -27,6 +27,7 @@ modelCondServer <- function(id,
                             covars,
                             timePoint,
                             modelType,
+                            REML_choice,
                             randomFX) {
 
   moduleServer(
@@ -105,7 +106,7 @@ modelCondServer <- function(id,
                                        "+ ", input$condition,
                                        " + ", age(), "*", input$condition
           ),
-          REML=F , data = modelDataScaled(),
+          REML=REML_choice() , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Quadratic"){
@@ -114,7 +115,7 @@ modelCondServer <- function(id,
                                        " + ", age(), "*", input$condition,
                                        " + I(", age(), "^2)*", input$condition
           ),
-          REML=F , data = modelDataScaled(),
+          REML=REML_choice() , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Cubic"){
@@ -124,7 +125,7 @@ modelCondServer <- function(id,
                                        " + I(", age(), "^2)*", input$condition,
                                        " + I(", age(), "^3)*", input$condition
           ),
-          REML=F , data = modelDataScaled(),
+          REML=REML_choice() , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         } else if(modelType() == "Quartic"){
@@ -135,7 +136,7 @@ modelCondServer <- function(id,
                                        " + I(", age(), "^3)*", input$condition,
                                        " + I(", age(), "^4)*", input$condition
           ),
-          REML=F , data = modelDataScaled(),
+          REML=REML_choice() , data = modelDataScaled(),
           control=lmerControl(optimizer="bobyqa",
                               optCtrl=list(maxfun=2e5)))
         }
@@ -181,7 +182,7 @@ modelCondServer <- function(id,
             <pre>
             <code>',
                    paste0('lmer(formula = ',formula,',
-                 REML = FALSE ,
+                 REML = ',REML_choice(),' ,
                  data = newModelData,
                  control = lmerControl(optimizer="bobyqa",
                                       optCtrl=list(maxfun=2e5)))'),
@@ -189,7 +190,7 @@ modelCondServer <- function(id,
             </pre>
             Please see more infomation about the &quot;bobyqa&quot; optimiser <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>. The use of alternative optimisers is not currently supported.
             </br>
-            The argument <code>REML = FALSE</code> indicates the model was fitted by maximum likelihood.
+            The argument <code>REML</code> is either: <code>FALSE</code>, indicating the model was fitted by maximum likelihood, or <code>TRUE</code> indicating the model was fitted using restricted maximum likelihood.
             Please note the lme4 weights argument is not yet an option on this page.')
         }else{
           "The model doesn't run. This could be because there is too much missing data or too few time points."

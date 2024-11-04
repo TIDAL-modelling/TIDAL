@@ -233,7 +233,8 @@ server <- function(input, output, session) {
                                            age = selectDataServer$age,
                                            timePoint = selectDataServer$timePoint,
                                            weights = selectDataServer$weights,
-                                           weightCol  = selectDataServer$weightCol)
+                                           weightCol  = selectDataServer$weightCol,
+                                           REML_choice = selectDataServer$REML_choice)
   modelResultsServer <- TIDAL:::modelResultsServer("modelResults",
                                                    modelFit = modelRunServer$fit,
                                                    warningMsg = modelRunServer$warning,
@@ -295,6 +296,7 @@ server <- function(input, output, session) {
                                              covars = selectDataServer$covars,
                                              timePoint = selectDataServer$timePoint,
                                              modelType = selectDataServer$modelType,
+                                             REML_choice = selectDataServer$REML_choice,
                                              randomFX = selectDataServer$randomFX)
 
   singleTrajServer <- TIDAL:::singleTrajServer("singeTraj",

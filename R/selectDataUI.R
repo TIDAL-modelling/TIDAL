@@ -19,6 +19,7 @@ selectDataUI <- function(id, label = "data") {
     uiOutput(ns("randomFX_UI")),
     uiOutput(ns("weights_UI")),
     uiOutput(ns("weightCol_UI")),
+    uiOutput(ns("REML_choice_UI")),
     uiOutput(ns("button_UI"))
   )
 }

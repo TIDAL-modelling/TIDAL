@@ -103,6 +103,19 @@ selectDataServer <- function(id, dataFormatted) {
         }
       })
 
+      output$REML_choice_UI <- renderUI({
+        req(data())
+        tagList(
+          tags$div(title = "Default estimation method is ML, but there is the choice to use REML instead.",
+                   radioButtons(ns("REML_choice"),
+                                 tags$span("Model estimation method:",
+                                           tipify(bsButton("pB2", "?", style = "info", size = "extra-small"),
+                                                  "")),
+                                 choices = c("ML" = FALSE, "REML" = TRUE),
+                                inline = TRUE ))
+        )
+      })
+
       output$button_UI <- renderUI({
         req(data())
         actionButton(ns("button"), "Run Model")
@@ -213,6 +226,7 @@ selectDataServer <- function(id, dataFormatted) {
           randomFX = reactive({ input$randomFX }),
           weights = reactive({ input$weights }),
           weightCol = reactive({ input$weightCol }),
+          REML_choice = reactive({ input$REML_choice }),
           covariateChoice = covariateChoice,
           covars = covars
         )

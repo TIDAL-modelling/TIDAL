@@ -20,7 +20,8 @@ modelRunServer <- function(id,
                            traj,
                            timePoint,
                            weights,
-                           weightCol
+                           weightCol,
+                           REML_choice
                            ) {
 
   moduleServer(
@@ -61,7 +62,7 @@ modelRunServer <- function(id,
         # Run the mixed model
         if(weights() == FALSE){
           fit <- try(lmer(formula = as.formula(formCodeCovars()),
-                          REML=F ,
+                          REML=REML_choice() ,
                           data = newModelData(),
                           control=lmerControl(optimizer="bobyqa",
                                               optCtrl=list(maxfun=2e5))),
@@ -70,7 +71,7 @@ modelRunServer <- function(id,
 
           fit <- try({
             fit <- lmer(formula = as.formula(formCodeCovars()),
-                        REML=F ,
+                        REML=REML_choice() ,
                         data = newModelData(),
                         control=lmerControl(optimizer="bobyqa",
                                             optCtrl=list(maxfun=2e5)),
@@ -92,13 +93,13 @@ modelRunServer <- function(id,
             <code>',
                    if(weights() == FALSE){
                      paste0('lmer(formula = ',formCodeCovars(),',
-                 REML = FALSE ,
+                 REML = ', REML_choice(), ' ,
                  data = newModelData,
                  control = lmerControl(optimizer="bobyqa",
                                       optCtrl=list(maxfun=2e5)))')
                    }else{
                      paste0('lmer(formula = ',formCodeCovars(),',
-                 REML = FALSE ,
+                 REML = ', REML_choice(), ' ,
                  data = newModelData,
                  control = lmerControl(optimizer="bobyqa",
                                       optCtrl=list(maxfun=2e5)),
@@ -108,7 +109,7 @@ modelRunServer <- function(id,
             </pre>
             Please see more infomation about the &quot;bobyqa&quot; optimiser <a href="https://cran.r-project.org/web/packages/lme4/vignettes/lmerperf.html" style="color:blue" target="_blank"> here</a>. The use of alternative optimisers is not currently supported.
             </br>
-            The argument <code>REML = FALSE</code> indicates the model was fitted by maximum likelihood.')
+            The argument <code>REML</code> is either: <code>FALSE</code>, indicating the model was fitted by maximum likelihood, or <code>TRUE</code> indicating the model was fitted using restricted maximum likelihood.')
           }else{
             "The model doesn't run. This could be because there is too much missing data or too few time points. Try changing the random slope term."
           }
