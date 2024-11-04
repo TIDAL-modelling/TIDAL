@@ -20,4 +20,7 @@ launchTIDAL()
 # Launch Shiny app with browser display
 launchTIDAL(display = "browser")
 }
+
+You can also manually open a browser and copy and paste the URL after "Listening on" into the address bar. Eg. for "Listening on http://127.0.0.1:4484" copy and paste "http://127.0.0.1:4484" into your browser, eg. in Chrome or Firefox. Even though you are using a browser the app is still running locally on your computer, the same as if the pop-out window was launched from RStudio.
+
 }
