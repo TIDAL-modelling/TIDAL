@@ -1,7 +1,7 @@
 Package: TIDAL
 Type: Package
 Title: Tool to Implement Developmental Analyses of Longitudinal Data
-Version: 0.1.0
+Version: 2.0.0
 Author: Amelia Edmondson-Stait
 Maintainer: Amelia Edmondson-Stait <TIDAL@ed.ac.uk>
 Description: The aim is for this digital tool to facilitate trajectories work and remove barriers to implementing longitudinal research to researchers without specialist statistical backgrounds. 
