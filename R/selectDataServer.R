@@ -106,7 +106,7 @@ selectDataServer <- function(id, dataFormatted) {
       output$REML_choice_UI <- renderUI({
         req(data())
         tagList(
-          tags$div(title = "Default estimation method is ML, but there is the choice to use REML instead.",
+          tags$div(title = "Default estimation method is ML. REML may be preferred in some instances (for small studies). See documentation website for more details.",
                    radioButtons(ns("REML_choice"),
                                  tags$span("Model estimation method:",
                                            tipify(bsButton("pB2", "?", style = "info", size = "extra-small"),
