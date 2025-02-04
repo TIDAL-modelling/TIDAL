@@ -65,6 +65,10 @@ selectDataServer <- function(id, dataFormatted) {
                       choices = names(data()) ,
                       selected = NULL,
                       multiple = TRUE),
+        # create temporary checkbox to mean center continuous covariates
+          checkboxInput(ns("meanCont"),
+                        "Mean center continuous covariates",
+                        value = FALSE),
           selectInput(ns("modelType"), "Model Type (fixed effects):", choices = c("Linear", "Quadratic", "Cubic", "Quartic"))
         )
       })
@@ -124,16 +128,39 @@ selectDataServer <- function(id, dataFormatted) {
 
       # edit dataframe so that categorical covariates are factorised and age column is converted to years if ticked
       dataEdit <- reactive({
-        if (isTRUE(input$toYears)) {
-          dataEdit <- data() %>%
-            mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) ) %>%
-            mutate_at(vars(input$age), ~./12) %>%
-            mutate_at(vars(all_of(input$covarsCat)), factor)
-        } else {
-          dataEdit <- data() %>%
-            mutate_at(vars(all_of(input$covarsCat)), factor) %>%
-            mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) )
+
+        if(isTRUE(input$meanCont)) {
+
+          if (isTRUE(input$toYears)) {
+            dataEdit <- data() %>%
+              mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) ) %>%
+              mutate(across(all_of(input$covarsCont), ~ as.numeric(.) - mean(as.numeric(.), na.rm = TRUE))) %>%
+              mutate_at(vars(input$age), ~./12) %>%
+              mutate_at(vars(all_of(input$covarsCat)), factor)
+          } else {
+            dataEdit <- data() %>%
+              mutate_at(vars(all_of(input$covarsCat)), factor) %>%
+              mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) ) %>%
+              mutate(across(all_of(input$covarsCont), ~ as.numeric(.) - mean(as.numeric(.), na.rm = TRUE)))
+          }
+
+        }else{
+
+          if (isTRUE(input$toYears)) {
+            dataEdit <- data() %>%
+              mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) ) %>%
+              mutate_at(vars(input$age), ~./12) %>%
+              mutate_at(vars(all_of(input$covarsCat)), factor)
+          } else {
+            dataEdit <- data() %>%
+              mutate_at(vars(all_of(input$covarsCat)), factor) %>%
+              mutate_at(vars(all_of(c(input$age, input$traj, input$covarsCont))), ~as.numeric(.) )
+          }
+
         }
+
+
+
       })
 
       covars <- reactive({
