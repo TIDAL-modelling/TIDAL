@@ -476,7 +476,7 @@ modelCondServer <- function(id,
           commonMessage <- paste0(
             'The interaction variable you have chosen has been factorised with the lowest level "', lowestLevel, '" being the reference or baseline category. ',
             'For the level "', lowestLevel, '", the score at the intercept is ', intercept, '. The intercept here has been shifted to the mean age of all the assessments which is ', ageMeanVal, '. ',
-            'You could interpret this as the score at the intercept for "', lowestLevel, '" at ', ageMeanVal, ' is ', intercept, '. <br/><br/> ',
+            'You could interpret this as the score at the intercept for "', lowestLevel, '" at ', ageMeanVal, ' is ', intercept, '.', ifelse(length(covars()) > 0, paste0(' Because you have adjusted for the following confounders/covariates: ', confounders, ',  this score reflects individuals with the lowest categorical covariate and/or the mean of continuous covariates.'),'' ), '<br/><br/> ',
             '',
             'For the level "', lowestLevel, '", every unit increase in ', ageVar, ' is associated with ', direction, ' of "', trajVar, '" by ', abs(slope), '. <br/><br/> '
           )
@@ -487,12 +487,13 @@ modelCondServer <- function(id,
             'The intercept and ', ageVar, ' estimates are when the interaction has been set to 0. ',
             'You could interpret this as the score at the intercept is ', intercept, '. ',
             'The intercept here has been shifted to the mean age of all the assessments, which is ', ageMeanVal, '. ',
-            'You could interpret this as the score at the intercept (when your interaction is set to 0) at ', ageMeanVal, ' is ', intercept, '.<br/><br/> ',
+            'You could interpret this as the score at the intercept (when your interaction is set to 0) at ', ageMeanVal, ' is ', intercept, '.', ifelse(length(covars()) > 0, paste0(' Because you have adjusted for the following confounders/covariates: ', confounders, ',  this score reflects individuals with the lowest categorical covariate and/or the mean of continuous covariates.'), ''), '<br/><br/> ',
             'Every unit increase in ', ageVar, ' is associated with ', direction, ' of "', trajVar, '" by ', abs(slope), '.<br/><br/> '
           )
 
         }
 
+        covarsMessage <- paste0(ifelse(length(covars()) > 0, paste0('In addition, the following confounders/covariates: ', confounderLevels, ' are associated with an increase or decrease of ', trajVar, ' by ', confounderEst, ' respectively.<br/><br/>'), ''), '')
 
         # Determine the model-specific message
         if (input$varType == "cat") {
@@ -521,7 +522,7 @@ modelCondServer <- function(id,
 
         }
 
-        finalMessage <- paste0(commonMessage, modelSpecificMessage, '<br/><br/>An example of interpreting multiple grouped trajectories is given on the TIDAL GitHub Documentation website: https://tidal-modelling.github.io/docs/example_code.html. Further information on how to interpret these results can be found on the TIDAL GitHub training videos section. Please also see the "Plot" tab for visualisation of these results. <br/><br/>', ifelse(length(covars()) > 0, paste0('These estimates are adjusted for the following confounders/covariates: ', confounders, '.<br/><br/>', 'In addition, the following confounders/covariates: ', confounderLevels, ' are associated with an increase or decrease of ', trajVar, ' by ', confounderEst, ' respectively.<br/><br/>'), ''), '<br/><br/>')
+        finalMessage <- paste0(commonMessage,  covarsMessage , modelSpecificMessage, '<br/><br/>An example of interpreting multiple grouped trajectories is given on the TIDAL GitHub Documentation website: https://tidal-modelling.github.io/docs/example_code.html. Further information on how to interpret these results can be found on the TIDAL GitHub training videos section. Please also see the "Plot" tab for visualisation of these results. <br/><br/>' )
 
 
       })
