@@ -31,7 +31,7 @@ datExAUCServer <- function(id,
     # ------------------------------------------
     # Overview of what AUC does text
     output$AUCoverview <- renderText({
-      paste0("The area under curve (AUC) represents the proportion of time with phenotype (", traj(), ").")
+      paste0('The area under the curve (AUC) represents the cumulative or total "exposure" to the outcome (', traj(), ') over the time period being measured.')
     })
 
     # ------------------------------------------
