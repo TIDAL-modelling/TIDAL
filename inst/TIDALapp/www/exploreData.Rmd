@@ -86,7 +86,7 @@ cat(paste0("$",latex_text, "$"))
 params$mainPlot
 ```
 
-`r params$modelType` `r params$formCode`. "Phenotype" on the y-axis is `r params$phenotype`. Note that any categorical covariates/confounders are set to level zero.
+`r params$modelType` `r params$formCode`. "Phenotype" on the y-axis is `r params$phenotype`. Note that in TIDAL continuous covariates are mean centered and categorical covariates are set to the lowest level by default.
 
 ### Fixed Effects
 
