@@ -131,7 +131,7 @@ overview_page <-   tabPanel(
                  ),
                  p("Either upload a long format dataframe (.csv or .tsv) or use the data frame you formatted on the previous page. If you are uploading a long format dataframe then columns must have unique names.
                    Then select the columns you wish to use as variables in your model. Inspect the descriptive statistics of your trajectory variable at each time point.
-                   Select the model type (eg. linear or a polynomial model) and view the plot of the mean trajectory against these models. You are also able to add covariates to the model which are plotted with any categorical covariates set to zero in the plot.")
+                   Select the model type (eg. linear or a polynomial model) and view the plot of the mean trajectory against these models. You are also able to add covariates to the model which are plotted with any continuous covariates mean centered and categorical covariates set to the lowest level by default.")
                )),
       tabPanel("Output",
                sidebarLayout(
@@ -258,7 +258,7 @@ server <- function(input, output, session) {
                                            modelFit = modelRunServer$fit,
                                            modelType = selectDataServer$modelType,
                                            traj = selectDataServer$traj
-                                           )
+  )
   datExAUCServer <- TIDAL:::datExAUCServer("datExAUC",
                                            modelDataEdit = modelPlotServer$modelDataEdit,
                                            modelFit = modelRunServer$fit,
@@ -268,23 +268,23 @@ server <- function(input, output, session) {
   )
 
   downloadExploreServer <- TIDAL:::downloadExploreServer("downloadExplore",
-                                             descTable = modelRunServer$mainTable,
-                                             warningMsg = modelRunServer$warning,
-                                             formCodeRender = modelResultsServer$modelFormRender,
-                                             statement = modelResultsServer$statement,
-                                             fixedTab = modelResultsServer$fixedTab,
-                                             interpretation = modelResultsServer$interpretation,
-                                             interpretationRand = modelResultsServer$interpretationRand,
-                                             randomTab = modelResultsServer$randomTab,
-                                             N = modelResultsServer$N,
-                                             mainPlot = modelPlotServer$mainPlot,
-                                             phenotype = selectDataServer$traj,
-                                             modelType = selectDataServer$modelType,
-                                             datExAltTable = datExAltServer$datExAltTable,
-                                             datExAltPlot = datExAltServer$datExAltPlot,
-                                             AUC = datExAUCServer$AUC,
-                                             plotAUC = datExAUCServer$plotAUC,
-                                             tableAUC = datExAUCServer$tableAUC
+                                                         descTable = modelRunServer$mainTable,
+                                                         warningMsg = modelRunServer$warning,
+                                                         formCodeRender = modelResultsServer$modelFormRender,
+                                                         statement = modelResultsServer$statement,
+                                                         fixedTab = modelResultsServer$fixedTab,
+                                                         interpretation = modelResultsServer$interpretation,
+                                                         interpretationRand = modelResultsServer$interpretationRand,
+                                                         randomTab = modelResultsServer$randomTab,
+                                                         N = modelResultsServer$N,
+                                                         mainPlot = modelPlotServer$mainPlot,
+                                                         phenotype = selectDataServer$traj,
+                                                         modelType = selectDataServer$modelType,
+                                                         datExAltTable = datExAltServer$datExAltTable,
+                                                         datExAltPlot = datExAltServer$datExAltPlot,
+                                                         AUC = datExAUCServer$AUC,
+                                                         plotAUC = datExAUCServer$plotAUC,
+                                                         tableAUC = datExAUCServer$tableAUC
 
   )
   modelCondServer <- TIDAL:::modelCondServer("modelCond",
@@ -314,17 +314,17 @@ server <- function(input, output, session) {
                                                    age = selectDataServer$age)
   observe(session$setCurrentTheme(
     if (input$Theme == "Dark Mode"){
-        dark
-      }else if(input$Theme == "High Contrast"){
-        contrast
-      }else if(input$Theme == "Large Font"){
-        large
-      }else if(input$Theme == "High Contrast & Large Font"){
-        largecontrast
-      }else{
-        light
-      }
-    ))
+      dark
+    }else if(input$Theme == "High Contrast"){
+      contrast
+    }else if(input$Theme == "Large Font"){
+      large
+    }else if(input$Theme == "High Contrast & Large Font"){
+      largecontrast
+    }else{
+      light
+    }
+  ))
 }
 
 # Run the application
