@@ -476,18 +476,19 @@ modelCondServer <- function(id,
           commonMessage <- paste0(
             'The interaction variable you have chosen has been factorised with the lowest level "', lowestLevel, '" being the reference or baseline category. ',
             'For the level "', lowestLevel, '", the score at the intercept is ', intercept, '. The intercept here has been shifted to the mean ', ageVar, ' of all the assessments which is ', ageMeanVal, '. ',
-            'You could interpret this as the score at ', ageVar, ' ' , ageMeanVal, ' is ', intercept, '. (Please note: this score at this age reflects individuals in the lowest category/level of the categorical interaction variable. ', paste0(ifelse(length(covars()) > 0, paste0('Because you have adjusted for the following confounders/covariates: ', confounderLevels, ' this score also reflects individuals with the lowest categorical covariate(s) and/or the mean of continuous covariate(s)).)'), ')')),
-            'For the level "', lowestLevel, '", every unit increase in ', ageVar, ' is associated with ', direction, ' of "', trajVar, '" by ', abs(slope), '. <br/><br/> '
+            'You could interpret this as the score at ', ageVar, ' ' , ageMeanVal, ' is ', intercept, '. (Please note: this score at this age reflects individuals in the lowest category/level of the categorical interaction variable.', paste0(ifelse(length(covars()) > 0, paste0(' Because you have adjusted for the following confounders/covariates: ', confounderLevels, ' this score also reflects individuals with the lowest categorical covariate(s) and/or the mean of the continuous covariate(s).)'), ')')),
+            '<br/><br/> For the level "', lowestLevel, '", every unit increase in ', ageVar, ' is associated with ', direction, ' of "', trajVar, '" by ', abs(slope), '. '
           )
 
         } else if (input$varType == "cont") {
           commonMessage <- paste0(
             'The interaction variable you have chosen has been standardised to have a mean of 0 and a standard deviation of 1. ',
             'The intercept and ', ageVar, ' estimates are when the interaction has been set to 0. ',
-            'You could interpret this as the score at ', ageVar, ' ' , ageMeanVal, ' is ', intercept, '. (Please note: this score at this age reflects individuals with the average score of the continuous interaction variable. ', paste0(ifelse(length(covars()) > 0, paste0('Because you have adjusted for the following confounders/covariates: ', confounderLevels, ' this score also reflects individuals with the lowest categorical covariate(s) and/or the mean of continuous covariate(s)).)'), ')')),
-            'The intercept here has been shifted to the mean age of all the assessments, which is ', ageMeanVal, '. ',
-            'You could interpret this as the score at the intercept (when your interaction is set to 0) at ', ageMeanVal, ' is ', intercept, '.<br/><br/> ',
-            'Every unit increase in ', ageVar, ' is associated with ', direction, ' of "', trajVar, '" by ', abs(slope), '.<br/><br/> '
+            'You could interpret this as the score at ', ageVar, ' ' , ageMeanVal, ' is ', intercept, '. (Please note: this score at this age reflects individuals with the average score of the continuous interaction variable.', paste0(ifelse(length(covars()) > 0, paste0(' Because you have adjusted for the following confounders/covariates: ', confounderLevels, ' this score also reflects individuals with the lowest categorical covariate(s) and/or the mean of the continuous covariate(s).)'), ')')),
+
+            '<br/><br/>The intercept here has been shifted to the mean age of all the assessments, which is ', ageMeanVal, '. ',
+            'You could interpret this as the score at the intercept (when your interaction is set to 0) at ', ageMeanVal, ' is ', intercept, '.',
+            'Every unit increase in ', ageVar, ' is associated with ', direction, ' of "', trajVar, '" by ', abs(slope), '.'
           )
 
         }
@@ -508,7 +509,7 @@ modelCondServer <- function(id,
         } else if (input$varType == "cont") {
 
           if(modelType() ==  "Linear")
-            modelSpecificMessage <-  paste0('It is possible to estimate the trajectory of the outcome (', trajVar, ') across ', ageVar, ' for different values of the continuous interaction variable (', input$condition, '). You can do this by adding the intercept and ', ageVar, ' estimates to the main effect estimates of the continuous interaction variable, and then the estimates for the ', ageVar, ':continuous variable interactions, which can be calculated for specific values of the continuous interaction variable. These calculated estimates will provide the trajectories for different levels of continuous interaction variable.<br><br>If you are interested in the effect of the interaction only, you can focus solely on the corresponding interaction and ', ageVar, ':continuous variable interaction estimates, as this captures how the relationship between ', ageVar, ' and the outcome variable changes with changes in the continuous interaction variable. <br><br>')
+            modelSpecificMessage <-  paste0('It is possible to estimate the trajectory of the outcome (', trajVar, ') across ', ageVar, ' for different values of the continuous interaction variable (', input$condition, '). You can do this by adding the intercept and ', ageVar, ' estimates to the main effect estimates of the continuous interaction variable, and then the estimates for the ', ageVar, ':continuous variable interactions, which can be calculated for specific values of the continuous interaction variable. These calculated estimates will provide the trajectories for different levels of continuous interaction variable.<br><br>If you are interested in the effect of the interaction only, you can focus solely on the corresponding interaction and ', ageVar, ':continuous variable interaction estimates, as this captures how the relationship between ', ageVar, ' and the outcome variable changes with changes in the continuous interaction variable.')
           else if(modelType() ==  "Quadratic"){
             modelSpecificMessage <- paste0('It is possible to estimate the trajectory of the outcome (', trajVar, ') across ', ageVar, ' for different values of the continuous interaction variable (', input$condition, '). As you have specified a quadratic model, every unit increase in ', ageVar ,'^2 is also associated with ', direction2 ,' of ', trajVar,' by ',abs(slope2),'. It is possible to estimate the effect of different trajectory groups by adding the intercept, ', ageVar, ' and ', ageVar ,'^2 estimates to the corresponding interaction, ', ageVar, ':interaction and ',ageVar, '^2:interaction to get group specific trajectories. If you are interested in the effect of the interaction only, then you can ignore the intercept, ', ageVar, ' and ', ageVar ,'^2 estimates and focus solely on the corresponding interactions, ', ageVar, ':interactions and ',ageVar, '^2:interactions estimates.<br/> However, it can be difficult to interpret these estimates in isolation, so we would recommend exploring your trajectories with the "Plot" and "Scores At Ages" tabs for more information.')
           }else if(modelType() ==  "Cubic"){
@@ -519,7 +520,7 @@ modelCondServer <- function(id,
 
         }
 
-        finalMessage <- paste0(commonMessage,  covarsMessage , modelSpecificMessage, '<br/><br/>An example of interpreting multiple grouped trajectories is given on the TIDAL GitHub Documentation website: https://tidal-modelling.github.io/docs/example_code.html. Further information on how to interpret these results can be found on the TIDAL GitHub training videos section. Please also see the "Plot" tab for visualisation of these results. <br/><br/>' )
+        finalMessage <- paste0(commonMessage,  modelSpecificMessage,'<br/><br/>', covarsMessage, 'An example of interpreting multiple grouped trajectories is given on the TIDAL GitHub Documentation website: https://tidal-modelling.github.io/docs/example_code.html. Further information on how to interpret these results can be found on the TIDAL GitHub training videos section. Please also see the "Plot" tab for visualisation of these results. <br/><br/>' )
 
 
       })
