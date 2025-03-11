@@ -486,7 +486,7 @@ modelCondServer <- function(id,
             'The intercept and ', ageVar, ' estimates are when the interaction has been set to 0.<br><br>',
 
             'The intercept here has been shifted to the mean ', ageVar, ' of all the assessments, which is ', ageMeanVal, '. ',
-            'You could interpret this as the score at the intercept (when your interaction is set to 0) at ', ageMeanVal, ' is ', intercept, '. (Please note: this score at this age reflects individuals with the average score of the continuous interaction variable that you have chosen.', paste0(ifelse(length(covars()) > 0, paste0(' <br><br>Because you have adjusted for the following confounders/covariates: ', confounderLevels, ' this score also reflects individuals with the lowest categorical covariate(s) and/or the mean of the continuous covariate(s).)'), ')')),
+            'You could interpret this as the score at the intercept (when your interaction is set to 0) at ', ageMeanVal, ' is ', intercept, '. (Please note: this score at this age reflects individuals with the average score of the continuous interaction variable that you have chosen.', paste0(ifelse(length(covars()) > 0, paste0(' Because you have adjusted for the following confounders/covariates: ', confounderLevels, ' this score also reflects individuals with the lowest categorical covariate(s) and/or the mean of the continuous covariate(s).)'), ')')),
             '<br><br>Every unit increase in ', ageVar, ' is associated with ', direction, ' of "', trajVar, '" by ', abs(slope), '. '
           )
 
