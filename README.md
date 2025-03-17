@@ -18,5 +18,6 @@ install.packages("remotes")
 remotes::install_github("TIDAL-modelling/TIDAL")
 ```
 * installed as [a desktop application](https://tidal-modelling.github.io/docs/installation/desktop) (on Windows and macOS)
+* [a docker image](https://tidal-modelling.github.io/docs/installation/docker.html)
 
 The online application can be used to explore synthetic datasets provided, please do not upload sensitive data to the tool online. To explore your own data please install the R package or desktop application. This ensures no sensitive data is being uploaded online.
