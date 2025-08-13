@@ -1,0 +1,58 @@
+name: "💡 Feature Request"
+description: Suggest a new feature or enhancement for TIDAL.
+title: "💡 [FEAT] - <title>"
+labels:
+  - "feature"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <p align="center">
+          <img src="https://user-images.githubusercontent.com/24313187/216609683-bac9e15c-6860-4441-a9ae-936f81940b1b.png" alt="TIDAL Logo">
+          <br>
+          <em><a href="https://doi.org/10.1093/ije/dyaf095">TIDAL's Paper</a>—<a href="https://tidal-modelling.github.io/">TIDAL's Documentation</a>.</em>
+        </p>
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: "Before Submitting"
+      description: Please confirm the following to help us process your request efficiently.
+      options:
+        - label: I have checked if this feature already exists or has been requested.
+          required: true
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: "Feature Description"
+      description: Please provide a clear and concise description of the feature you are requesting.
+      placeholder: "Hint: ‘brevity is the soul of wit’, Hamlet — by William Shakespeare"
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: "Proposed Solution"
+      description: Describe how you envision this feature working.
+      placeholder: "Explain how the feature should function."
+    validations:
+      required: true
+  - type: textarea
+    id: examples
+    attributes:
+      label: "Examples or References"
+      description: Provide any examples, links, or references that might help illustrate your request.
+      placeholder: "Hint: Optional, e.g., screenshots, links to similar features in other projects, etc."
+    validations:
+      required: false
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: "Willing to Contribute?"
+      description: Would you be willing to help implement this feature?
+      options:
+        - "Yes"
+        - "No"
+  - type: markdown
+    attributes:
+      value: |
+        **Security Note:** Please do not share sensitive information such as personal data, confidential project details, or sensitive datasets in this request.
