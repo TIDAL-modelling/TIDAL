@@ -25,7 +25,6 @@ body:
     attributes:
       label: "Question"
       description: Please provide a clear and concise question.
-      placeholder: ""
     validations:
       required: true
   - type: textarea
