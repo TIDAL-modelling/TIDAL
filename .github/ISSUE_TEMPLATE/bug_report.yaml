@@ -16,7 +16,7 @@ body:
     id: checks
     attributes:
       label: "Before Submitting"
-      description: Please confirm the following to help us process your issue in a timely manner.
+      description: Please confirm the following to help us process your issue efficiently.
       options:
         - label: I have checked the documentation and existing issues.
           required: true
@@ -25,7 +25,7 @@ body:
     attributes:
       label: "Description"
       description: Please provide a clear and concise description of the bug.
-      placeholder: "Hint: ‘brevity is the soul of wit’, Hamlet — by William Shakespeare"
+      placeholder: ""
     validations:
       required: true
   - type: input
@@ -77,7 +77,6 @@ body:
       options:
         - "Online Shiny App"
         - "R Package"
-        - "Desktop Application"
         - "Docker Image"
   - type: input
     id: r-version

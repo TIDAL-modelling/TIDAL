@@ -25,7 +25,7 @@ body:
     attributes:
       label: "Question"
       description: Please provide a clear and concise question.
-      placeholder: "Hint: ‘brevity is the soul of wit’, Hamlet — by William Shakespeare"
+      placeholder: ""
     validations:
       required: true
   - type: textarea
